@@ -13,7 +13,9 @@ _Expense _$ExpenseFromJson(Map<String, dynamic> json) => _Expense(
   amountInCents: (json['amountInCents'] as num).toInt(),
   description: json['description'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
+  origem: $enumDecode(_$ExpenseOrigemEnumMap, json['origem']),
   receiptPath: json['receiptPath'] as String?,
+  beneficiario: json['beneficiario'] as String?,
   updatedAt: json['updatedAt'] == null
       ? null
       : DateTime.parse(json['updatedAt'] as String),
@@ -29,7 +31,9 @@ Map<String, dynamic> _$ExpenseToJson(_Expense instance) => <String, dynamic>{
   'amountInCents': instance.amountInCents,
   'description': instance.description,
   'createdAt': instance.createdAt.toIso8601String(),
+  'origem': _$ExpenseOrigemEnumMap[instance.origem]!,
   'receiptPath': instance.receiptPath,
+  'beneficiario': instance.beneficiario,
   'updatedAt': instance.updatedAt?.toIso8601String(),
   'deletedAt': instance.deletedAt?.toIso8601String(),
 };
@@ -40,4 +44,10 @@ const _$DeductionCategoryEnumMap = {
   DeductionCategory.pensaoAlimenticia: 'pensaoAlimenticia',
   DeductionCategory.previdenciaPrivada: 'previdenciaPrivada',
   DeductionCategory.dependentes: 'dependentes',
+};
+
+const _$ExpenseOrigemEnumMap = {
+  ExpenseOrigem.manual: 'manual',
+  ExpenseOrigem.ocr: 'ocr',
+  ExpenseOrigem.importado: 'importado',
 };

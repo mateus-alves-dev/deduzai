@@ -5,8 +5,7 @@ import 'package:drift/drift.dart';
 part 'expense_dao.g.dart';
 
 @DriftAccessor(tables: [Expenses])
-class ExpenseDao extends DatabaseAccessor<AppDatabase>
-    with _$ExpenseDaoMixin {
+class ExpenseDao extends DatabaseAccessor<AppDatabase> with _$ExpenseDaoMixin {
   ExpenseDao(super.db);
 
   Future<List<Expense>> getAll() =>
@@ -36,12 +35,17 @@ class ExpenseDao extends DatabaseAccessor<AppDatabase>
       update(expenses).replace(entry);
 
   Future<void> softDelete(String id) {
-    return (update(expenses)..where((e) => e.id.equals(id)))
-        .write(
+    return (update(expenses)..where((e) => e.id.equals(id))).write(
       ExpensesCompanion(
         updatedAt: Value(DateTime.now()),
         deletedAt: Value(DateTime.now()),
       ),
     );
   }
+
+  Stream<Expense?> watchById(String id) =>
+      (select(expenses)
+            ..where((e) => e.id.equals(id))
+            ..where((e) => e.deletedAt.isNull()))
+          .watchSingleOrNull();
 }

@@ -70,6 +70,27 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _beneficiarioMeta = const VerificationMeta(
+    'beneficiario',
+  );
+  @override
+  late final GeneratedColumn<String> beneficiario = GeneratedColumn<String>(
+    'beneficiario',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _origemMeta = const VerificationMeta('origem');
+  @override
+  late final GeneratedColumn<String> origem = GeneratedColumn<String>(
+    'origem',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('MANUAL'),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -111,6 +132,8 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     amountInCents,
     description,
     receiptPath,
+    beneficiario,
+    origem,
     createdAt,
     updatedAt,
     deletedAt,
@@ -179,6 +202,21 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         ),
       );
     }
+    if (data.containsKey('beneficiario')) {
+      context.handle(
+        _beneficiarioMeta,
+        beneficiario.isAcceptableOrUnknown(
+          data['beneficiario']!,
+          _beneficiarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('origem')) {
+      context.handle(
+        _origemMeta,
+        origem.isAcceptableOrUnknown(data['origem']!, _origemMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -232,6 +270,14 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         DriftSqlType.string,
         data['${effectivePrefix}receipt_path'],
       ),
+      beneficiario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}beneficiario'],
+      ),
+      origem: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origem'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -260,6 +306,8 @@ class Expense extends DataClass implements Insertable<Expense> {
   final int amountInCents;
   final String description;
   final String? receiptPath;
+  final String? beneficiario;
+  final String origem;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
@@ -270,6 +318,8 @@ class Expense extends DataClass implements Insertable<Expense> {
     required this.amountInCents,
     required this.description,
     this.receiptPath,
+    this.beneficiario,
+    required this.origem,
     required this.createdAt,
     this.updatedAt,
     this.deletedAt,
@@ -285,6 +335,10 @@ class Expense extends DataClass implements Insertable<Expense> {
     if (!nullToAbsent || receiptPath != null) {
       map['receipt_path'] = Variable<String>(receiptPath);
     }
+    if (!nullToAbsent || beneficiario != null) {
+      map['beneficiario'] = Variable<String>(beneficiario);
+    }
+    map['origem'] = Variable<String>(origem);
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -305,6 +359,10 @@ class Expense extends DataClass implements Insertable<Expense> {
       receiptPath: receiptPath == null && nullToAbsent
           ? const Value.absent()
           : Value(receiptPath),
+      beneficiario: beneficiario == null && nullToAbsent
+          ? const Value.absent()
+          : Value(beneficiario),
+      origem: Value(origem),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -327,6 +385,8 @@ class Expense extends DataClass implements Insertable<Expense> {
       amountInCents: serializer.fromJson<int>(json['amountInCents']),
       description: serializer.fromJson<String>(json['description']),
       receiptPath: serializer.fromJson<String?>(json['receiptPath']),
+      beneficiario: serializer.fromJson<String?>(json['beneficiario']),
+      origem: serializer.fromJson<String>(json['origem']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -342,6 +402,8 @@ class Expense extends DataClass implements Insertable<Expense> {
       'amountInCents': serializer.toJson<int>(amountInCents),
       'description': serializer.toJson<String>(description),
       'receiptPath': serializer.toJson<String?>(receiptPath),
+      'beneficiario': serializer.toJson<String?>(beneficiario),
+      'origem': serializer.toJson<String>(origem),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -355,6 +417,8 @@ class Expense extends DataClass implements Insertable<Expense> {
     int? amountInCents,
     String? description,
     Value<String?> receiptPath = const Value.absent(),
+    Value<String?> beneficiario = const Value.absent(),
+    String? origem,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -365,6 +429,8 @@ class Expense extends DataClass implements Insertable<Expense> {
     amountInCents: amountInCents ?? this.amountInCents,
     description: description ?? this.description,
     receiptPath: receiptPath.present ? receiptPath.value : this.receiptPath,
+    beneficiario: beneficiario.present ? beneficiario.value : this.beneficiario,
+    origem: origem ?? this.origem,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -383,6 +449,10 @@ class Expense extends DataClass implements Insertable<Expense> {
       receiptPath: data.receiptPath.present
           ? data.receiptPath.value
           : this.receiptPath,
+      beneficiario: data.beneficiario.present
+          ? data.beneficiario.value
+          : this.beneficiario,
+      origem: data.origem.present ? data.origem.value : this.origem,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -398,6 +468,8 @@ class Expense extends DataClass implements Insertable<Expense> {
           ..write('amountInCents: $amountInCents, ')
           ..write('description: $description, ')
           ..write('receiptPath: $receiptPath, ')
+          ..write('beneficiario: $beneficiario, ')
+          ..write('origem: $origem, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -413,6 +485,8 @@ class Expense extends DataClass implements Insertable<Expense> {
     amountInCents,
     description,
     receiptPath,
+    beneficiario,
+    origem,
     createdAt,
     updatedAt,
     deletedAt,
@@ -427,6 +501,8 @@ class Expense extends DataClass implements Insertable<Expense> {
           other.amountInCents == this.amountInCents &&
           other.description == this.description &&
           other.receiptPath == this.receiptPath &&
+          other.beneficiario == this.beneficiario &&
+          other.origem == this.origem &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
@@ -439,6 +515,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<int> amountInCents;
   final Value<String> description;
   final Value<String?> receiptPath;
+  final Value<String?> beneficiario;
+  final Value<String> origem;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -450,6 +528,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.amountInCents = const Value.absent(),
     this.description = const Value.absent(),
     this.receiptPath = const Value.absent(),
+    this.beneficiario = const Value.absent(),
+    this.origem = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -462,6 +542,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     required int amountInCents,
     required String description,
     this.receiptPath = const Value.absent(),
+    this.beneficiario = const Value.absent(),
+    this.origem = const Value.absent(),
     required DateTime createdAt,
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -479,6 +561,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Expression<int>? amountInCents,
     Expression<String>? description,
     Expression<String>? receiptPath,
+    Expression<String>? beneficiario,
+    Expression<String>? origem,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -491,6 +575,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       if (amountInCents != null) 'amount_in_cents': amountInCents,
       if (description != null) 'description': description,
       if (receiptPath != null) 'receipt_path': receiptPath,
+      if (beneficiario != null) 'beneficiario': beneficiario,
+      if (origem != null) 'origem': origem,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -505,6 +591,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Value<int>? amountInCents,
     Value<String>? description,
     Value<String?>? receiptPath,
+    Value<String?>? beneficiario,
+    Value<String>? origem,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -517,6 +605,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       amountInCents: amountInCents ?? this.amountInCents,
       description: description ?? this.description,
       receiptPath: receiptPath ?? this.receiptPath,
+      beneficiario: beneficiario ?? this.beneficiario,
+      origem: origem ?? this.origem,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -545,6 +635,12 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     if (receiptPath.present) {
       map['receipt_path'] = Variable<String>(receiptPath.value);
     }
+    if (beneficiario.present) {
+      map['beneficiario'] = Variable<String>(beneficiario.value);
+    }
+    if (origem.present) {
+      map['origem'] = Variable<String>(origem.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -569,6 +665,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
           ..write('amountInCents: $amountInCents, ')
           ..write('description: $description, ')
           ..write('receiptPath: $receiptPath, ')
+          ..write('beneficiario: $beneficiario, ')
+          ..write('origem: $origem, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -911,6 +1009,8 @@ typedef $$ExpensesTableCreateCompanionBuilder =
       required int amountInCents,
       required String description,
       Value<String?> receiptPath,
+      Value<String?> beneficiario,
+      Value<String> origem,
       required DateTime createdAt,
       Value<DateTime?> updatedAt,
       Value<DateTime?> deletedAt,
@@ -924,6 +1024,8 @@ typedef $$ExpensesTableUpdateCompanionBuilder =
       Value<int> amountInCents,
       Value<String> description,
       Value<String?> receiptPath,
+      Value<String?> beneficiario,
+      Value<String> origem,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
       Value<DateTime?> deletedAt,
@@ -990,6 +1092,16 @@ class $$ExpensesTableFilterComposer
 
   ColumnFilters<String> get receiptPath => $composableBuilder(
     column: $table.receiptPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get origem => $composableBuilder(
+    column: $table.origem,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1073,6 +1185,16 @@ class $$ExpensesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get origem => $composableBuilder(
+    column: $table.origem,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -1121,6 +1243,14 @@ class $$ExpensesTableAnnotationComposer
     column: $table.receiptPath,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get origem =>
+      $composableBuilder(column: $table.origem, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -1191,6 +1321,8 @@ class $$ExpensesTableTableManager
                 Value<int> amountInCents = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<String?> receiptPath = const Value.absent(),
+                Value<String?> beneficiario = const Value.absent(),
+                Value<String> origem = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -1202,6 +1334,8 @@ class $$ExpensesTableTableManager
                 amountInCents: amountInCents,
                 description: description,
                 receiptPath: receiptPath,
+                beneficiario: beneficiario,
+                origem: origem,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -1215,6 +1349,8 @@ class $$ExpensesTableTableManager
                 required int amountInCents,
                 required String description,
                 Value<String?> receiptPath = const Value.absent(),
+                Value<String?> beneficiario = const Value.absent(),
+                Value<String> origem = const Value.absent(),
                 required DateTime createdAt,
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -1226,6 +1362,8 @@ class $$ExpensesTableTableManager
                 amountInCents: amountInCents,
                 description: description,
                 receiptPath: receiptPath,
+                beneficiario: beneficiario,
+                origem: origem,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,

@@ -1,4 +1,5 @@
 import 'package:deduzai/core/domain/models/category.dart';
+import 'package:deduzai/core/domain/models/expense_origem.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'expense.freezed.dart';
@@ -13,7 +14,9 @@ abstract class Expense with _$Expense {
     required int amountInCents,
     required String description,
     required DateTime createdAt,
+    required ExpenseOrigem origem,
     String? receiptPath,
+    String? beneficiario,
     DateTime? updatedAt,
     DateTime? deletedAt,
   }) = _Expense;

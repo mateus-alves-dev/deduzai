@@ -10,17 +10,24 @@ import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(
-  tables: [Expenses, Receipts],
-  daos: [ExpenseDao],
-)
+@DriftDatabase(tables: [Expenses, Receipts], daos: [ExpenseDao])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(expenses, expenses.beneficiario);
+        await m.addColumn(expenses, expenses.origem);
+      }
+    },
+  );
 
   static QueryExecutor _openConnection() {
     return LazyDatabase(() async {
