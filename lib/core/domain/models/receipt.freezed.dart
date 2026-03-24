@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Receipt {
 
- String get id; String get expenseId; String get localPath; DateTime get createdAt;
+ String get id; String get expenseId; String get localPath; DateTime get createdAt; String? get mimeType; int? get tamanhoBytes; OcrStatus? get ocrStatus;
 /// Create a copy of Receipt
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ReceiptCopyWith<Receipt> get copyWith => _$ReceiptCopyWithImpl<Receipt>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Receipt&&(identical(other.id, id) || other.id == id)&&(identical(other.expenseId, expenseId) || other.expenseId == expenseId)&&(identical(other.localPath, localPath) || other.localPath == localPath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Receipt&&(identical(other.id, id) || other.id == id)&&(identical(other.expenseId, expenseId) || other.expenseId == expenseId)&&(identical(other.localPath, localPath) || other.localPath == localPath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.tamanhoBytes, tamanhoBytes) || other.tamanhoBytes == tamanhoBytes)&&(identical(other.ocrStatus, ocrStatus) || other.ocrStatus == ocrStatus));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,expenseId,localPath,createdAt);
+int get hashCode => Object.hash(runtimeType,id,expenseId,localPath,createdAt,mimeType,tamanhoBytes,ocrStatus);
 
 @override
 String toString() {
-  return 'Receipt(id: $id, expenseId: $expenseId, localPath: $localPath, createdAt: $createdAt)';
+  return 'Receipt(id: $id, expenseId: $expenseId, localPath: $localPath, createdAt: $createdAt, mimeType: $mimeType, tamanhoBytes: $tamanhoBytes, ocrStatus: $ocrStatus)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ReceiptCopyWith<$Res>  {
   factory $ReceiptCopyWith(Receipt value, $Res Function(Receipt) _then) = _$ReceiptCopyWithImpl;
 @useResult
 $Res call({
- String id, String expenseId, String localPath, DateTime createdAt
+ String id, String expenseId, String localPath, DateTime createdAt, String? mimeType, int? tamanhoBytes, OcrStatus? ocrStatus
 });
 
 
@@ -65,13 +65,16 @@ class _$ReceiptCopyWithImpl<$Res>
 
 /// Create a copy of Receipt
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? expenseId = null,Object? localPath = null,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? expenseId = null,Object? localPath = null,Object? createdAt = null,Object? mimeType = freezed,Object? tamanhoBytes = freezed,Object? ocrStatus = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,expenseId: null == expenseId ? _self.expenseId : expenseId // ignore: cast_nullable_to_non_nullable
 as String,localPath: null == localPath ? _self.localPath : localPath // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,mimeType: freezed == mimeType ? _self.mimeType : mimeType // ignore: cast_nullable_to_non_nullable
+as String?,tamanhoBytes: freezed == tamanhoBytes ? _self.tamanhoBytes : tamanhoBytes // ignore: cast_nullable_to_non_nullable
+as int?,ocrStatus: freezed == ocrStatus ? _self.ocrStatus : ocrStatus // ignore: cast_nullable_to_non_nullable
+as OcrStatus?,
   ));
 }
 
@@ -156,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String expenseId,  String localPath,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String expenseId,  String localPath,  DateTime createdAt,  String? mimeType,  int? tamanhoBytes,  OcrStatus? ocrStatus)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Receipt() when $default != null:
-return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt);case _:
+return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt,_that.mimeType,_that.tamanhoBytes,_that.ocrStatus);case _:
   return orElse();
 
 }
@@ -177,10 +180,10 @@ return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String expenseId,  String localPath,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String expenseId,  String localPath,  DateTime createdAt,  String? mimeType,  int? tamanhoBytes,  OcrStatus? ocrStatus)  $default,) {final _that = this;
 switch (_that) {
 case _Receipt():
-return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt);case _:
+return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt,_that.mimeType,_that.tamanhoBytes,_that.ocrStatus);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +200,10 @@ return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String expenseId,  String localPath,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String expenseId,  String localPath,  DateTime createdAt,  String? mimeType,  int? tamanhoBytes,  OcrStatus? ocrStatus)?  $default,) {final _that = this;
 switch (_that) {
 case _Receipt() when $default != null:
-return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt);case _:
+return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt,_that.mimeType,_that.tamanhoBytes,_that.ocrStatus);case _:
   return null;
 
 }
@@ -212,13 +215,16 @@ return $default(_that.id,_that.expenseId,_that.localPath,_that.createdAt);case _
 @JsonSerializable()
 
 class _Receipt implements Receipt {
-  const _Receipt({required this.id, required this.expenseId, required this.localPath, required this.createdAt});
+  const _Receipt({required this.id, required this.expenseId, required this.localPath, required this.createdAt, this.mimeType, this.tamanhoBytes, this.ocrStatus});
   factory _Receipt.fromJson(Map<String, dynamic> json) => _$ReceiptFromJson(json);
 
 @override final  String id;
 @override final  String expenseId;
 @override final  String localPath;
 @override final  DateTime createdAt;
+@override final  String? mimeType;
+@override final  int? tamanhoBytes;
+@override final  OcrStatus? ocrStatus;
 
 /// Create a copy of Receipt
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Receipt&&(identical(other.id, id) || other.id == id)&&(identical(other.expenseId, expenseId) || other.expenseId == expenseId)&&(identical(other.localPath, localPath) || other.localPath == localPath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Receipt&&(identical(other.id, id) || other.id == id)&&(identical(other.expenseId, expenseId) || other.expenseId == expenseId)&&(identical(other.localPath, localPath) || other.localPath == localPath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.tamanhoBytes, tamanhoBytes) || other.tamanhoBytes == tamanhoBytes)&&(identical(other.ocrStatus, ocrStatus) || other.ocrStatus == ocrStatus));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,expenseId,localPath,createdAt);
+int get hashCode => Object.hash(runtimeType,id,expenseId,localPath,createdAt,mimeType,tamanhoBytes,ocrStatus);
 
 @override
 String toString() {
-  return 'Receipt(id: $id, expenseId: $expenseId, localPath: $localPath, createdAt: $createdAt)';
+  return 'Receipt(id: $id, expenseId: $expenseId, localPath: $localPath, createdAt: $createdAt, mimeType: $mimeType, tamanhoBytes: $tamanhoBytes, ocrStatus: $ocrStatus)';
 }
 
 
@@ -253,7 +259,7 @@ abstract mixin class _$ReceiptCopyWith<$Res> implements $ReceiptCopyWith<$Res> {
   factory _$ReceiptCopyWith(_Receipt value, $Res Function(_Receipt) _then) = __$ReceiptCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String expenseId, String localPath, DateTime createdAt
+ String id, String expenseId, String localPath, DateTime createdAt, String? mimeType, int? tamanhoBytes, OcrStatus? ocrStatus
 });
 
 
@@ -270,13 +276,16 @@ class __$ReceiptCopyWithImpl<$Res>
 
 /// Create a copy of Receipt
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? expenseId = null,Object? localPath = null,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? expenseId = null,Object? localPath = null,Object? createdAt = null,Object? mimeType = freezed,Object? tamanhoBytes = freezed,Object? ocrStatus = freezed,}) {
   return _then(_Receipt(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,expenseId: null == expenseId ? _self.expenseId : expenseId // ignore: cast_nullable_to_non_nullable
 as String,localPath: null == localPath ? _self.localPath : localPath // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,mimeType: freezed == mimeType ? _self.mimeType : mimeType // ignore: cast_nullable_to_non_nullable
+as String?,tamanhoBytes: freezed == tamanhoBytes ? _self.tamanhoBytes : tamanhoBytes // ignore: cast_nullable_to_non_nullable
+as int?,ocrStatus: freezed == ocrStatus ? _self.ocrStatus : ocrStatus // ignore: cast_nullable_to_non_nullable
+as OcrStatus?,
   ));
 }
 

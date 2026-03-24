@@ -12,7 +12,7 @@ void main() {
 
     setUp(() {
       db = createTestDatabase();
-      service = ExpenseService(db.expenseDao);
+      service = ExpenseService(db.expenseDao, db.receiptDao);
     });
 
     tearDown(() => db.close());

@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'expense_service.dart';
+part of 'ocr_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$expenseServiceHash() => r'a9de326eca14e3cb913d751719fb6325f7268f15';
+String _$ocrServiceHash() => r'bcadf8cc9579074ebaa310d69ee4a2a8dcc9d972';
 
-/// See also [expenseService].
-@ProviderFor(expenseService)
-final expenseServiceProvider = AutoDisposeProvider<ExpenseService>.internal(
-  expenseService,
-  name: r'expenseServiceProvider',
+/// See also [ocrService].
+@ProviderFor(ocrService)
+final ocrServiceProvider = AutoDisposeProvider<OcrService>.internal(
+  ocrService,
+  name: r'ocrServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$expenseServiceHash,
+      : _$ocrServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ExpenseServiceRef = AutoDisposeProviderRef<ExpenseService>;
+typedef OcrServiceRef = AutoDisposeProviderRef<OcrService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

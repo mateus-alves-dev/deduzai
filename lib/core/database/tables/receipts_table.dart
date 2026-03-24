@@ -5,6 +5,9 @@ class Receipts extends Table {
   TextColumn get id => text()();
   TextColumn get expenseId => text().references(Expenses, #id)();
   TextColumn get localPath => text()();
+  TextColumn get mimeType => text().nullable()();
+  IntColumn get tamanhoBytes => integer().nullable()();
+  TextColumn get ocrStatus => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 
   @override

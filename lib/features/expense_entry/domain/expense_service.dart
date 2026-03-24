@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:deduzai/core/database/app_database.dart' as db;
 import 'package:deduzai/core/database/daos/expense_dao.dart';
+import 'package:deduzai/core/database/daos/receipt_dao.dart';
 import 'package:deduzai/core/database/providers/database_providers.dart';
 import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/expense_origem.dart';
+import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,13 +15,16 @@ import 'package:uuid/uuid.dart';
 part 'expense_service.g.dart';
 
 @riverpod
-ExpenseService expenseService(Ref ref) =>
-    ExpenseService(ref.watch(expenseDaoProvider));
+ExpenseService expenseService(Ref ref) => ExpenseService(
+      ref.watch(expenseDaoProvider),
+      ref.watch(receiptDaoProvider),
+    );
 
 class ExpenseService {
-  ExpenseService(this._dao);
+  ExpenseService(this._dao, this._receiptDao);
 
   final ExpenseDao _dao;
+  final ReceiptDao _receiptDao;
   static const _uuid = Uuid();
 
   Future<void> createExpense({
@@ -26,20 +33,46 @@ class ExpenseService {
     required int amountInCents,
     required String description,
     String? beneficiario,
+    String? cnpj,
+    ExpenseOrigem origem = ExpenseOrigem.manual,
+    String? imagePath,
   }) async {
     final now = DateTime.now();
+    final expenseId = _uuid.v4();
+
     await _dao.insertExpense(
       db.ExpensesCompanion.insert(
-        id: _uuid.v4(),
+        id: expenseId,
         date: date,
         category: category.name,
         amountInCents: amountInCents,
         description: description,
-        origem: Value(ExpenseOrigem.manual.value),
+        origem: Value(origem.value),
         beneficiario: Value(beneficiario),
+        cnpj: Value(cnpj),
         createdAt: now,
       ),
     );
+
+    if (imagePath != null) {
+      final file = File(imagePath);
+      final size = await file.length();
+      await _receiptDao.insertReceipt(
+        db.ReceiptsCompanion.insert(
+          id: _uuid.v4(),
+          expenseId: expenseId,
+          localPath: imagePath,
+          mimeType: const Value('image/jpeg'),
+          tamanhoBytes: Value(size),
+          ocrStatus: Value(
+            origem == ExpenseOrigem.ocr
+                ? OcrStatus.success.name
+                : OcrStatus.failure.name,
+          ),
+          createdAt: now,
+        ),
+      );
+    }
   }
 
   Future<void> updateExpense({
@@ -49,6 +82,7 @@ class ExpenseService {
     required int amountInCents,
     required String description,
     String? beneficiario,
+    String? cnpj,
   }) async {
     await _dao.updateExpense(
       db.ExpensesCompanion(
@@ -58,6 +92,7 @@ class ExpenseService {
         amountInCents: Value(amountInCents),
         description: Value(description),
         beneficiario: Value(beneficiario),
+        cnpj: Value(cnpj),
         receiptPath: Value(existing.receiptPath),
         origem: Value(existing.origem),
         createdAt: Value(existing.createdAt),

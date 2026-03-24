@@ -40,5 +40,22 @@ final expenseDaoProvider = Provider<ExpenseDao>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ExpenseDaoRef = ProviderRef<ExpenseDao>;
+String _$receiptDaoHash() => r'8d461c97b3f37c74b9d046a340eacaacd71d476a';
+
+/// See also [receiptDao].
+@ProviderFor(receiptDao)
+final receiptDaoProvider = Provider<ReceiptDao>.internal(
+  receiptDao,
+  name: r'receiptDaoProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$receiptDaoHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ReceiptDaoRef = ProviderRef<ReceiptDao>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -81,6 +81,15 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _cnpjMeta = const VerificationMeta('cnpj');
+  @override
+  late final GeneratedColumn<String> cnpj = GeneratedColumn<String>(
+    'cnpj',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _origemMeta = const VerificationMeta('origem');
   @override
   late final GeneratedColumn<String> origem = GeneratedColumn<String>(
@@ -133,6 +142,7 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     description,
     receiptPath,
     beneficiario,
+    cnpj,
     origem,
     createdAt,
     updatedAt,
@@ -211,6 +221,12 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         ),
       );
     }
+    if (data.containsKey('cnpj')) {
+      context.handle(
+        _cnpjMeta,
+        cnpj.isAcceptableOrUnknown(data['cnpj']!, _cnpjMeta),
+      );
+    }
     if (data.containsKey('origem')) {
       context.handle(
         _origemMeta,
@@ -274,6 +290,10 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         DriftSqlType.string,
         data['${effectivePrefix}beneficiario'],
       ),
+      cnpj: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cnpj'],
+      ),
       origem: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}origem'],
@@ -307,6 +327,7 @@ class Expense extends DataClass implements Insertable<Expense> {
   final String description;
   final String? receiptPath;
   final String? beneficiario;
+  final String? cnpj;
   final String origem;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -319,6 +340,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     required this.description,
     this.receiptPath,
     this.beneficiario,
+    this.cnpj,
     required this.origem,
     required this.createdAt,
     this.updatedAt,
@@ -337,6 +359,9 @@ class Expense extends DataClass implements Insertable<Expense> {
     }
     if (!nullToAbsent || beneficiario != null) {
       map['beneficiario'] = Variable<String>(beneficiario);
+    }
+    if (!nullToAbsent || cnpj != null) {
+      map['cnpj'] = Variable<String>(cnpj);
     }
     map['origem'] = Variable<String>(origem);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -362,6 +387,7 @@ class Expense extends DataClass implements Insertable<Expense> {
       beneficiario: beneficiario == null && nullToAbsent
           ? const Value.absent()
           : Value(beneficiario),
+      cnpj: cnpj == null && nullToAbsent ? const Value.absent() : Value(cnpj),
       origem: Value(origem),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
@@ -386,6 +412,7 @@ class Expense extends DataClass implements Insertable<Expense> {
       description: serializer.fromJson<String>(json['description']),
       receiptPath: serializer.fromJson<String?>(json['receiptPath']),
       beneficiario: serializer.fromJson<String?>(json['beneficiario']),
+      cnpj: serializer.fromJson<String?>(json['cnpj']),
       origem: serializer.fromJson<String>(json['origem']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
@@ -403,6 +430,7 @@ class Expense extends DataClass implements Insertable<Expense> {
       'description': serializer.toJson<String>(description),
       'receiptPath': serializer.toJson<String?>(receiptPath),
       'beneficiario': serializer.toJson<String?>(beneficiario),
+      'cnpj': serializer.toJson<String?>(cnpj),
       'origem': serializer.toJson<String>(origem),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
@@ -418,6 +446,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     String? description,
     Value<String?> receiptPath = const Value.absent(),
     Value<String?> beneficiario = const Value.absent(),
+    Value<String?> cnpj = const Value.absent(),
     String? origem,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
@@ -430,6 +459,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     description: description ?? this.description,
     receiptPath: receiptPath.present ? receiptPath.value : this.receiptPath,
     beneficiario: beneficiario.present ? beneficiario.value : this.beneficiario,
+    cnpj: cnpj.present ? cnpj.value : this.cnpj,
     origem: origem ?? this.origem,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
@@ -452,6 +482,7 @@ class Expense extends DataClass implements Insertable<Expense> {
       beneficiario: data.beneficiario.present
           ? data.beneficiario.value
           : this.beneficiario,
+      cnpj: data.cnpj.present ? data.cnpj.value : this.cnpj,
       origem: data.origem.present ? data.origem.value : this.origem,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -469,6 +500,7 @@ class Expense extends DataClass implements Insertable<Expense> {
           ..write('description: $description, ')
           ..write('receiptPath: $receiptPath, ')
           ..write('beneficiario: $beneficiario, ')
+          ..write('cnpj: $cnpj, ')
           ..write('origem: $origem, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -486,6 +518,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     description,
     receiptPath,
     beneficiario,
+    cnpj,
     origem,
     createdAt,
     updatedAt,
@@ -502,6 +535,7 @@ class Expense extends DataClass implements Insertable<Expense> {
           other.description == this.description &&
           other.receiptPath == this.receiptPath &&
           other.beneficiario == this.beneficiario &&
+          other.cnpj == this.cnpj &&
           other.origem == this.origem &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
@@ -516,6 +550,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<String> description;
   final Value<String?> receiptPath;
   final Value<String?> beneficiario;
+  final Value<String?> cnpj;
   final Value<String> origem;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -529,6 +564,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.description = const Value.absent(),
     this.receiptPath = const Value.absent(),
     this.beneficiario = const Value.absent(),
+    this.cnpj = const Value.absent(),
     this.origem = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -543,6 +579,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     required String description,
     this.receiptPath = const Value.absent(),
     this.beneficiario = const Value.absent(),
+    this.cnpj = const Value.absent(),
     this.origem = const Value.absent(),
     required DateTime createdAt,
     this.updatedAt = const Value.absent(),
@@ -562,6 +599,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Expression<String>? description,
     Expression<String>? receiptPath,
     Expression<String>? beneficiario,
+    Expression<String>? cnpj,
     Expression<String>? origem,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -576,6 +614,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       if (description != null) 'description': description,
       if (receiptPath != null) 'receipt_path': receiptPath,
       if (beneficiario != null) 'beneficiario': beneficiario,
+      if (cnpj != null) 'cnpj': cnpj,
       if (origem != null) 'origem': origem,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -592,6 +631,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Value<String>? description,
     Value<String?>? receiptPath,
     Value<String?>? beneficiario,
+    Value<String?>? cnpj,
     Value<String>? origem,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
@@ -606,6 +646,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       description: description ?? this.description,
       receiptPath: receiptPath ?? this.receiptPath,
       beneficiario: beneficiario ?? this.beneficiario,
+      cnpj: cnpj ?? this.cnpj,
       origem: origem ?? this.origem,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -638,6 +679,9 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     if (beneficiario.present) {
       map['beneficiario'] = Variable<String>(beneficiario.value);
     }
+    if (cnpj.present) {
+      map['cnpj'] = Variable<String>(cnpj.value);
+    }
     if (origem.present) {
       map['origem'] = Variable<String>(origem.value);
     }
@@ -666,6 +710,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
           ..write('description: $description, ')
           ..write('receiptPath: $receiptPath, ')
           ..write('beneficiario: $beneficiario, ')
+          ..write('cnpj: $cnpj, ')
           ..write('origem: $origem, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -715,6 +760,39 @@ class $ReceiptsTable extends Receipts with TableInfo<$ReceiptsTable, Receipt> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _mimeTypeMeta = const VerificationMeta(
+    'mimeType',
+  );
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+    'mime_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tamanhoBytesMeta = const VerificationMeta(
+    'tamanhoBytes',
+  );
+  @override
+  late final GeneratedColumn<int> tamanhoBytes = GeneratedColumn<int>(
+    'tamanho_bytes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ocrStatusMeta = const VerificationMeta(
+    'ocrStatus',
+  );
+  @override
+  late final GeneratedColumn<String> ocrStatus = GeneratedColumn<String>(
+    'ocr_status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -727,7 +805,15 @@ class $ReceiptsTable extends Receipts with TableInfo<$ReceiptsTable, Receipt> {
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, expenseId, localPath, createdAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    expenseId,
+    localPath,
+    mimeType,
+    tamanhoBytes,
+    ocrStatus,
+    createdAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -761,6 +847,27 @@ class $ReceiptsTable extends Receipts with TableInfo<$ReceiptsTable, Receipt> {
     } else if (isInserting) {
       context.missing(_localPathMeta);
     }
+    if (data.containsKey('mime_type')) {
+      context.handle(
+        _mimeTypeMeta,
+        mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta),
+      );
+    }
+    if (data.containsKey('tamanho_bytes')) {
+      context.handle(
+        _tamanhoBytesMeta,
+        tamanhoBytes.isAcceptableOrUnknown(
+          data['tamanho_bytes']!,
+          _tamanhoBytesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ocr_status')) {
+      context.handle(
+        _ocrStatusMeta,
+        ocrStatus.isAcceptableOrUnknown(data['ocr_status']!, _ocrStatusMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -790,6 +897,18 @@ class $ReceiptsTable extends Receipts with TableInfo<$ReceiptsTable, Receipt> {
         DriftSqlType.string,
         data['${effectivePrefix}local_path'],
       )!,
+      mimeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_type'],
+      ),
+      tamanhoBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tamanho_bytes'],
+      ),
+      ocrStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ocr_status'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -807,11 +926,17 @@ class Receipt extends DataClass implements Insertable<Receipt> {
   final String id;
   final String expenseId;
   final String localPath;
+  final String? mimeType;
+  final int? tamanhoBytes;
+  final String? ocrStatus;
   final DateTime createdAt;
   const Receipt({
     required this.id,
     required this.expenseId,
     required this.localPath,
+    this.mimeType,
+    this.tamanhoBytes,
+    this.ocrStatus,
     required this.createdAt,
   });
   @override
@@ -820,6 +945,15 @@ class Receipt extends DataClass implements Insertable<Receipt> {
     map['id'] = Variable<String>(id);
     map['expense_id'] = Variable<String>(expenseId);
     map['local_path'] = Variable<String>(localPath);
+    if (!nullToAbsent || mimeType != null) {
+      map['mime_type'] = Variable<String>(mimeType);
+    }
+    if (!nullToAbsent || tamanhoBytes != null) {
+      map['tamanho_bytes'] = Variable<int>(tamanhoBytes);
+    }
+    if (!nullToAbsent || ocrStatus != null) {
+      map['ocr_status'] = Variable<String>(ocrStatus);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -829,6 +963,15 @@ class Receipt extends DataClass implements Insertable<Receipt> {
       id: Value(id),
       expenseId: Value(expenseId),
       localPath: Value(localPath),
+      mimeType: mimeType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mimeType),
+      tamanhoBytes: tamanhoBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tamanhoBytes),
+      ocrStatus: ocrStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ocrStatus),
       createdAt: Value(createdAt),
     );
   }
@@ -842,6 +985,9 @@ class Receipt extends DataClass implements Insertable<Receipt> {
       id: serializer.fromJson<String>(json['id']),
       expenseId: serializer.fromJson<String>(json['expenseId']),
       localPath: serializer.fromJson<String>(json['localPath']),
+      mimeType: serializer.fromJson<String?>(json['mimeType']),
+      tamanhoBytes: serializer.fromJson<int?>(json['tamanhoBytes']),
+      ocrStatus: serializer.fromJson<String?>(json['ocrStatus']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -852,6 +998,9 @@ class Receipt extends DataClass implements Insertable<Receipt> {
       'id': serializer.toJson<String>(id),
       'expenseId': serializer.toJson<String>(expenseId),
       'localPath': serializer.toJson<String>(localPath),
+      'mimeType': serializer.toJson<String?>(mimeType),
+      'tamanhoBytes': serializer.toJson<int?>(tamanhoBytes),
+      'ocrStatus': serializer.toJson<String?>(ocrStatus),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -860,11 +1009,17 @@ class Receipt extends DataClass implements Insertable<Receipt> {
     String? id,
     String? expenseId,
     String? localPath,
+    Value<String?> mimeType = const Value.absent(),
+    Value<int?> tamanhoBytes = const Value.absent(),
+    Value<String?> ocrStatus = const Value.absent(),
     DateTime? createdAt,
   }) => Receipt(
     id: id ?? this.id,
     expenseId: expenseId ?? this.expenseId,
     localPath: localPath ?? this.localPath,
+    mimeType: mimeType.present ? mimeType.value : this.mimeType,
+    tamanhoBytes: tamanhoBytes.present ? tamanhoBytes.value : this.tamanhoBytes,
+    ocrStatus: ocrStatus.present ? ocrStatus.value : this.ocrStatus,
     createdAt: createdAt ?? this.createdAt,
   );
   Receipt copyWithCompanion(ReceiptsCompanion data) {
@@ -872,6 +1027,11 @@ class Receipt extends DataClass implements Insertable<Receipt> {
       id: data.id.present ? data.id.value : this.id,
       expenseId: data.expenseId.present ? data.expenseId.value : this.expenseId,
       localPath: data.localPath.present ? data.localPath.value : this.localPath,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      tamanhoBytes: data.tamanhoBytes.present
+          ? data.tamanhoBytes.value
+          : this.tamanhoBytes,
+      ocrStatus: data.ocrStatus.present ? data.ocrStatus.value : this.ocrStatus,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -882,13 +1042,24 @@ class Receipt extends DataClass implements Insertable<Receipt> {
           ..write('id: $id, ')
           ..write('expenseId: $expenseId, ')
           ..write('localPath: $localPath, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('tamanhoBytes: $tamanhoBytes, ')
+          ..write('ocrStatus: $ocrStatus, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, expenseId, localPath, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    expenseId,
+    localPath,
+    mimeType,
+    tamanhoBytes,
+    ocrStatus,
+    createdAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -896,6 +1067,9 @@ class Receipt extends DataClass implements Insertable<Receipt> {
           other.id == this.id &&
           other.expenseId == this.expenseId &&
           other.localPath == this.localPath &&
+          other.mimeType == this.mimeType &&
+          other.tamanhoBytes == this.tamanhoBytes &&
+          other.ocrStatus == this.ocrStatus &&
           other.createdAt == this.createdAt);
 }
 
@@ -903,12 +1077,18 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
   final Value<String> id;
   final Value<String> expenseId;
   final Value<String> localPath;
+  final Value<String?> mimeType;
+  final Value<int?> tamanhoBytes;
+  final Value<String?> ocrStatus;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const ReceiptsCompanion({
     this.id = const Value.absent(),
     this.expenseId = const Value.absent(),
     this.localPath = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.tamanhoBytes = const Value.absent(),
+    this.ocrStatus = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -916,6 +1096,9 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
     required String id,
     required String expenseId,
     required String localPath,
+    this.mimeType = const Value.absent(),
+    this.tamanhoBytes = const Value.absent(),
+    this.ocrStatus = const Value.absent(),
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -926,6 +1109,9 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
     Expression<String>? id,
     Expression<String>? expenseId,
     Expression<String>? localPath,
+    Expression<String>? mimeType,
+    Expression<int>? tamanhoBytes,
+    Expression<String>? ocrStatus,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -933,6 +1119,9 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
       if (id != null) 'id': id,
       if (expenseId != null) 'expense_id': expenseId,
       if (localPath != null) 'local_path': localPath,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (tamanhoBytes != null) 'tamanho_bytes': tamanhoBytes,
+      if (ocrStatus != null) 'ocr_status': ocrStatus,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -942,6 +1131,9 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
     Value<String>? id,
     Value<String>? expenseId,
     Value<String>? localPath,
+    Value<String?>? mimeType,
+    Value<int?>? tamanhoBytes,
+    Value<String?>? ocrStatus,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -949,6 +1141,9 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
       id: id ?? this.id,
       expenseId: expenseId ?? this.expenseId,
       localPath: localPath ?? this.localPath,
+      mimeType: mimeType ?? this.mimeType,
+      tamanhoBytes: tamanhoBytes ?? this.tamanhoBytes,
+      ocrStatus: ocrStatus ?? this.ocrStatus,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -966,6 +1161,15 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
     if (localPath.present) {
       map['local_path'] = Variable<String>(localPath.value);
     }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (tamanhoBytes.present) {
+      map['tamanho_bytes'] = Variable<int>(tamanhoBytes.value);
+    }
+    if (ocrStatus.present) {
+      map['ocr_status'] = Variable<String>(ocrStatus.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -981,6 +1185,9 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
           ..write('id: $id, ')
           ..write('expenseId: $expenseId, ')
           ..write('localPath: $localPath, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('tamanhoBytes: $tamanhoBytes, ')
+          ..write('ocrStatus: $ocrStatus, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -994,6 +1201,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExpensesTable expenses = $ExpensesTable(this);
   late final $ReceiptsTable receipts = $ReceiptsTable(this);
   late final ExpenseDao expenseDao = ExpenseDao(this as AppDatabase);
+  late final ReceiptDao receiptDao = ReceiptDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1010,6 +1218,7 @@ typedef $$ExpensesTableCreateCompanionBuilder =
       required String description,
       Value<String?> receiptPath,
       Value<String?> beneficiario,
+      Value<String?> cnpj,
       Value<String> origem,
       required DateTime createdAt,
       Value<DateTime?> updatedAt,
@@ -1025,6 +1234,7 @@ typedef $$ExpensesTableUpdateCompanionBuilder =
       Value<String> description,
       Value<String?> receiptPath,
       Value<String?> beneficiario,
+      Value<String?> cnpj,
       Value<String> origem,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -1097,6 +1307,11 @@ class $$ExpensesTableFilterComposer
 
   ColumnFilters<String> get beneficiario => $composableBuilder(
     column: $table.beneficiario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1190,6 +1405,11 @@ class $$ExpensesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get origem => $composableBuilder(
     column: $table.origem,
     builder: (column) => ColumnOrderings(column),
@@ -1248,6 +1468,9 @@ class $$ExpensesTableAnnotationComposer
     column: $table.beneficiario,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get cnpj =>
+      $composableBuilder(column: $table.cnpj, builder: (column) => column);
 
   GeneratedColumn<String> get origem =>
       $composableBuilder(column: $table.origem, builder: (column) => column);
@@ -1322,6 +1545,7 @@ class $$ExpensesTableTableManager
                 Value<String> description = const Value.absent(),
                 Value<String?> receiptPath = const Value.absent(),
                 Value<String?> beneficiario = const Value.absent(),
+                Value<String?> cnpj = const Value.absent(),
                 Value<String> origem = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -1335,6 +1559,7 @@ class $$ExpensesTableTableManager
                 description: description,
                 receiptPath: receiptPath,
                 beneficiario: beneficiario,
+                cnpj: cnpj,
                 origem: origem,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -1350,6 +1575,7 @@ class $$ExpensesTableTableManager
                 required String description,
                 Value<String?> receiptPath = const Value.absent(),
                 Value<String?> beneficiario = const Value.absent(),
+                Value<String?> cnpj = const Value.absent(),
                 Value<String> origem = const Value.absent(),
                 required DateTime createdAt,
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -1363,6 +1589,7 @@ class $$ExpensesTableTableManager
                 description: description,
                 receiptPath: receiptPath,
                 beneficiario: beneficiario,
+                cnpj: cnpj,
                 origem: origem,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -1422,6 +1649,9 @@ typedef $$ReceiptsTableCreateCompanionBuilder =
       required String id,
       required String expenseId,
       required String localPath,
+      Value<String?> mimeType,
+      Value<int?> tamanhoBytes,
+      Value<String?> ocrStatus,
       required DateTime createdAt,
       Value<int> rowid,
     });
@@ -1430,6 +1660,9 @@ typedef $$ReceiptsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> expenseId,
       Value<String> localPath,
+      Value<String?> mimeType,
+      Value<int?> tamanhoBytes,
+      Value<String?> ocrStatus,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -1472,6 +1705,21 @@ class $$ReceiptsTableFilterComposer
 
   ColumnFilters<String> get localPath => $composableBuilder(
     column: $table.localPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get tamanhoBytes => $composableBuilder(
+    column: $table.tamanhoBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ocrStatus => $composableBuilder(
+    column: $table.ocrStatus,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1523,6 +1771,21 @@ class $$ReceiptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tamanhoBytes => $composableBuilder(
+    column: $table.tamanhoBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ocrStatus => $composableBuilder(
+    column: $table.ocrStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -1566,6 +1829,17 @@ class $$ReceiptsTableAnnotationComposer
 
   GeneratedColumn<String> get localPath =>
       $composableBuilder(column: $table.localPath, builder: (column) => column);
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get tamanhoBytes => $composableBuilder(
+    column: $table.tamanhoBytes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ocrStatus =>
+      $composableBuilder(column: $table.ocrStatus, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -1625,12 +1899,18 @@ class $$ReceiptsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> expenseId = const Value.absent(),
                 Value<String> localPath = const Value.absent(),
+                Value<String?> mimeType = const Value.absent(),
+                Value<int?> tamanhoBytes = const Value.absent(),
+                Value<String?> ocrStatus = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ReceiptsCompanion(
                 id: id,
                 expenseId: expenseId,
                 localPath: localPath,
+                mimeType: mimeType,
+                tamanhoBytes: tamanhoBytes,
+                ocrStatus: ocrStatus,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -1639,12 +1919,18 @@ class $$ReceiptsTableTableManager
                 required String id,
                 required String expenseId,
                 required String localPath,
+                Value<String?> mimeType = const Value.absent(),
+                Value<int?> tamanhoBytes = const Value.absent(),
+                Value<String?> ocrStatus = const Value.absent(),
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
               }) => ReceiptsCompanion.insert(
                 id: id,
                 expenseId: expenseId,
                 localPath: localPath,
+                mimeType: mimeType,
+                tamanhoBytes: tamanhoBytes,
+                ocrStatus: ocrStatus,
                 createdAt: createdAt,
                 rowid: rowid,
               ),

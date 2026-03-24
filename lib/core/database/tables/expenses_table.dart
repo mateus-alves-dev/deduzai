@@ -8,6 +8,7 @@ class Expenses extends Table {
   TextColumn get description => text()();
   TextColumn get receiptPath => text().nullable()();
   TextColumn get beneficiario => text().nullable()();
+  TextColumn get cnpj => text().nullable()();
   TextColumn get origem => text().withDefault(const Constant('MANUAL'))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime().nullable()();

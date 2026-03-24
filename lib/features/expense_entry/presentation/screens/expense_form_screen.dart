@@ -1,5 +1,7 @@
 import 'package:deduzai/core/database/app_database.dart' as db;
 import 'package:deduzai/core/domain/models/category.dart';
+import 'package:deduzai/core/domain/models/expense_origem.dart';
+import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/features/expense_entry/domain/expense_service.dart';
 import 'package:deduzai/features/expense_entry/presentation/providers/expense_form_provider.dart';
@@ -30,14 +32,22 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   late final TextEditingController _dateDisplayController;
 
   DeductionCategory? _selectedCategory;
-  DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedDate;
   db.Expense? _existingExpense;
   bool _initialized = false;
   bool _isSaving = false;
 
+  // OCR state
+  OcrResult? _ocrResult;
+  // Tracks which fields were prefilled by OCR
+  final Set<String> _ocrFilledFields = {};
+  String? _ocrMessage;
+  String? _cnpj;
+
   @override
   void initState() {
     super.initState();
+    _selectedDate = DateTime.now();
     _amountController = TextEditingController();
     _descriptionController = TextEditingController();
     _beneficiarioController = TextEditingController();
@@ -65,7 +75,43 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     _selectedDate = expense.date;
     _dateDisplayController.text = DateFormat('dd/MM/yyyy').format(expense.date);
     _existingExpense = expense;
+    _cnpj = expense.cnpj;
     _initialized = true;
+  }
+
+  void _applyOcrResult(OcrResult result) {
+    setState(() {
+      _ocrResult = result;
+      _ocrFilledFields.clear();
+
+      if (result.valor != null) {
+        final amount = result.valor! / 100;
+        _amountController.text =
+            NumberFormat('#,##0.00', 'pt_BR').format(amount);
+        _ocrFilledFields.add('valor');
+      }
+      if (result.data != null) {
+        _selectedDate = result.data!;
+        _dateDisplayController.text =
+            DateFormat('dd/MM/yyyy').format(result.data!);
+        _ocrFilledFields.add('data');
+      }
+      if (result.cnpj != null) {
+        _cnpj = result.cnpj;
+      }
+      if (result.beneficiario != null) {
+        _beneficiarioController.text = result.beneficiario!;
+        _ocrFilledFields.add('beneficiario');
+      }
+
+      _ocrMessage = switch (result.status) {
+        OcrStatus.partial =>
+          'Alguns campos não foram lidos. Confira antes de salvar.',
+        OcrStatus.failure =>
+          'Não conseguimos ler este comprovante. Preencha manualmente.',
+        OcrStatus.success => null,
+      };
+    });
   }
 
   String? _validateAmount(String? value) {
@@ -107,7 +153,15 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
       setState(() {
         _selectedDate = picked;
         _dateDisplayController.text = DateFormat('dd/MM/yyyy').format(picked);
+        _ocrFilledFields.remove('data');
       });
+    }
+  }
+
+  Future<void> _openCamera() async {
+    final result = await context.push<OcrResult>('/camera');
+    if (result != null && mounted) {
+      _applyOcrResult(result);
     }
   }
 
@@ -129,6 +183,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           .replaceAll(',', '.');
       final amountInCents = (double.parse(rawAmount) * 100).round();
       final service = ref.read(expenseServiceProvider);
+      final isOcr = _ocrResult != null &&
+          _ocrResult!.status != OcrStatus.failure;
 
       if (widget.expenseId == null) {
         await service.createExpense(
@@ -137,6 +193,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           amountInCents: amountInCents,
           description: _descriptionController.text.trim(),
           beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
+          cnpj: _cnpj,
+          origem: isOcr ? ExpenseOrigem.ocr : ExpenseOrigem.manual,
+          imagePath: _ocrResult?.imagePath,
         );
       } else {
         await service.updateExpense(
@@ -146,6 +205,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           amountInCents: amountInCents,
           description: _descriptionController.text.trim(),
           beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
+          cnpj: _cnpj,
         );
       }
 
@@ -241,22 +301,74 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // OCR button (only for new expenses)
+                    if (widget.expenseId == null) ...[
+                      OutlinedButton.icon(
+                        onPressed: _openCamera,
+                        icon: const Icon(Icons.document_scanner_outlined),
+                        label: const Text('Fotografar nota'),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
+
+                    // OCR message banner
+                    if (_ocrMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondaryContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 18,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _ocrMessage!,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
+
                     // Valor
                     TextFormField(
                       key: const Key('amountField'),
                       controller: _amountController,
-                      autofocus: true,
+                      autofocus: widget.expenseId != null,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp('[0-9,.]')),
                       ],
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Valor',
                         prefixText: r'R$ ',
                         hintText: '0,00',
+                        suffixIcon: _ocrFilledFields.contains('valor')
+                            ? const _OcrBadge()
+                            : null,
                       ),
+                      onChanged: (_) =>
+                          setState(() => _ocrFilledFields.remove('valor')),
                       validator: _validateAmount,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -283,9 +395,11 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                     TextFormField(
                       controller: _dateDisplayController,
                       readOnly: true,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Data',
-                        suffixIcon: Icon(Icons.calendar_today_outlined),
+                        suffixIcon: _ocrFilledFields.contains('data')
+                            ? const _OcrBadge()
+                            : const Icon(Icons.calendar_today_outlined),
                       ),
                       onTap: _pickDate,
                       validator: (_) => _validateDate(),
@@ -306,9 +420,15 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                     // Beneficiário (opcional)
                     TextFormField(
                       controller: _beneficiarioController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Beneficiário (opcional)',
                         hintText: 'Ex: Clínica São Lucas',
+                        suffixIcon: _ocrFilledFields.contains('beneficiario')
+                            ? const _OcrBadge()
+                            : null,
+                      ),
+                      onChanged: (_) => setState(
+                        () => _ocrFilledFields.remove('beneficiario'),
                       ),
                       maxLength: 255,
                     ),
@@ -344,6 +464,23 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Small badge shown on fields that were pre-filled by OCR.
+class _OcrBadge extends StatelessWidget {
+  const _OcrBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'Preenchido pelo OCR',
+      child: Icon(
+        Icons.auto_awesome,
+        size: 18,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }
