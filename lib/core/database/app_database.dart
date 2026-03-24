@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:deduzai/core/database/daos/app_settings_dao.dart';
 import 'package:deduzai/core/database/daos/cnpj_preference_dao.dart';
 import 'package:deduzai/core/database/daos/expense_dao.dart';
 import 'package:deduzai/core/database/daos/receipt_dao.dart';
+import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/database/tables/cnpj_preferences_table.dart';
 import 'package:deduzai/core/database/tables/expenses_table.dart';
 import 'package:deduzai/core/database/tables/receipts_table.dart';
@@ -14,8 +16,8 @@ import 'package:path_provider/path_provider.dart';
 part 'app_database.g.dart';
 
 @DriftDatabase(
-  tables: [Expenses, Receipts, CnpjPreferences],
-  daos: [ExpenseDao, ReceiptDao, CnpjPreferenceDao],
+  tables: [Expenses, Receipts, CnpjPreferences, AppSettings],
+  daos: [ExpenseDao, ReceiptDao, CnpjPreferenceDao, AppSettingsDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -23,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -40,6 +42,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 4) {
         await m.createTable(cnpjPreferences);
+      }
+      if (from < 5) {
+        await m.createTable(appSettings);
       }
     },
   );

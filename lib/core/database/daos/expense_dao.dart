@@ -48,4 +48,19 @@ class ExpenseDao extends DatabaseAccessor<AppDatabase> with _$ExpenseDaoMixin {
             ..where((e) => e.id.equals(id))
             ..where((e) => e.deletedAt.isNull()))
           .watchSingleOrNull();
+
+  Future<int> countExpensesInMonth(int year, int month) {
+    final start = DateTime(year, month);
+    final end = DateTime(year, month + 1);
+    final countExpr = expenses.id.count();
+    return (selectOnly(expenses)
+          ..where(
+            expenses.deletedAt.isNull() &
+                expenses.date.isBiggerOrEqualValue(start) &
+                expenses.date.isSmallerThanValue(end),
+          )
+          ..addColumns([countExpr]))
+        .map((row) => row.read(countExpr) ?? 0)
+        .getSingle();
+  }
 }

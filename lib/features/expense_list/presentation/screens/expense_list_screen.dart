@@ -1,5 +1,6 @@
 import 'package:deduzai/features/expense_list/presentation/providers/expense_list_provider.dart';
 import 'package:deduzai/features/expense_list/presentation/widgets/expense_list_tile.dart';
+import 'package:deduzai/features/notifications/presentation/widgets/notification_permission_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,24 +14,34 @@ class ExpenseListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Gastos')),
-      body: expenseAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erro ao carregar gastos: $e')),
-        data: (expenses) {
-          if (expenses.isEmpty) {
-            return const _EmptyState();
-          }
-          return ListView.builder(
-            itemCount: expenses.length,
-            itemBuilder: (context, i) {
-              final expense = expenses[i];
-              return ExpenseListTile(
-                expense: expense,
-                onTap: () => context.push('/expenses/${expense.id}'),
-              );
-            },
-          );
-        },
+      body: Column(
+        children: [
+          const NotificationPermissionBanner(),
+          Expanded(
+            child: expenseAsync.when(
+              loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+              error: (e, _) =>
+                  Center(child: Text('Erro ao carregar gastos: $e')),
+              data: (expenses) {
+                if (expenses.isEmpty) {
+                  return const _EmptyState();
+                }
+                return ListView.builder(
+                  itemCount: expenses.length,
+                  itemBuilder: (context, i) {
+                    final expense = expenses[i];
+                    return ExpenseListTile(
+                      expense: expense,
+                      onTap: () =>
+                          context.push('/expenses/${expense.id}'),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/expenses/new'),

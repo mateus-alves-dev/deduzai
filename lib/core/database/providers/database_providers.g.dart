@@ -74,5 +74,22 @@ final cnpjPreferenceDaoProvider = Provider<CnpjPreferenceDao>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CnpjPreferenceDaoRef = ProviderRef<CnpjPreferenceDao>;
+String _$appSettingsDaoHash() => r'744fed9d19bd0a178b347f584ca3fdaca6275d63';
+
+/// See also [appSettingsDao].
+@ProviderFor(appSettingsDao)
+final appSettingsDaoProvider = Provider<AppSettingsDao>.internal(
+  appSettingsDao,
+  name: r'appSettingsDaoProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appSettingsDaoHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AppSettingsDaoRef = ProviderRef<AppSettingsDao>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

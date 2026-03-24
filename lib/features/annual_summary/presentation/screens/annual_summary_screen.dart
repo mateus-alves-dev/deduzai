@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:deduzai/core/database/providers/database_providers.dart';
+import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/features/annual_summary/data/export_service.dart';
 import 'package:deduzai/features/annual_summary/presentation/providers/annual_summary_provider.dart';
@@ -22,6 +24,21 @@ class AnnualSummaryScreen extends ConsumerStatefulWidget {
 class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen> {
   bool _exportingPdf = false;
   bool _exportingCsv = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _recordSummaryAccess(ref.read(selectedYearProvider));
+    });
+  }
+
+  void _recordSummaryAccess(int year) {
+    ref.read(appSettingsDaoProvider).setValue(
+          AppSettingsKeys.summaryLastAccessedYear,
+          year.toString(),
+        );
+  }
 
   static final _currency = NumberFormat.currency(
     locale: 'pt_BR',
@@ -62,8 +79,10 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen> {
           const SizedBox(height: 8),
           YearSelector(
             year: year,
-            onChanged: (y) =>
-                ref.read(selectedYearProvider.notifier).select(y),
+            onChanged: (y) {
+              ref.read(selectedYearProvider.notifier).select(y);
+              _recordSummaryAccess(y);
+            },
           ),
           const SizedBox(height: 8),
           Expanded(

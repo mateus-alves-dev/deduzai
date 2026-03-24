@@ -1,4 +1,5 @@
 import 'package:deduzai/core/database/app_database.dart';
+import 'package:deduzai/core/database/daos/app_settings_dao.dart';
 import 'package:deduzai/core/database/daos/cnpj_preference_dao.dart';
 import 'package:deduzai/core/database/daos/expense_dao.dart';
 import 'package:deduzai/core/database/daos/receipt_dao.dart';
@@ -19,3 +20,7 @@ ReceiptDao receiptDao(Ref ref) => ref.watch(databaseProvider).receiptDao;
 @Riverpod(keepAlive: true)
 CnpjPreferenceDao cnpjPreferenceDao(Ref ref) =>
     ref.watch(databaseProvider).cnpjPreferenceDao;
+
+@Riverpod(keepAlive: true)
+AppSettingsDao appSettingsDao(Ref ref) =>
+    ref.watch(databaseProvider).appSettingsDao;

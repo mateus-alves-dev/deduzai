@@ -173,22 +173,22 @@ class _AnnualSummaryProviderElement
 
 String _$expensesForYearHash() => r'e33d3085c6d799b9b696b1e0228fb98ba25a2d94';
 
-/// Raw expenses for [year] — used by [ExportService] to build exports.
+/// Raw expenses for [year] — used by the export service to build exports.
 ///
 /// Copied from [expensesForYear].
 @ProviderFor(expensesForYear)
 const expensesForYearProvider = ExpensesForYearFamily();
 
-/// Raw expenses for [year] — used by [ExportService] to build exports.
+/// Raw expenses for [year] — used by the export service to build exports.
 ///
 /// Copied from [expensesForYear].
 class ExpensesForYearFamily extends Family<AsyncValue<List<Expense>>> {
-  /// Raw expenses for [year] — used by [ExportService] to build exports.
+  /// Raw expenses for [year] — used by the export service to build exports.
   ///
   /// Copied from [expensesForYear].
   const ExpensesForYearFamily();
 
-  /// Raw expenses for [year] — used by [ExportService] to build exports.
+  /// Raw expenses for [year] — used by the export service to build exports.
   ///
   /// Copied from [expensesForYear].
   ExpensesForYearProvider call(int year) {
@@ -217,11 +217,11 @@ class ExpensesForYearFamily extends Family<AsyncValue<List<Expense>>> {
   String? get name => r'expensesForYearProvider';
 }
 
-/// Raw expenses for [year] — used by [ExportService] to build exports.
+/// Raw expenses for [year] — used by the export service to build exports.
 ///
 /// Copied from [expensesForYear].
 class ExpensesForYearProvider extends AutoDisposeFutureProvider<List<Expense>> {
-  /// Raw expenses for [year] — used by [ExportService] to build exports.
+  /// Raw expenses for [year] — used by the export service to build exports.
   ///
   /// Copied from [expensesForYear].
   ExpensesForYearProvider(int year)
