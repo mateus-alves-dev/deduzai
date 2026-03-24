@@ -17,6 +17,7 @@ abstract class Expense with _$Expense {
     required ExpenseOrigem origem,
     String? receiptPath,
     String? beneficiario,
+    String? cnpj,
     DateTime? updatedAt,
     DateTime? deletedAt,
   }) = _Expense;

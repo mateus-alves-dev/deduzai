@@ -1195,18 +1195,295 @@ class ReceiptsCompanion extends UpdateCompanion<Receipt> {
   }
 }
 
+class $CnpjPreferencesTable extends CnpjPreferences
+    with TableInfo<$CnpjPreferencesTable, CnpjPreference> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CnpjPreferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cnpjMeta = const VerificationMeta('cnpj');
+  @override
+  late final GeneratedColumn<String> cnpj = GeneratedColumn<String>(
+    'cnpj',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [cnpj, category, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cnpj_preferences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CnpjPreference> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cnpj')) {
+      context.handle(
+        _cnpjMeta,
+        cnpj.isAcceptableOrUnknown(data['cnpj']!, _cnpjMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cnpjMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cnpj};
+  @override
+  CnpjPreference map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CnpjPreference(
+      cnpj: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cnpj'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CnpjPreferencesTable createAlias(String alias) {
+    return $CnpjPreferencesTable(attachedDatabase, alias);
+  }
+}
+
+class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
+  final String cnpj;
+  final String category;
+  final DateTime updatedAt;
+  const CnpjPreference({
+    required this.cnpj,
+    required this.category,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cnpj'] = Variable<String>(cnpj);
+    map['category'] = Variable<String>(category);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CnpjPreferencesCompanion toCompanion(bool nullToAbsent) {
+    return CnpjPreferencesCompanion(
+      cnpj: Value(cnpj),
+      category: Value(category),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CnpjPreference.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CnpjPreference(
+      cnpj: serializer.fromJson<String>(json['cnpj']),
+      category: serializer.fromJson<String>(json['category']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cnpj': serializer.toJson<String>(cnpj),
+      'category': serializer.toJson<String>(category),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CnpjPreference copyWith({
+    String? cnpj,
+    String? category,
+    DateTime? updatedAt,
+  }) => CnpjPreference(
+    cnpj: cnpj ?? this.cnpj,
+    category: category ?? this.category,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CnpjPreference copyWithCompanion(CnpjPreferencesCompanion data) {
+    return CnpjPreference(
+      cnpj: data.cnpj.present ? data.cnpj.value : this.cnpj,
+      category: data.category.present ? data.category.value : this.category,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CnpjPreference(')
+          ..write('cnpj: $cnpj, ')
+          ..write('category: $category, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cnpj, category, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CnpjPreference &&
+          other.cnpj == this.cnpj &&
+          other.category == this.category &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CnpjPreferencesCompanion extends UpdateCompanion<CnpjPreference> {
+  final Value<String> cnpj;
+  final Value<String> category;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CnpjPreferencesCompanion({
+    this.cnpj = const Value.absent(),
+    this.category = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CnpjPreferencesCompanion.insert({
+    required String cnpj,
+    required String category,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : cnpj = Value(cnpj),
+       category = Value(category),
+       updatedAt = Value(updatedAt);
+  static Insertable<CnpjPreference> custom({
+    Expression<String>? cnpj,
+    Expression<String>? category,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cnpj != null) 'cnpj': cnpj,
+      if (category != null) 'category': category,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CnpjPreferencesCompanion copyWith({
+    Value<String>? cnpj,
+    Value<String>? category,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CnpjPreferencesCompanion(
+      cnpj: cnpj ?? this.cnpj,
+      category: category ?? this.category,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cnpj.present) {
+      map['cnpj'] = Variable<String>(cnpj.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CnpjPreferencesCompanion(')
+          ..write('cnpj: $cnpj, ')
+          ..write('category: $category, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ExpensesTable expenses = $ExpensesTable(this);
   late final $ReceiptsTable receipts = $ReceiptsTable(this);
+  late final $CnpjPreferencesTable cnpjPreferences = $CnpjPreferencesTable(
+    this,
+  );
   late final ExpenseDao expenseDao = ExpenseDao(this as AppDatabase);
   late final ReceiptDao receiptDao = ReceiptDao(this as AppDatabase);
+  late final CnpjPreferenceDao cnpjPreferenceDao = CnpjPreferenceDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [expenses, receipts];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    expenses,
+    receipts,
+    cnpjPreferences,
+  ];
 }
 
 typedef $$ExpensesTableCreateCompanionBuilder =
@@ -2001,6 +2278,174 @@ typedef $$ReceiptsTableProcessedTableManager =
       Receipt,
       PrefetchHooks Function({bool expenseId})
     >;
+typedef $$CnpjPreferencesTableCreateCompanionBuilder =
+    CnpjPreferencesCompanion Function({
+      required String cnpj,
+      required String category,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CnpjPreferencesTableUpdateCompanionBuilder =
+    CnpjPreferencesCompanion Function({
+      Value<String> cnpj,
+      Value<String> category,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$CnpjPreferencesTableFilterComposer
+    extends Composer<_$AppDatabase, $CnpjPreferencesTable> {
+  $$CnpjPreferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CnpjPreferencesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CnpjPreferencesTable> {
+  $$CnpjPreferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CnpjPreferencesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CnpjPreferencesTable> {
+  $$CnpjPreferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cnpj =>
+      $composableBuilder(column: $table.cnpj, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$CnpjPreferencesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CnpjPreferencesTable,
+          CnpjPreference,
+          $$CnpjPreferencesTableFilterComposer,
+          $$CnpjPreferencesTableOrderingComposer,
+          $$CnpjPreferencesTableAnnotationComposer,
+          $$CnpjPreferencesTableCreateCompanionBuilder,
+          $$CnpjPreferencesTableUpdateCompanionBuilder,
+          (
+            CnpjPreference,
+            BaseReferences<
+              _$AppDatabase,
+              $CnpjPreferencesTable,
+              CnpjPreference
+            >,
+          ),
+          CnpjPreference,
+          PrefetchHooks Function()
+        > {
+  $$CnpjPreferencesTableTableManager(
+    _$AppDatabase db,
+    $CnpjPreferencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CnpjPreferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CnpjPreferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CnpjPreferencesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> cnpj = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CnpjPreferencesCompanion(
+                cnpj: cnpj,
+                category: category,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String cnpj,
+                required String category,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CnpjPreferencesCompanion.insert(
+                cnpj: cnpj,
+                category: category,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CnpjPreferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CnpjPreferencesTable,
+      CnpjPreference,
+      $$CnpjPreferencesTableFilterComposer,
+      $$CnpjPreferencesTableOrderingComposer,
+      $$CnpjPreferencesTableAnnotationComposer,
+      $$CnpjPreferencesTableCreateCompanionBuilder,
+      $$CnpjPreferencesTableUpdateCompanionBuilder,
+      (
+        CnpjPreference,
+        BaseReferences<_$AppDatabase, $CnpjPreferencesTable, CnpjPreference>,
+      ),
+      CnpjPreference,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2009,4 +2454,6 @@ class $AppDatabaseManager {
       $$ExpensesTableTableManager(_db, _db.expenses);
   $$ReceiptsTableTableManager get receipts =>
       $$ReceiptsTableTableManager(_db, _db.receipts);
+  $$CnpjPreferencesTableTableManager get cnpjPreferences =>
+      $$CnpjPreferencesTableTableManager(_db, _db.cnpjPreferences);
 }

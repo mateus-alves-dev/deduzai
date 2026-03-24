@@ -29,7 +29,7 @@ void main() {
     });
 
     testWidgets('shows expense tile after inserting', (tester) async {
-      final service = ExpenseService(db.expenseDao);
+      final service = ExpenseService(db.expenseDao, db.receiptDao);
       await service.createExpense(
         date: DateTime.now(),
         category: DeductionCategory.saude,

@@ -3,6 +3,7 @@ import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/expense_origem.dart';
 import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
+import 'package:deduzai/features/expense_entry/domain/cnpj_categorization_service.dart';
 import 'package:deduzai/features/expense_entry/domain/expense_service.dart';
 import 'package:deduzai/features/expense_entry/presentation/providers/expense_form_provider.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   String? _ocrMessage;
   String? _cnpj;
 
+  // CNPJ auto-categorization state (F3)
+  bool _categorySuggested = false;
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +81,21 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     _existingExpense = expense;
     _cnpj = expense.cnpj;
     _initialized = true;
+    // Attempt to suggest a category if this expense has a CNPJ but editing
+    // it might benefit from the user's learned preference.
+    if (expense.cnpj != null) _tryAutoCategory(expense.cnpj);
+  }
+
+  Future<void> _tryAutoCategory(String? cnpj) async {
+    if (cnpj == null || cnpj.isEmpty) return;
+    final service = ref.read(cnpjCategorizationServiceProvider);
+    final suggestion = await service.suggestCategory(cnpj);
+    if (suggestion != null && mounted) {
+      setState(() {
+        _selectedCategory = suggestion;
+        _categorySuggested = true;
+      });
+    }
   }
 
   void _applyOcrResult(OcrResult result) {
@@ -86,18 +105,23 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
       if (result.valor != null) {
         final amount = result.valor! / 100;
-        _amountController.text =
-            NumberFormat('#,##0.00', 'pt_BR').format(amount);
+        _amountController.text = NumberFormat(
+          '#,##0.00',
+          'pt_BR',
+        ).format(amount);
         _ocrFilledFields.add('valor');
       }
       if (result.data != null) {
         _selectedDate = result.data!;
-        _dateDisplayController.text =
-            DateFormat('dd/MM/yyyy').format(result.data!);
+        _dateDisplayController.text = DateFormat(
+          'dd/MM/yyyy',
+        ).format(result.data!);
         _ocrFilledFields.add('data');
       }
       if (result.cnpj != null) {
         _cnpj = result.cnpj;
+        // Reset suggestion flag before the async call updates it.
+        _categorySuggested = false;
       }
       if (result.beneficiario != null) {
         _beneficiarioController.text = result.beneficiario!;
@@ -112,6 +136,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
         OcrStatus.success => null,
       };
     });
+    if (result.cnpj != null) _tryAutoCategory(result.cnpj);
   }
 
   String? _validateAmount(String? value) {
@@ -183,8 +208,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           .replaceAll(',', '.');
       final amountInCents = (double.parse(rawAmount) * 100).round();
       final service = ref.read(expenseServiceProvider);
-      final isOcr = _ocrResult != null &&
-          _ocrResult!.status != OcrStatus.failure;
+      final isOcr =
+          _ocrResult != null && _ocrResult!.status != OcrStatus.failure;
 
       if (widget.expenseId == null) {
         await service.createExpense(
@@ -207,6 +232,13 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
           cnpj: _cnpj,
         );
+      }
+
+      // Persist the user's CNPJ→category preference (Spec 3.3).
+      if (_cnpj != null && _cnpj!.isNotEmpty) {
+        await ref
+            .read(cnpjCategorizationServiceProvider)
+            .savePreference(_cnpj!, _selectedCategory!);
       }
 
       if (mounted) {
@@ -316,9 +348,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.sm),
                         decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -326,18 +358,18 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                             Icon(
                               Icons.info_outline,
                               size: 18,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondaryContainer,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSecondaryContainer,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 _ocrMessage!,
                                 style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondaryContainer,
                                   fontSize: 13,
                                 ),
                               ),
@@ -385,10 +417,33 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                             ),
                           )
                           .toList(),
-                      onChanged: (v) => setState(() => _selectedCategory = v),
+                      onChanged: (v) => setState(() {
+                        _selectedCategory = v;
+                        _categorySuggested = false;
+                      }),
                       validator: (v) =>
                           v == null ? 'Selecione uma categoria' : null,
                     ),
+                    if (_categorySuggested) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Categoria sugerida',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: AppSpacing.md),
 
                     // Data

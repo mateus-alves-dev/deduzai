@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Expense {
 
- String get id; DateTime get date; DeductionCategory get category; int get amountInCents; String get description; DateTime get createdAt; ExpenseOrigem get origem; String? get receiptPath; String? get beneficiario; DateTime? get updatedAt; DateTime? get deletedAt;
+ String get id; DateTime get date; DeductionCategory get category; int get amountInCents; String get description; DateTime get createdAt; ExpenseOrigem get origem; String? get receiptPath; String? get beneficiario; String? get cnpj; DateTime? get updatedAt; DateTime? get deletedAt;
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ExpenseCopyWith<Expense> get copyWith => _$ExpenseCopyWithImpl<Expense>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.category, category) || other.category == category)&&(identical(other.amountInCents, amountInCents) || other.amountInCents == amountInCents)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.receiptPath, receiptPath) || other.receiptPath == receiptPath)&&(identical(other.beneficiario, beneficiario) || other.beneficiario == beneficiario)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.category, category) || other.category == category)&&(identical(other.amountInCents, amountInCents) || other.amountInCents == amountInCents)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.receiptPath, receiptPath) || other.receiptPath == receiptPath)&&(identical(other.beneficiario, beneficiario) || other.beneficiario == beneficiario)&&(identical(other.cnpj, cnpj) || other.cnpj == cnpj)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,date,category,amountInCents,description,createdAt,origem,receiptPath,beneficiario,updatedAt,deletedAt);
+int get hashCode => Object.hash(runtimeType,id,date,category,amountInCents,description,createdAt,origem,receiptPath,beneficiario,cnpj,updatedAt,deletedAt);
 
 @override
 String toString() {
-  return 'Expense(id: $id, date: $date, category: $category, amountInCents: $amountInCents, description: $description, createdAt: $createdAt, origem: $origem, receiptPath: $receiptPath, beneficiario: $beneficiario, updatedAt: $updatedAt, deletedAt: $deletedAt)';
+  return 'Expense(id: $id, date: $date, category: $category, amountInCents: $amountInCents, description: $description, createdAt: $createdAt, origem: $origem, receiptPath: $receiptPath, beneficiario: $beneficiario, cnpj: $cnpj, updatedAt: $updatedAt, deletedAt: $deletedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ExpenseCopyWith<$Res>  {
   factory $ExpenseCopyWith(Expense value, $Res Function(Expense) _then) = _$ExpenseCopyWithImpl;
 @useResult
 $Res call({
- String id, DateTime date, DeductionCategory category, int amountInCents, String description, DateTime createdAt, ExpenseOrigem origem, String? receiptPath, String? beneficiario, DateTime? updatedAt, DateTime? deletedAt
+ String id, DateTime date, DeductionCategory category, int amountInCents, String description, DateTime createdAt, ExpenseOrigem origem, String? receiptPath, String? beneficiario, String? cnpj, DateTime? updatedAt, DateTime? deletedAt
 });
 
 
@@ -65,7 +65,7 @@ class _$ExpenseCopyWithImpl<$Res>
 
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? date = null,Object? category = null,Object? amountInCents = null,Object? description = null,Object? createdAt = null,Object? origem = null,Object? receiptPath = freezed,Object? beneficiario = freezed,Object? updatedAt = freezed,Object? deletedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? date = null,Object? category = null,Object? amountInCents = null,Object? description = null,Object? createdAt = null,Object? origem = null,Object? receiptPath = freezed,Object? beneficiario = freezed,Object? cnpj = freezed,Object? updatedAt = freezed,Object? deletedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
@@ -76,6 +76,7 @@ as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: 
 as DateTime,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
 as ExpenseOrigem,receiptPath: freezed == receiptPath ? _self.receiptPath : receiptPath // ignore: cast_nullable_to_non_nullable
 as String?,beneficiario: freezed == beneficiario ? _self.beneficiario : beneficiario // ignore: cast_nullable_to_non_nullable
+as String?,cnpj: freezed == cnpj ? _self.cnpj : cnpj // ignore: cast_nullable_to_non_nullable
 as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -163,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DateTime date,  DeductionCategory category,  int amountInCents,  String description,  DateTime createdAt,  ExpenseOrigem origem,  String? receiptPath,  String? beneficiario,  DateTime? updatedAt,  DateTime? deletedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DateTime date,  DeductionCategory category,  int amountInCents,  String description,  DateTime createdAt,  ExpenseOrigem origem,  String? receiptPath,  String? beneficiario,  String? cnpj,  DateTime? updatedAt,  DateTime? deletedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Expense() when $default != null:
-return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.description,_that.createdAt,_that.origem,_that.receiptPath,_that.beneficiario,_that.updatedAt,_that.deletedAt);case _:
+return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.description,_that.createdAt,_that.origem,_that.receiptPath,_that.beneficiario,_that.cnpj,_that.updatedAt,_that.deletedAt);case _:
   return orElse();
 
 }
@@ -184,10 +185,10 @@ return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.des
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DateTime date,  DeductionCategory category,  int amountInCents,  String description,  DateTime createdAt,  ExpenseOrigem origem,  String? receiptPath,  String? beneficiario,  DateTime? updatedAt,  DateTime? deletedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DateTime date,  DeductionCategory category,  int amountInCents,  String description,  DateTime createdAt,  ExpenseOrigem origem,  String? receiptPath,  String? beneficiario,  String? cnpj,  DateTime? updatedAt,  DateTime? deletedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Expense():
-return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.description,_that.createdAt,_that.origem,_that.receiptPath,_that.beneficiario,_that.updatedAt,_that.deletedAt);case _:
+return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.description,_that.createdAt,_that.origem,_that.receiptPath,_that.beneficiario,_that.cnpj,_that.updatedAt,_that.deletedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +205,10 @@ return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.des
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DateTime date,  DeductionCategory category,  int amountInCents,  String description,  DateTime createdAt,  ExpenseOrigem origem,  String? receiptPath,  String? beneficiario,  DateTime? updatedAt,  DateTime? deletedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DateTime date,  DeductionCategory category,  int amountInCents,  String description,  DateTime createdAt,  ExpenseOrigem origem,  String? receiptPath,  String? beneficiario,  String? cnpj,  DateTime? updatedAt,  DateTime? deletedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Expense() when $default != null:
-return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.description,_that.createdAt,_that.origem,_that.receiptPath,_that.beneficiario,_that.updatedAt,_that.deletedAt);case _:
+return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.description,_that.createdAt,_that.origem,_that.receiptPath,_that.beneficiario,_that.cnpj,_that.updatedAt,_that.deletedAt);case _:
   return null;
 
 }
@@ -219,7 +220,7 @@ return $default(_that.id,_that.date,_that.category,_that.amountInCents,_that.des
 @JsonSerializable()
 
 class _Expense implements Expense {
-  const _Expense({required this.id, required this.date, required this.category, required this.amountInCents, required this.description, required this.createdAt, required this.origem, this.receiptPath, this.beneficiario, this.updatedAt, this.deletedAt});
+  const _Expense({required this.id, required this.date, required this.category, required this.amountInCents, required this.description, required this.createdAt, required this.origem, this.receiptPath, this.beneficiario, this.cnpj, this.updatedAt, this.deletedAt});
   factory _Expense.fromJson(Map<String, dynamic> json) => _$ExpenseFromJson(json);
 
 @override final  String id;
@@ -231,6 +232,7 @@ class _Expense implements Expense {
 @override final  ExpenseOrigem origem;
 @override final  String? receiptPath;
 @override final  String? beneficiario;
+@override final  String? cnpj;
 @override final  DateTime? updatedAt;
 @override final  DateTime? deletedAt;
 
@@ -247,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.category, category) || other.category == category)&&(identical(other.amountInCents, amountInCents) || other.amountInCents == amountInCents)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.receiptPath, receiptPath) || other.receiptPath == receiptPath)&&(identical(other.beneficiario, beneficiario) || other.beneficiario == beneficiario)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.category, category) || other.category == category)&&(identical(other.amountInCents, amountInCents) || other.amountInCents == amountInCents)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.receiptPath, receiptPath) || other.receiptPath == receiptPath)&&(identical(other.beneficiario, beneficiario) || other.beneficiario == beneficiario)&&(identical(other.cnpj, cnpj) || other.cnpj == cnpj)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,date,category,amountInCents,description,createdAt,origem,receiptPath,beneficiario,updatedAt,deletedAt);
+int get hashCode => Object.hash(runtimeType,id,date,category,amountInCents,description,createdAt,origem,receiptPath,beneficiario,cnpj,updatedAt,deletedAt);
 
 @override
 String toString() {
-  return 'Expense(id: $id, date: $date, category: $category, amountInCents: $amountInCents, description: $description, createdAt: $createdAt, origem: $origem, receiptPath: $receiptPath, beneficiario: $beneficiario, updatedAt: $updatedAt, deletedAt: $deletedAt)';
+  return 'Expense(id: $id, date: $date, category: $category, amountInCents: $amountInCents, description: $description, createdAt: $createdAt, origem: $origem, receiptPath: $receiptPath, beneficiario: $beneficiario, cnpj: $cnpj, updatedAt: $updatedAt, deletedAt: $deletedAt)';
 }
 
 
@@ -267,7 +269,7 @@ abstract mixin class _$ExpenseCopyWith<$Res> implements $ExpenseCopyWith<$Res> {
   factory _$ExpenseCopyWith(_Expense value, $Res Function(_Expense) _then) = __$ExpenseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DateTime date, DeductionCategory category, int amountInCents, String description, DateTime createdAt, ExpenseOrigem origem, String? receiptPath, String? beneficiario, DateTime? updatedAt, DateTime? deletedAt
+ String id, DateTime date, DeductionCategory category, int amountInCents, String description, DateTime createdAt, ExpenseOrigem origem, String? receiptPath, String? beneficiario, String? cnpj, DateTime? updatedAt, DateTime? deletedAt
 });
 
 
@@ -284,7 +286,7 @@ class __$ExpenseCopyWithImpl<$Res>
 
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? date = null,Object? category = null,Object? amountInCents = null,Object? description = null,Object? createdAt = null,Object? origem = null,Object? receiptPath = freezed,Object? beneficiario = freezed,Object? updatedAt = freezed,Object? deletedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? date = null,Object? category = null,Object? amountInCents = null,Object? description = null,Object? createdAt = null,Object? origem = null,Object? receiptPath = freezed,Object? beneficiario = freezed,Object? cnpj = freezed,Object? updatedAt = freezed,Object? deletedAt = freezed,}) {
   return _then(_Expense(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
@@ -295,6 +297,7 @@ as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: 
 as DateTime,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
 as ExpenseOrigem,receiptPath: freezed == receiptPath ? _self.receiptPath : receiptPath // ignore: cast_nullable_to_non_nullable
 as String?,beneficiario: freezed == beneficiario ? _self.beneficiario : beneficiario // ignore: cast_nullable_to_non_nullable
+as String?,cnpj: freezed == cnpj ? _self.cnpj : cnpj // ignore: cast_nullable_to_non_nullable
 as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,

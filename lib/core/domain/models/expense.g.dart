@@ -16,6 +16,7 @@ _Expense _$ExpenseFromJson(Map<String, dynamic> json) => _Expense(
   origem: $enumDecode(_$ExpenseOrigemEnumMap, json['origem']),
   receiptPath: json['receiptPath'] as String?,
   beneficiario: json['beneficiario'] as String?,
+  cnpj: json['cnpj'] as String?,
   updatedAt: json['updatedAt'] == null
       ? null
       : DateTime.parse(json['updatedAt'] as String),
@@ -34,6 +35,7 @@ Map<String, dynamic> _$ExpenseToJson(_Expense instance) => <String, dynamic>{
   'origem': _$ExpenseOrigemEnumMap[instance.origem]!,
   'receiptPath': instance.receiptPath,
   'beneficiario': instance.beneficiario,
+  'cnpj': instance.cnpj,
   'updatedAt': instance.updatedAt?.toIso8601String(),
   'deletedAt': instance.deletedAt?.toIso8601String(),
 };

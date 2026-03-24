@@ -14,10 +14,7 @@ GoRouter _formRouter({String? expenseId}) {
   return GoRouter(
     initialLocation: expenseId != null ? '/form/$expenseId' : '/form',
     routes: [
-      GoRoute(
-        path: '/form',
-        builder: (_, __) => const ExpenseFormScreen(),
-      ),
+      GoRoute(path: '/form', builder: (_, __) => const ExpenseFormScreen()),
       GoRoute(
         path: '/form/:id',
         builder: (_, state) =>
@@ -28,10 +25,7 @@ GoRouter _formRouter({String? expenseId}) {
 }
 
 extension on WidgetTester {
-  Future<void> pumpForm(
-    List<Override> overrides, {
-    String? expenseId,
-  }) async {
+  Future<void> pumpForm(List<Override> overrides, {String? expenseId}) async {
     await pumpWidget(
       ProviderScope(
         overrides: overrides,
@@ -51,8 +45,7 @@ void main() {
 
     tearDownAll(db.close);
 
-    List<Override> get overrides =>
-        [databaseProvider.overrideWithValue(db)];
+    final overrides = [databaseProvider.overrideWithValue(db)];
 
     group('Spec 1.1 — new expense', () {
       testWidgets('shows "Novo Gasto" title', (tester) async {
@@ -83,10 +76,7 @@ void main() {
         await tester.tap(find.text('Salvar'));
         await tester.pump();
 
-        expect(
-          find.text('Informe um valor maior que zero'),
-          findsOneWidget,
-        );
+        expect(find.text('Informe um valor maior que zero'), findsOneWidget);
       });
 
       testWidgets('shows error when amount is zero', (tester) async {
@@ -96,10 +86,7 @@ void main() {
         await tester.tap(find.text('Salvar'));
         await tester.pump();
 
-        expect(
-          find.text('Informe um valor maior que zero'),
-          findsOneWidget,
-        );
+        expect(find.text('Informe um valor maior que zero'), findsOneWidget);
       });
     });
 
@@ -107,10 +94,7 @@ void main() {
       testWidgets('shows error when no category selected', (tester) async {
         await tester.pumpForm(overrides);
 
-        await tester.enterText(
-          find.byKey(const Key('amountField')),
-          '100',
-        );
+        await tester.enterText(find.byKey(const Key('amountField')), '100');
         await tester.tap(find.text('Salvar'));
         await tester.pump();
 
@@ -129,13 +113,12 @@ void main() {
       testWidgets('saves expense to DB with origem MANUAL', (tester) async {
         await tester.pumpForm(overrides);
 
-        await tester.enterText(
-          find.byKey(const Key('amountField')),
-          '125,50',
-        );
+        await tester.enterText(find.byKey(const Key('amountField')), '125,50');
 
         // Open category dropdown and select Saúde
-        await tester.tap(find.byType(DropdownButtonFormField<DeductionCategory>));
+        await tester.tap(
+          find.byType(DropdownButtonFormField<DeductionCategory>),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.text('Saúde').last);
         await tester.pumpAndSettle();
@@ -159,7 +142,7 @@ void main() {
         for (final row in rows) {
           await db.expenseDao.softDelete(row.id);
         }
-        final service = ExpenseService(db.expenseDao);
+        final service = ExpenseService(db.expenseDao, db.receiptDao);
         await service.createExpense(
           date: DateTime.now(),
           category: DeductionCategory.saude,
