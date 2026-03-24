@@ -1,9 +1,20 @@
 # Spec Driven Development — DeduzAí
 **Especificações técnicas e contratos de comportamento**
 
-> **Versão:** 0.1
+> **Versão:** 0.2
 > **Referência:** PRD DeduzAí v0.1
 > **Última atualização:** Março/2026
+
+---
+
+## Escopo de versão
+
+| Versão | Escopo |
+|---|---|
+| **V1 (atual)** | 100% local — todos os dados (gastos, comprovantes, preferências) são armazenados no dispositivo via Drift/SQLite. Sem backend, sem autenticação remota, sem sincronização. OCR on-device (ML Kit). |
+| **V2 (futuro)** | Integração com backend — autenticação (JWT), sincronização de dados, APIs REST, armazenamento de comprovantes em nuvem com URLs assinadas, multi-dispositivo. |
+
+> As specs marcadas com `[V2]` descrevem comportamentos planejados para a V2 e **não devem ser implementadas na V1**.
 
 ---
 
@@ -32,7 +43,7 @@ Nenhuma feature começa a ser implementada sem spec aprovada. Nenhuma spec é co
 6. F5 — Resumo Anual e Exportação
 7. F6 — Lembrete Periódico
 8. Regras de Negócio Globais
-9. Contratos de API Interna
+9. [V2] Contratos de API
 10. Critérios de Qualidade Não-Funcionais
 
 ---
@@ -43,8 +54,7 @@ Nenhuma feature começa a ser implementada sem spec aprovada. Nenhuma spec é co
 
 ```
 Gasto {
-  id              UUID           obrigatório, gerado pelo sistema
-  usuario_id      UUID           obrigatório
+  id              UUID           obrigatório, gerado localmente (client-side UUID)
   data            DATE           obrigatório  (data do gasto, não do registro)
   valor           DECIMAL(10,2)  obrigatório  (> 0)
   categoria       ENUM           obrigatório  (ver 1.3)
@@ -60,21 +70,24 @@ Gasto {
 }
 ```
 
+> **V1:** Sem `usuario_id` — o app é single-user local. O campo será adicionado na V2 com autenticação.
+
 ### 1.2 Entidade: `Comprovante`
 
 ```
 Comprovante {
   id              UUID           obrigatório
   gasto_id        UUID           obrigatório  (FK para Gasto)
-  usuario_id      UUID           obrigatório
-  arquivo_url     STRING         obrigatório  (URL segura, acesso autenticado)
+  arquivo_path    STRING         obrigatório  (caminho relativo no diretório de documentos do app)
   mime_type       ENUM           obrigatório  (image/jpeg | image/png | application/pdf)
   tamanho_bytes   INTEGER        obrigatório
-  ocr_raw         JSON           opcional     (payload bruto retornado pelo OCR)
+  ocr_raw         JSON           opcional     (payload bruto retornado pelo OCR on-device)
   ocr_status      ENUM           opcional     (PENDENTE | SUCESSO | FALHA)
   criado_em       TIMESTAMP      obrigatório
 }
 ```
+
+> **V1:** Sem `usuario_id`. Comprovantes são arquivos locais no app documents directory, referenciados por caminho relativo. Na V2, migrarão para armazenamento em nuvem com URLs assinadas.
 
 ### 1.3 Enum: `Categoria`
 
@@ -92,6 +105,7 @@ Comprovante {
 - `valor` não pode ser negativo nem zero
 - `deletado_em` preenchido = gasto excluído logicamente; nunca deletar fisicamente
 - Um `Comprovante` sem `Gasto` associado é inválido e deve ser rejeitado
+- **V1:** Todos os dados residem no SQLite local (Drift). Não há comunicação com servidor.
 
 ---
 
@@ -100,7 +114,7 @@ Comprovante {
 ### Spec 1.1 — Abertura do formulário
 
 ```
-GIVEN  o usuário está autenticado na tela inicial
+GIVEN  o usuário está na tela inicial
 WHEN   toca no botão "+" (novo gasto)
 THEN   o formulário de registro abre em ≤ 300ms
 AND    o campo "valor" já está em foco com teclado numérico visível
@@ -113,7 +127,7 @@ AND    nenhuma categoria está pré-selecionada
 ```
 GIVEN  o formulário de registro está aberto
 WHEN   o usuário preenche valor (> 0), seleciona uma categoria e confirma
-THEN   o gasto é salvo com origem = MANUAL
+THEN   o gasto é salvo localmente (Drift/SQLite) com origem = MANUAL
 AND    uma confirmação visual (toast) aparece por 2 segundos: "Gasto salvo ✓"
 AND    o usuário retorna automaticamente à tela anterior
 AND    o novo gasto aparece no topo da lista
@@ -196,11 +210,11 @@ AND    uma sobreposição com guia de enquadramento é exibida
 AND    botão "Usar foto existente" (galeria) também está disponível
 ```
 
-### Spec 2.2 — Processamento OCR com sucesso
+### Spec 2.2 — Processamento OCR com sucesso (on-device)
 
 ```
 GIVEN  o usuário capturou ou selecionou uma imagem
-WHEN   o OCR processa com sucesso (acurácia ≥ 80% nos campos-chave)
+WHEN   o OCR on-device (ML Kit) processa com sucesso (acurácia ≥ 80% nos campos-chave)
 THEN   os campos extraídos são pré-preenchidos no formulário:
          - valor         → campo "valor"
          - data emissão  → campo "data"
@@ -211,6 +225,8 @@ AND    todos os campos pré-preenchidos ficam editáveis
 AND    um indicador visual mostra quais campos foram preenchidos por OCR
 AND    o status do comprovante = SUCESSO
 ```
+
+> **V1:** OCR é executado inteiramente no dispositivo via Google ML Kit Text Recognition. Não há chamada a servidor.
 
 ### Spec 2.3 — OCR com extração parcial
 
@@ -254,15 +270,17 @@ AND    nenhuma mensagem de erro é exibida ao usuário
 AND    a imagem original NÃO é armazenada (somente a comprimida)
 ```
 
-### Spec 2.7 — Timeout do OCR
+### Spec 2.7 — Falha no OCR on-device
 
 ```
-GIVEN  a imagem foi enviada para processamento OCR
-WHEN   a resposta não chega em 15 segundos
-THEN   o sistema exibe: "Processamento demorou mais que o esperado."
-AND    oferece opção: "Aguardar" ou "Preencher manualmente"
+GIVEN  a imagem foi submetida ao OCR on-device (ML Kit)
+WHEN   o processamento falha por erro interno ou timeout local
+THEN   o sistema exibe: "Não foi possível processar a imagem."
+AND    oferece opção: "Tentar novamente" ou "Preencher manualmente"
 AND    a imagem já está salva localmente, independente do resultado
 ```
+
+> **V1:** Como o OCR é on-device, o processamento é tipicamente rápido (< 3s). Timeouts de rede não se aplicam.
 
 ---
 
@@ -318,9 +336,9 @@ A base deve cobrir, no mínimo, os seguintes CNAEs:
 ```
 GIVEN  um gasto tem comprovante associado
 WHEN   o usuário toca no ícone de comprovante na listagem
-THEN   a imagem abre em tela cheia com opção de zoom (pinch)
+THEN   a imagem local abre em tela cheia com opção de zoom (pinch)
 AND    os metadados do gasto são exibidos abaixo da imagem
-AND    botão "Download" está disponível
+AND    botão "Compartilhar" está disponível (share sheet nativo)
 ```
 
 ### Spec 4.2 — Gasto sem comprovante
@@ -338,7 +356,7 @@ AND    ao tocar, exibe opção: "Adicionar comprovante agora"
 GIVEN  o usuário escolhe adicionar comprovante a um gasto existente
 WHEN   fotografa ou seleciona uma imagem
 THEN   o comprovante é vinculado ao gasto
-AND    o OCR é executado em background
+AND    o OCR on-device (ML Kit) é executado em background
 AND    se o OCR extrair valor diferente do registrado, exibe alerta:
        "O valor na nota (R$ X) é diferente do registrado (R$ Y). Deseja atualizar?"
 ```
@@ -484,8 +502,9 @@ Todos os valores são armazenados em BRL (Real Brasileiro) com 2 casas decimais.
 ### RN-04: Privacidade de dados
 
 - CPF do usuário nunca é exibido completo na interface — sempre mascarado
-- CNPJs extraídos por OCR são armazenados mas não compartilhados com terceiros
-- Comprovantes são armazenados com acesso autenticado (URL assinada com expiração)
+- CNPJs extraídos por OCR são armazenados localmente e não compartilhados com terceiros
+- **V1:** Comprovantes são arquivos locais no app documents directory. Sem transmissão de dados para servidor.
+- **V2:** Comprovantes migrarão para armazenamento em nuvem com acesso autenticado (URL assinada com expiração)
 
 ### RN-05: Tetos de dedução (ano-base 2025)
 
@@ -498,13 +517,20 @@ Todos os valores são armazenados em BRL (Real Brasileiro) com 2 casas decimais.
 
 > ⚠️ Os tetos devem ser configuráveis por ano fiscal — a Receita Federal pode alterá-los. Não hardcodar valores direto no código.
 
-### RN-06: Dados offline
+### RN-06: Armazenamento local (V1)
 
-O app deve funcionar offline para registro manual e visualização de gastos já sincronizados. A sincronização ocorre automaticamente quando a conexão é restaurada.
+Na V1, o app é 100% local. Todos os dados (gastos, comprovantes, preferências) são armazenados no dispositivo via Drift/SQLite e sistema de arquivos local. Não há backend, não há sincronização, não há dependência de rede para nenhuma funcionalidade.
+
+> **V2:** O app passará a sincronizar com backend. A sincronização ocorrerá automaticamente quando houver conexão, mantendo a capacidade offline-first com sync posterior.
 
 ---
 
-## 9. Contratos de API Interna
+## 9. [V2] Contratos de API
+
+> **Esta seção descreve os contratos de API planejados para a V2.** Na V1, não há backend — todas as operações são locais (Drift/SQLite + sistema de arquivos). Os contratos abaixo servem como referência para o design da V2.
+
+<details>
+<summary>Expandir contratos de API (V2)</summary>
 
 ### POST /gastos
 
@@ -624,6 +650,8 @@ O app deve funcionar offline para registro manual e visualização de gastos já
 }
 ```
 
+</details>
+
 ---
 
 ## 10. Critérios de Qualidade Não-Funcionais
@@ -643,12 +671,18 @@ O app deve funcionar offline para registro manual e visualização de gastos já
 
 | Métrica | Requisito |
 |---|---|
-| Uptime da API | ≥ 99,5% |
-| Dados nunca perdidos em falha de rede | Obrigatório (offline-first com sync posterior) |
-| Acurácia do OCR em notas de farmácia impressas | ≥ 80% nos campos: valor, data, CNPJ |
+| Dados nunca perdidos | Obrigatório — armazenamento local persistente (SQLite + arquivos) |
+| Acurácia do OCR on-device em notas de farmácia impressas | ≥ 80% nos campos: valor, data, CNPJ |
+| ~~Uptime da API~~ | ~~≥ 99,5%~~ `[V2]` |
 
 ### Segurança
 
+**V1 (local):**
+- Dados em repouso protegidos pelo sandbox do app (iOS/Android)
+- Comprovantes armazenados no app documents directory (não acessível a outros apps)
+- Conformidade com LGPD: o usuário pode excluir todos os dados localmente a qualquer momento
+
+**V2 (com backend):**
 - Autenticação via JWT com expiração de 24h
 - Refresh token com validade de 30 dias
 - URLs de comprovantes assinadas com expiração de 1 hora
@@ -673,6 +707,7 @@ O app deve funcionar offline para registro manual e visualização de gastos já
 | OCR | Optical Character Recognition — leitura automática de texto em imagens |
 | Soft delete | Exclusão lógica: registro marcado como deletado, mas mantido no banco |
 | Origem | Como o gasto foi criado: MANUAL (digitado), OCR (lido de nota), IMPORTADO |
+| Local-only (V1) | Arquitetura sem backend: todos os dados no dispositivo via SQLite + arquivos locais |
 
 ---
 
