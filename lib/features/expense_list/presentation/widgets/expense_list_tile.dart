@@ -2,10 +2,13 @@ import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/theme/app_colors.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/features/expense_list/presentation/providers/expense_list_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class ExpenseListTile extends StatelessWidget {
+class ExpenseListTile extends ConsumerWidget {
   const ExpenseListTile({
     required this.expense,
     required this.onTap,
@@ -16,7 +19,7 @@ class ExpenseListTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final category = DeductionCategory.values.byName(expense.category);
     final amount = expense.amountInCents / 100;
     final formatted = NumberFormat.currency(
@@ -42,9 +45,17 @@ class ExpenseListTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: AppTextStyles.bodyMedium,
       ),
-      trailing: Text(
-        formatted,
-        style: AppTextStyles.amountDisplay.copyWith(fontSize: 15),
+      trailing: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            formatted,
+            style: AppTextStyles.amountDisplay.copyWith(fontSize: 15),
+          ),
+          const SizedBox(height: 2),
+          _ReceiptIcon(expenseId: expense.id),
+        ],
       ),
     );
   }
@@ -71,6 +82,51 @@ class _CategoryDot extends StatelessWidget {
       decoration: BoxDecoration(
         color: _colorFor(category),
         shape: BoxShape.circle,
+      ),
+    );
+  }
+}
+
+class _ReceiptIcon extends ConsumerWidget {
+  const _ReceiptIcon({required this.expenseId});
+
+  final String expenseId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasReceipt =
+        ref.watch(expenseHasReceiptProvider(expenseId)).valueOrNull ?? false;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (hasReceipt) {
+          context.push('/expenses/$expenseId/receipt');
+        } else {
+          showModalBottomSheet<void>(
+            context: context,
+            builder: (_) => SafeArea(
+              child: ListTile(
+                leading: const Icon(Icons.add_a_photo_outlined),
+                title: const Text('Adicionar comprovante agora'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  context.push('/expenses/$expenseId/receipt');
+                },
+              ),
+            ),
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(2),
+        child: Icon(
+          Icons.receipt_outlined,
+          size: 16,
+          color: hasReceipt
+              ? AppColors.success
+              : Theme.of(context).colorScheme.outlineVariant,
+        ),
       ),
     );
   }

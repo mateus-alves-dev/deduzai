@@ -103,4 +103,25 @@ class ExpenseService {
   }
 
   Future<void> deleteExpense(String id) => _dao.softDelete(id);
+
+  /// Attaches a new receipt to an existing expense (Spec 4.3).
+  Future<void> attachReceipt({
+    required String expenseId,
+    required String imagePath,
+    required OcrStatus ocrStatus,
+  }) async {
+    final file = File(imagePath);
+    final size = await file.length();
+    await _receiptDao.insertReceipt(
+      db.ReceiptsCompanion.insert(
+        id: _uuid.v4(),
+        expenseId: expenseId,
+        localPath: imagePath,
+        mimeType: const Value('image/jpeg'),
+        tamanhoBytes: Value(size),
+        ocrStatus: Value(ocrStatus.name),
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
 }

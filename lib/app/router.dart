@@ -3,6 +3,7 @@ import 'package:deduzai/features/annual_summary/presentation/screens/annual_summ
 import 'package:deduzai/features/expense_entry/presentation/screens/camera_capture_screen.dart';
 import 'package:deduzai/features/expense_entry/presentation/screens/expense_form_screen.dart';
 import 'package:deduzai/features/expense_list/presentation/screens/expense_list_screen.dart';
+import 'package:deduzai/features/receipt_gallery/presentation/screens/archived_receipts_screen.dart';
 import 'package:deduzai/features/receipt_gallery/presentation/screens/receipt_viewer_screen.dart';
 import 'package:deduzai/features/settings/presentation/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +71,11 @@ final router = GoRouter(
         fullscreenDialog: true,
         child: CameraCaptureScreen(),
       ),
+    ),
+    GoRoute(
+      path: '/receipts/archived',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const ArchivedReceiptsScreen(),
     ),
   ],
 );
