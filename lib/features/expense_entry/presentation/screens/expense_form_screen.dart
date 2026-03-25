@@ -1,13 +1,17 @@
 import 'package:deduzai/core/database/app_database.dart' as db;
+import 'package:deduzai/core/database/providers/database_providers.dart';
 import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/expense_origem.dart';
 import 'package:deduzai/core/domain/models/ocr_result.dart';
+import 'package:deduzai/core/domain/models/recurrence_frequency.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
 import 'package:deduzai/features/expense_entry/domain/cnpj_categorization_service.dart';
 import 'package:deduzai/features/expense_entry/domain/expense_service.dart';
 import 'package:deduzai/features/expense_entry/presentation/providers/expense_form_provider.dart';
 import 'package:deduzai/features/expense_entry/presentation/widgets/category_selector.dart';
+import 'package:deduzai/features/recurring_expenses/domain/recurring_expense_service.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,6 +57,11 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   bool _beneficiarioAutoFilled = false;
   String? _cnaeDescricao;
 
+  // Recurrence
+  bool _isRecurring = false;
+  RecurrenceFrequency _recurrenceFrequency = RecurrenceFrequency.mensal;
+  late final TextEditingController _dayController;
+
   @override
   void initState() {
     super.initState();
@@ -63,6 +72,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     _dateDisplayController = TextEditingController(
       text: DateFormat('dd/MM/yyyy').format(_selectedDate),
     );
+    _dayController = TextEditingController(
+      text: DateTime.now().day.toString(),
+    );
   }
 
   @override
@@ -71,6 +83,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     _descriptionController.dispose();
     _beneficiarioController.dispose();
     _dateDisplayController.dispose();
+    _dayController.dispose();
     super.dispose();
   }
 
@@ -228,37 +241,79 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
       return;
     }
 
+    if (_isRecurring && _descriptionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe uma descrição para o gasto recorrente'),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSaving = true);
     try {
       final rawAmount = _amountController.text
           .replaceAll('.', '')
           .replaceAll(',', '.');
       final amountInCents = (double.parse(rawAmount) * 100).round();
-      final service = ref.read(expenseServiceProvider);
-      final isOcr =
-          _ocrResult != null && _ocrResult!.status != OcrStatus.failure;
 
-      if (widget.expenseId == null) {
-        await service.createExpense(
-          date: _selectedDate,
-          category: _selectedCategory!,
-          amountInCents: amountInCents,
+      if (_isRecurring) {
+        final hasDayField =
+            _recurrenceFrequency == RecurrenceFrequency.mensal ||
+            _recurrenceFrequency == RecurrenceFrequency.quinzenal;
+        final isAnnual = _recurrenceFrequency == RecurrenceFrequency.anual;
+        final dayOfMonth = hasDayField
+            ? int.tryParse(_dayController.text.trim())
+            : isAnnual
+            ? _selectedDate.day
+            : null;
+
+        final recurringService = ref.read(recurringExpenseServiceProvider);
+        final id = await recurringService.createTemplate(
           description: _descriptionController.text.trim(),
+          amountInCents: amountInCents,
+          category: _selectedCategory!,
+          frequency: _recurrenceFrequency,
+          referenceDate: _selectedDate,
+          dayOfMonth: dayOfMonth,
           beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
           cnpj: _cnpj,
-          origem: isOcr ? ExpenseOrigem.ocr : ExpenseOrigem.manual,
-          imagePath: _ocrResult?.imagePath,
         );
+
+        final template = await ref.read(recurringExpenseDaoProvider).getById(id);
+        if (template != null) {
+          await recurringService.registerOccurrence(
+            template,
+            forDate: _selectedDate,
+          );
+        }
       } else {
-        await service.updateExpense(
-          existing: _existingExpense!,
-          date: _selectedDate,
-          category: _selectedCategory!,
-          amountInCents: amountInCents,
-          description: _descriptionController.text.trim(),
-          beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
-          cnpj: _cnpj,
-        );
+        final service = ref.read(expenseServiceProvider);
+        final isOcr =
+            _ocrResult != null && _ocrResult!.status != OcrStatus.failure;
+
+        if (widget.expenseId == null) {
+          await service.createExpense(
+            date: _selectedDate,
+            category: _selectedCategory!,
+            amountInCents: amountInCents,
+            description: _descriptionController.text.trim(),
+            beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
+            cnpj: _cnpj,
+            origem: isOcr ? ExpenseOrigem.ocr : ExpenseOrigem.manual,
+            imagePath: _ocrResult?.imagePath,
+          );
+        } else {
+          await service.updateExpense(
+            existing: _existingExpense!,
+            date: _selectedDate,
+            category: _selectedCategory!,
+            amountInCents: amountInCents,
+            description: _descriptionController.text.trim(),
+            beneficiario: _beneficiarioController.text.trim().nullIfEmpty,
+            cnpj: _cnpj,
+          );
+        }
       }
 
       // Persist the user's CNPJ→category preference (Spec 3.3).
@@ -270,9 +325,11 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Gasto salvo ✓'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(
+              _isRecurring ? 'Gasto recorrente criado ✓' : 'Gasto salvo ✓',
+            ),
+            duration: const Duration(seconds: 2),
           ),
         );
         context.pop();
@@ -324,14 +381,13 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
     return formAsync.when(
       loading: () => Scaffold(
-        appBar: AppBar(
-          title:
-              Text(widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto'),
+        appBar: DeduzaiAppBar(
+          title: widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto',
         ),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Erro')),
+        appBar: const DeduzaiAppBar(title: 'Erro'),
         body: Center(child: Text('Erro ao carregar gasto: $e')),
       ),
       data: (_) => _buildForm(context),
@@ -342,8 +398,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto'),
+      appBar: DeduzaiAppBar(
+        title: widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto',
         actions: [
           if (widget.expenseId != null)
             IconButton(
@@ -514,6 +570,28 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                         cnaeDescricao: _cnaeDescricao,
                       ),
                     ],
+
+                    // Recurrence toggle (new expenses only)
+                    if (widget.expenseId == null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      const Divider(),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Gasto recorrente'),
+                        subtitle: const Text(
+                          'Repete automaticamente em datas futuras',
+                        ),
+                        value: _isRecurring,
+                        onChanged: (v) => setState(() => _isRecurring = v),
+                      ),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        child: _isRecurring
+                            ? _buildRecurrenceSection(theme)
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -547,6 +625,74 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRecurrenceSection(ThemeData theme) {
+    final hasDayField =
+        _recurrenceFrequency == RecurrenceFrequency.mensal ||
+        _recurrenceFrequency == RecurrenceFrequency.quinzenal;
+    final isAnnual = _recurrenceFrequency == RecurrenceFrequency.anual;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Frequência',
+          style: AppTextStyles.labelMedium.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        SegmentedButton<RecurrenceFrequency>(
+          segments: RecurrenceFrequency.values
+              .map(
+                (f) => ButtonSegment<RecurrenceFrequency>(
+                  value: f,
+                  label: Text(f.label),
+                ),
+              )
+              .toList(),
+          selected: {_recurrenceFrequency},
+          onSelectionChanged: (s) =>
+              setState(() => _recurrenceFrequency = s.first),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (hasDayField)
+          TextFormField(
+            controller: _dayController,
+            decoration: const InputDecoration(
+              labelText: 'Dia do mês',
+              hintText: '1–28',
+              helperText: 'Dia do mês em que o gasto vence',
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(2),
+            ],
+            validator: (_) {
+              if (!_isRecurring || !hasDayField) return null;
+              final n = int.tryParse(_dayController.text.trim());
+              if (n == null || n < 1 || n > 28) {
+                return 'Informe um dia entre 1 e 28';
+              }
+              return null;
+            },
+          )
+        else if (isAnnual)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.calendar_month_outlined),
+            title: const Text('Mês de referência'),
+            subtitle: Text(
+              '${DateFormat('dd/MM', 'pt_BR').format(_selectedDate)} — vencimento anual nesta data',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _pickDate,
+          ),
+        const SizedBox(height: AppSpacing.sm),
+      ],
     );
   }
 

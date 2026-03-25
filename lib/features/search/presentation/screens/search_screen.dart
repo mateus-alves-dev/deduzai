@@ -7,6 +7,7 @@ import 'package:deduzai/features/expense_list/presentation/widgets/expense_list_
 import 'package:deduzai/features/search/presentation/providers/search_providers.dart';
 import 'package:deduzai/features/search/presentation/widgets/favorite_chips_row.dart';
 import 'package:deduzai/features/search/presentation/widgets/filter_panel.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,8 +40,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final resultsAsync = ref.watch(searchResultsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Buscar gastos'),
+      appBar: DeduzaiAppBar(
+        title: 'Buscar gastos',
         actions: [
           IconButton(
             icon: Icon(

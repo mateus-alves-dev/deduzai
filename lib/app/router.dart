@@ -98,11 +98,6 @@ final router = GoRouter(
       builder: (context, state) => const RecurringExpensesScreen(),
       routes: [
         GoRoute(
-          path: 'new',
-          parentNavigatorKey: _rootNavigatorKey,
-          builder: (context, state) => const RecurringExpenseFormScreen(),
-        ),
-        GoRoute(
           path: ':id',
           parentNavigatorKey: _rootNavigatorKey,
           builder: (context, state) => RecurringExpenseFormScreen(

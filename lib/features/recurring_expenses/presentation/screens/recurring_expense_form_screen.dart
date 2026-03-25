@@ -6,6 +6,7 @@ import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
 import 'package:deduzai/features/expense_entry/presentation/widgets/category_selector.dart';
 import 'package:deduzai/features/recurring_expenses/domain/recurring_expense_service.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -195,8 +196,8 @@ class _RecurringExpenseFormScreenState
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Editar recorrência' : 'Nova recorrência'),
+      appBar: DeduzaiAppBar(
+        title: isEditing ? 'Editar recorrência' : 'Nova recorrência',
         actions: [
           if (_isSaving)
             const Padding(

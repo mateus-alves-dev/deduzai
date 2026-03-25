@@ -1,6 +1,7 @@
 import 'package:deduzai/core/theme/app_colors.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 
 // ---------------------------------------------------------------------------
@@ -264,54 +265,32 @@ class TipsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text('Dicas de IR'),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryDark,
-                      AppColors.primary,
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 60, 16, 48),
-                  child: Text(
-                    'Tudo que você precisa saber para declarar com segurança',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                  ),
+      appBar: const DeduzaiAppBar(title: 'Dicas de IR'),
+      body: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.xxl,
+        ),
+        itemCount: _sections.length + 1,
+        itemBuilder: (context, i) {
+          if (i == 0) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: Text(
+                'Tudo que você precisa saber para declarar com segurança',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.xxl,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, i) => _SectionCard(
-                  section: _sections[i],
-                  theme: theme,
-                ),
-                childCount: _sections.length,
-              ),
-            ),
-          ),
-        ],
+            );
+          }
+          return _SectionCard(
+            section: _sections[i - 1],
+            theme: theme,
+          );
+        },
       ),
     );
   }

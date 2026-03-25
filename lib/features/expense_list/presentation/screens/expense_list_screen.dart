@@ -1,6 +1,7 @@
 import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/expense_list/presentation/providers/expense_list_provider.dart';
 import 'package:deduzai/features/expense_list/presentation/widgets/expense_list_tile.dart';
 import 'package:deduzai/features/notifications/presentation/widgets/notification_permission_banner.dart';
@@ -18,8 +19,8 @@ class ExpenseListScreen extends ConsumerWidget {
     final expenseAsync = ref.watch(expenseListProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gastos'),
+      appBar: DeduzaiAppBar(
+        title: 'Gastos',
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

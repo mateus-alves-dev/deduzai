@@ -10,6 +10,7 @@ import 'package:deduzai/features/annual_summary/presentation/widgets/category_su
 import 'package:deduzai/features/annual_summary/presentation/widgets/hero_summary_header.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/year_selector.dart';
 import 'package:deduzai/features/monthly_summary/presentation/screens/monthly_summary_screen.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -63,8 +64,8 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen>
     final summaryAsync = ref.watch(annualSummaryProvider(year));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Resumo'),
+      appBar: DeduzaiAppBar(
+        title: 'Resumo',
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -88,7 +89,6 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen>
                     loading: _exportingCsv,
                     onPressed: () => _exportCsv(year),
                   ),
-                  const SizedBox(width: 4),
                 ],
           orElse: () => null,
         ),

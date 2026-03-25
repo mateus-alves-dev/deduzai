@@ -6,6 +6,7 @@ import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/expense_entry/domain/expense_service.dart';
 import 'package:deduzai/features/receipt_gallery/presentation/providers/receipt_viewer_provider.dart';
 import 'package:deduzai/features/receipt_gallery/presentation/widgets/receipt_metadata_panel.dart';
@@ -122,8 +123,8 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
         receiptsAsync.value?.isNotEmpty ?? false;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Comprovante'),
+      appBar: DeduzaiAppBar(
+        title: 'Comprovante',
         actions: [
           if (hasReceipt)
             IconButton(

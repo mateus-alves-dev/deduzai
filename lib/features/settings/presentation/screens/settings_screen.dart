@@ -2,6 +2,7 @@ import 'package:deduzai/core/database/providers/database_providers.dart';
 import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/notifications/domain/notification_scheduler.dart';
 import 'package:deduzai/features/notifications/presentation/providers/notification_providers.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class SettingsScreen extends ConsumerWidget {
         timeOfDayAsync.value ?? ReminderTimeOfDay.morning;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Configurações')),
+      appBar: const DeduzaiAppBar(title: 'Configurações'),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [

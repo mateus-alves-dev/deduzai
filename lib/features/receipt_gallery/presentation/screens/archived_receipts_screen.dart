@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/receipt_gallery/presentation/providers/receipt_viewer_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +17,7 @@ class ArchivedReceiptsScreen extends ConsumerWidget {
     final archivedAsync = ref.watch(archivedReceiptsWithExpenseProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Comprovantes arquivados')),
+      appBar: const DeduzaiAppBar(title: 'Comprovantes arquivados'),
       body: archivedAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erro: $e')),

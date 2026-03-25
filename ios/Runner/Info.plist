@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Precisa da câmera para fotografar comprovantes de despesas dedutíveis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Precisa acessar a galeria para selecionar fotos de comprovantes.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

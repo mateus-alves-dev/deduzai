@@ -81,7 +81,7 @@ class RecurringExpenseService {
     }
   }
 
-  Future<void> createTemplate({
+  Future<String> createTemplate({
     required String description,
     required int amountInCents,
     required DeductionCategory category,
@@ -91,11 +91,12 @@ class RecurringExpenseService {
     String? beneficiario,
     String? cnpj,
   }) async {
+    final id = _uuid.v4();
     final now = DateTime.now();
     // nextDueDate starts at referenceDate so it's immediately due if in the past
     await _dao.insertRecurringExpense(
       db.RecurringExpensesCompanion.insert(
-        id: _uuid.v4(),
+        id: id,
         description: description,
         amountInCents: amountInCents,
         category: category.name,
@@ -108,6 +109,7 @@ class RecurringExpenseService {
         createdAt: now,
       ),
     );
+    return id;
   }
 
   Future<void> updateTemplate({

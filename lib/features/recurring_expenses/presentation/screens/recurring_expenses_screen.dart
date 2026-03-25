@@ -2,6 +2,7 @@ import 'package:deduzai/features/recurring_expenses/domain/recurring_expense_ser
 import 'package:deduzai/features/recurring_expenses/presentation/providers/recurring_expense_providers.dart';
 import 'package:deduzai/features/recurring_expenses/presentation/widgets/recurring_expense_tile.dart';
 import 'package:deduzai/features/recurring_expenses/presentation/widgets/recurring_registration_sheet.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,15 +16,14 @@ class RecurringExpensesScreen extends ConsumerWidget {
     final dueCount = ref.watch(dueRecurringExpensesCountProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recorrências'),
+      appBar: DeduzaiAppBar(
+        title: 'Recorrências',
         actions: [
           if (dueCount > 0)
             FilledButton.tonal(
               onPressed: () => showRecurringRegistrationSheet(context),
               child: Text('Registrar ($dueCount)'),
             ),
-          const SizedBox(width: 8),
         ],
       ),
       body: listAsync.when(
@@ -84,7 +84,7 @@ class RecurringExpensesScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Erro: $e')),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/recurring/new'),
+        onPressed: () => context.push('/expenses/new'),
         child: const Icon(Icons.add),
       ),
     );
