@@ -1,3 +1,5 @@
+import 'package:deduzai/app/widgets/custom_bottom_bar.dart';
+import 'package:deduzai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,46 +16,38 @@ class AppShell extends StatelessWidget {
     return 0;
   }
 
+  void _onDestinationSelected(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.go('/expenses');
+      case 1:
+        context.go('/summary');
+      case 2:
+        context.go('/tips');
+      case 3:
+        context.go('/settings');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: child,
-      bottomNavigationBar: NavigationBar(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/expenses/new'),
+        backgroundColor: AppColors.secondary,
+        foregroundColor: colorScheme.onInverseSurface,
+        elevation: 4,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 28),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CustomBottomBar(
         selectedIndex: _currentIndex(context),
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              context.go('/expenses');
-            case 1:
-              context.go('/summary');
-            case 2:
-              context.go('/tips');
-            case 3:
-              context.go('/settings');
-          }
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Gastos',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Resumo',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.lightbulb_outlined),
-            selectedIcon: Icon(Icons.lightbulb),
-            label: 'Dicas',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Config',
-          ),
-        ],
+        onDestinationSelected: (index) =>
+            _onDestinationSelected(context, index),
       ),
     );
   }
