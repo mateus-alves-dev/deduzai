@@ -4,6 +4,7 @@ import 'package:deduzai/core/theme/app_text_styles.dart';
 import 'package:deduzai/features/expense_list/presentation/providers/expense_list_provider.dart';
 import 'package:deduzai/features/expense_list/presentation/widgets/expense_list_tile.dart';
 import 'package:deduzai/features/notifications/presentation/widgets/notification_permission_banner.dart';
+import 'package:deduzai/features/recurring_expenses/presentation/widgets/due_recurring_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +18,16 @@ class ExpenseListScreen extends ConsumerWidget {
     final expenseAsync = ref.watch(expenseListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gastos')),
+      appBar: AppBar(
+        title: const Text('Gastos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Buscar',
+            onPressed: () => context.push('/search'),
+          ),
+        ],
+      ),
       body: expenseAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erro ao carregar gastos: $e')),
@@ -64,6 +74,7 @@ class _GroupedExpenseList extends StatelessWidget {
             count: expenses.length,
           ),
         ),
+        const SliverToBoxAdapter(child: DueRecurringBanner()),
         const SliverToBoxAdapter(child: NotificationPermissionBanner()),
         for (final monthKey in monthKeys) ...[
           SliverToBoxAdapter(

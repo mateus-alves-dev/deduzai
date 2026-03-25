@@ -9,6 +9,7 @@ import 'package:deduzai/features/annual_summary/presentation/widgets/category_br
 import 'package:deduzai/features/annual_summary/presentation/widgets/category_summary_card.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/hero_summary_header.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/year_selector.dart';
+import 'package:deduzai/features/monthly_summary/presentation/screens/monthly_summary_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,16 +24,25 @@ class AnnualSummaryScreen extends ConsumerStatefulWidget {
       _AnnualSummaryScreenState();
 }
 
-class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen> {
+class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
   bool _exportingPdf = false;
   bool _exportingCsv = false;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _recordSummaryAccess(ref.read(selectedYearProvider));
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _recordSummaryAccess(int year) {
@@ -54,7 +64,14 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resumo Anual'),
+        title: const Text('Resumo'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Anual'),
+            Tab(text: 'Mensal'),
+          ],
+        ),
         actions: summaryAsync.maybeWhen(
           data: (summary) => summary.isEmpty
               ? null
@@ -76,29 +93,37 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen> {
           orElse: () => null,
         ),
       ),
-      body: Column(
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          const SizedBox(height: 8),
-          YearSelector(
-            year: year,
-            onChanged: (y) {
-              ref.read(selectedYearProvider.notifier).select(y);
-              _recordSummaryAccess(y);
-            },
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: summaryAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Text('Erro ao carregar resumo: $e'),
+          // ── Tab 0: Anual ──────────────────────────────────────────────────
+          Column(
+            children: [
+              const SizedBox(height: 8),
+              YearSelector(
+                year: year,
+                onChanged: (y) {
+                  ref.read(selectedYearProvider.notifier).select(y);
+                  _recordSummaryAccess(y);
+                },
               ),
-              data: (summary) => summary.isEmpty
-                  ? _EmptyState(year: year)
-                  : _SummaryBody(summary: summary, currency: _currency),
-            ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: summaryAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(
+                    child: Text('Erro ao carregar resumo: $e'),
+                  ),
+                  data: (summary) => summary.isEmpty
+                      ? _EmptyState(year: year)
+                      : _SummaryBody(summary: summary, currency: _currency),
+                ),
+              ),
+            ],
           ),
+          // ── Tab 1: Mensal ─────────────────────────────────────────────────
+          const MonthlySummaryScreen(),
         ],
       ),
     );

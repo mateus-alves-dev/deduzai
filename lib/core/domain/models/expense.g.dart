@@ -55,4 +55,5 @@ const _$ExpenseOrigemEnumMap = {
   ExpenseOrigem.manual: 'manual',
   ExpenseOrigem.ocr: 'ocr',
   ExpenseOrigem.importado: 'importado',
+  ExpenseOrigem.recorrente: 'recorrente',
 };

@@ -2,7 +2,9 @@ import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/database/daos/app_settings_dao.dart';
 import 'package:deduzai/core/database/daos/cnpj_preference_dao.dart';
 import 'package:deduzai/core/database/daos/expense_dao.dart';
+import 'package:deduzai/core/database/daos/filter_favorite_dao.dart';
 import 'package:deduzai/core/database/daos/receipt_dao.dart';
+import 'package:deduzai/core/database/daos/recurring_expense_dao.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -24,3 +26,11 @@ CnpjPreferenceDao cnpjPreferenceDao(Ref ref) =>
 @Riverpod(keepAlive: true)
 AppSettingsDao appSettingsDao(Ref ref) =>
     ref.watch(databaseProvider).appSettingsDao;
+
+@Riverpod(keepAlive: true)
+RecurringExpenseDao recurringExpenseDao(Ref ref) =>
+    ref.watch(databaseProvider).recurringExpenseDao;
+
+@Riverpod(keepAlive: true)
+FilterFavoriteDao filterFavoriteDao(Ref ref) =>
+    ref.watch(databaseProvider).filterFavoriteDao;

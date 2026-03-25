@@ -144,6 +144,23 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
+          _SectionHeader('Automação'),
+          Card(
+            margin: EdgeInsets.zero,
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              leading: const Icon(Icons.repeat),
+              title: const Text('Recorrências'),
+              subtitle: const Text('Gerencie gastos que se repetem'),
+              trailing: const Icon(Icons.chevron_right),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
+              onTap: () => context.push('/recurring'),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
           _SectionHeader('Dados'),
           Card(
             margin: EdgeInsets.zero,

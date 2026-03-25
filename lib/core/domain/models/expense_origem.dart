@@ -1,7 +1,8 @@
 enum ExpenseOrigem {
   manual('MANUAL'),
   ocr('OCR'),
-  importado('IMPORTADO');
+  importado('IMPORTADO'),
+  recorrente('RECORRENTE');
 
   const ExpenseOrigem(this.value);
 

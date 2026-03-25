@@ -219,3 +219,98 @@ final class AppSettingsDaoProvider
 }
 
 String _$appSettingsDaoHash() => r'744fed9d19bd0a178b347f584ca3fdaca6275d63';
+
+@ProviderFor(recurringExpenseDao)
+final recurringExpenseDaoProvider = RecurringExpenseDaoProvider._();
+
+final class RecurringExpenseDaoProvider
+    extends
+        $FunctionalProvider<
+          RecurringExpenseDao,
+          RecurringExpenseDao,
+          RecurringExpenseDao
+        >
+    with $Provider<RecurringExpenseDao> {
+  RecurringExpenseDaoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recurringExpenseDaoProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$recurringExpenseDaoHash();
+
+  @$internal
+  @override
+  $ProviderElement<RecurringExpenseDao> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  RecurringExpenseDao create(Ref ref) {
+    return recurringExpenseDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RecurringExpenseDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RecurringExpenseDao>(value),
+    );
+  }
+}
+
+String _$recurringExpenseDaoHash() =>
+    r'4e5030a5ecf4de9ad992764dc0b5563ab7a8530d';
+
+@ProviderFor(filterFavoriteDao)
+final filterFavoriteDaoProvider = FilterFavoriteDaoProvider._();
+
+final class FilterFavoriteDaoProvider
+    extends
+        $FunctionalProvider<
+          FilterFavoriteDao,
+          FilterFavoriteDao,
+          FilterFavoriteDao
+        >
+    with $Provider<FilterFavoriteDao> {
+  FilterFavoriteDaoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'filterFavoriteDaoProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$filterFavoriteDaoHash();
+
+  @$internal
+  @override
+  $ProviderElement<FilterFavoriteDao> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  FilterFavoriteDao create(Ref ref) {
+    return filterFavoriteDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FilterFavoriteDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FilterFavoriteDao>(value),
+    );
+  }
+}
+
+String _$filterFavoriteDaoHash() => r'29170105e013df02b2dd314e95369df1378483be';

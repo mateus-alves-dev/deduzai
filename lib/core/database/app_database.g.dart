@@ -1783,6 +1783,1471 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $RecurringExpensesTable extends RecurringExpenses
+    with TableInfo<$RecurringExpensesTable, RecurringExpense> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RecurringExpensesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountInCentsMeta = const VerificationMeta(
+    'amountInCents',
+  );
+  @override
+  late final GeneratedColumn<int> amountInCents = GeneratedColumn<int>(
+    'amount_in_cents',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _frequencyMeta = const VerificationMeta(
+    'frequency',
+  );
+  @override
+  late final GeneratedColumn<String> frequency = GeneratedColumn<String>(
+    'frequency',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayOfMonthMeta = const VerificationMeta(
+    'dayOfMonth',
+  );
+  @override
+  late final GeneratedColumn<int> dayOfMonth = GeneratedColumn<int>(
+    'day_of_month',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referenceDateMeta = const VerificationMeta(
+    'referenceDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> referenceDate =
+      GeneratedColumn<DateTime>(
+        'reference_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _nextDueDateMeta = const VerificationMeta(
+    'nextDueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> nextDueDate = GeneratedColumn<DateTime>(
+    'next_due_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _beneficiarioMeta = const VerificationMeta(
+    'beneficiario',
+  );
+  @override
+  late final GeneratedColumn<String> beneficiario = GeneratedColumn<String>(
+    'beneficiario',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cnpjMeta = const VerificationMeta('cnpj');
+  @override
+  late final GeneratedColumn<String> cnpj = GeneratedColumn<String>(
+    'cnpj',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    description,
+    amountInCents,
+    category,
+    frequency,
+    dayOfMonth,
+    referenceDate,
+    nextDueDate,
+    beneficiario,
+    cnpj,
+    isActive,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'recurring_expenses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RecurringExpense> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('amount_in_cents')) {
+      context.handle(
+        _amountInCentsMeta,
+        amountInCents.isAcceptableOrUnknown(
+          data['amount_in_cents']!,
+          _amountInCentsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountInCentsMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('frequency')) {
+      context.handle(
+        _frequencyMeta,
+        frequency.isAcceptableOrUnknown(data['frequency']!, _frequencyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_frequencyMeta);
+    }
+    if (data.containsKey('day_of_month')) {
+      context.handle(
+        _dayOfMonthMeta,
+        dayOfMonth.isAcceptableOrUnknown(
+          data['day_of_month']!,
+          _dayOfMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reference_date')) {
+      context.handle(
+        _referenceDateMeta,
+        referenceDate.isAcceptableOrUnknown(
+          data['reference_date']!,
+          _referenceDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_referenceDateMeta);
+    }
+    if (data.containsKey('next_due_date')) {
+      context.handle(
+        _nextDueDateMeta,
+        nextDueDate.isAcceptableOrUnknown(
+          data['next_due_date']!,
+          _nextDueDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_nextDueDateMeta);
+    }
+    if (data.containsKey('beneficiario')) {
+      context.handle(
+        _beneficiarioMeta,
+        beneficiario.isAcceptableOrUnknown(
+          data['beneficiario']!,
+          _beneficiarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cnpj')) {
+      context.handle(
+        _cnpjMeta,
+        cnpj.isAcceptableOrUnknown(data['cnpj']!, _cnpjMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RecurringExpense map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RecurringExpense(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      amountInCents: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_in_cents'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      frequency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}frequency'],
+      )!,
+      dayOfMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day_of_month'],
+      ),
+      referenceDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}reference_date'],
+      )!,
+      nextDueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}next_due_date'],
+      )!,
+      beneficiario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}beneficiario'],
+      ),
+      cnpj: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cnpj'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $RecurringExpensesTable createAlias(String alias) {
+    return $RecurringExpensesTable(attachedDatabase, alias);
+  }
+}
+
+class RecurringExpense extends DataClass
+    implements Insertable<RecurringExpense> {
+  final String id;
+  final String description;
+  final int amountInCents;
+  final String category;
+  final String frequency;
+  final int? dayOfMonth;
+  final DateTime referenceDate;
+  final DateTime nextDueDate;
+  final String? beneficiario;
+  final String? cnpj;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final DateTime? deletedAt;
+  const RecurringExpense({
+    required this.id,
+    required this.description,
+    required this.amountInCents,
+    required this.category,
+    required this.frequency,
+    this.dayOfMonth,
+    required this.referenceDate,
+    required this.nextDueDate,
+    this.beneficiario,
+    this.cnpj,
+    required this.isActive,
+    required this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['description'] = Variable<String>(description);
+    map['amount_in_cents'] = Variable<int>(amountInCents);
+    map['category'] = Variable<String>(category);
+    map['frequency'] = Variable<String>(frequency);
+    if (!nullToAbsent || dayOfMonth != null) {
+      map['day_of_month'] = Variable<int>(dayOfMonth);
+    }
+    map['reference_date'] = Variable<DateTime>(referenceDate);
+    map['next_due_date'] = Variable<DateTime>(nextDueDate);
+    if (!nullToAbsent || beneficiario != null) {
+      map['beneficiario'] = Variable<String>(beneficiario);
+    }
+    if (!nullToAbsent || cnpj != null) {
+      map['cnpj'] = Variable<String>(cnpj);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  RecurringExpensesCompanion toCompanion(bool nullToAbsent) {
+    return RecurringExpensesCompanion(
+      id: Value(id),
+      description: Value(description),
+      amountInCents: Value(amountInCents),
+      category: Value(category),
+      frequency: Value(frequency),
+      dayOfMonth: dayOfMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dayOfMonth),
+      referenceDate: Value(referenceDate),
+      nextDueDate: Value(nextDueDate),
+      beneficiario: beneficiario == null && nullToAbsent
+          ? const Value.absent()
+          : Value(beneficiario),
+      cnpj: cnpj == null && nullToAbsent ? const Value.absent() : Value(cnpj),
+      isActive: Value(isActive),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory RecurringExpense.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RecurringExpense(
+      id: serializer.fromJson<String>(json['id']),
+      description: serializer.fromJson<String>(json['description']),
+      amountInCents: serializer.fromJson<int>(json['amountInCents']),
+      category: serializer.fromJson<String>(json['category']),
+      frequency: serializer.fromJson<String>(json['frequency']),
+      dayOfMonth: serializer.fromJson<int?>(json['dayOfMonth']),
+      referenceDate: serializer.fromJson<DateTime>(json['referenceDate']),
+      nextDueDate: serializer.fromJson<DateTime>(json['nextDueDate']),
+      beneficiario: serializer.fromJson<String?>(json['beneficiario']),
+      cnpj: serializer.fromJson<String?>(json['cnpj']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'description': serializer.toJson<String>(description),
+      'amountInCents': serializer.toJson<int>(amountInCents),
+      'category': serializer.toJson<String>(category),
+      'frequency': serializer.toJson<String>(frequency),
+      'dayOfMonth': serializer.toJson<int?>(dayOfMonth),
+      'referenceDate': serializer.toJson<DateTime>(referenceDate),
+      'nextDueDate': serializer.toJson<DateTime>(nextDueDate),
+      'beneficiario': serializer.toJson<String?>(beneficiario),
+      'cnpj': serializer.toJson<String?>(cnpj),
+      'isActive': serializer.toJson<bool>(isActive),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  RecurringExpense copyWith({
+    String? id,
+    String? description,
+    int? amountInCents,
+    String? category,
+    String? frequency,
+    Value<int?> dayOfMonth = const Value.absent(),
+    DateTime? referenceDate,
+    DateTime? nextDueDate,
+    Value<String?> beneficiario = const Value.absent(),
+    Value<String?> cnpj = const Value.absent(),
+    bool? isActive,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => RecurringExpense(
+    id: id ?? this.id,
+    description: description ?? this.description,
+    amountInCents: amountInCents ?? this.amountInCents,
+    category: category ?? this.category,
+    frequency: frequency ?? this.frequency,
+    dayOfMonth: dayOfMonth.present ? dayOfMonth.value : this.dayOfMonth,
+    referenceDate: referenceDate ?? this.referenceDate,
+    nextDueDate: nextDueDate ?? this.nextDueDate,
+    beneficiario: beneficiario.present ? beneficiario.value : this.beneficiario,
+    cnpj: cnpj.present ? cnpj.value : this.cnpj,
+    isActive: isActive ?? this.isActive,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  RecurringExpense copyWithCompanion(RecurringExpensesCompanion data) {
+    return RecurringExpense(
+      id: data.id.present ? data.id.value : this.id,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      amountInCents: data.amountInCents.present
+          ? data.amountInCents.value
+          : this.amountInCents,
+      category: data.category.present ? data.category.value : this.category,
+      frequency: data.frequency.present ? data.frequency.value : this.frequency,
+      dayOfMonth: data.dayOfMonth.present
+          ? data.dayOfMonth.value
+          : this.dayOfMonth,
+      referenceDate: data.referenceDate.present
+          ? data.referenceDate.value
+          : this.referenceDate,
+      nextDueDate: data.nextDueDate.present
+          ? data.nextDueDate.value
+          : this.nextDueDate,
+      beneficiario: data.beneficiario.present
+          ? data.beneficiario.value
+          : this.beneficiario,
+      cnpj: data.cnpj.present ? data.cnpj.value : this.cnpj,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecurringExpense(')
+          ..write('id: $id, ')
+          ..write('description: $description, ')
+          ..write('amountInCents: $amountInCents, ')
+          ..write('category: $category, ')
+          ..write('frequency: $frequency, ')
+          ..write('dayOfMonth: $dayOfMonth, ')
+          ..write('referenceDate: $referenceDate, ')
+          ..write('nextDueDate: $nextDueDate, ')
+          ..write('beneficiario: $beneficiario, ')
+          ..write('cnpj: $cnpj, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    description,
+    amountInCents,
+    category,
+    frequency,
+    dayOfMonth,
+    referenceDate,
+    nextDueDate,
+    beneficiario,
+    cnpj,
+    isActive,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RecurringExpense &&
+          other.id == this.id &&
+          other.description == this.description &&
+          other.amountInCents == this.amountInCents &&
+          other.category == this.category &&
+          other.frequency == this.frequency &&
+          other.dayOfMonth == this.dayOfMonth &&
+          other.referenceDate == this.referenceDate &&
+          other.nextDueDate == this.nextDueDate &&
+          other.beneficiario == this.beneficiario &&
+          other.cnpj == this.cnpj &&
+          other.isActive == this.isActive &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class RecurringExpensesCompanion extends UpdateCompanion<RecurringExpense> {
+  final Value<String> id;
+  final Value<String> description;
+  final Value<int> amountInCents;
+  final Value<String> category;
+  final Value<String> frequency;
+  final Value<int?> dayOfMonth;
+  final Value<DateTime> referenceDate;
+  final Value<DateTime> nextDueDate;
+  final Value<String?> beneficiario;
+  final Value<String?> cnpj;
+  final Value<bool> isActive;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const RecurringExpensesCompanion({
+    this.id = const Value.absent(),
+    this.description = const Value.absent(),
+    this.amountInCents = const Value.absent(),
+    this.category = const Value.absent(),
+    this.frequency = const Value.absent(),
+    this.dayOfMonth = const Value.absent(),
+    this.referenceDate = const Value.absent(),
+    this.nextDueDate = const Value.absent(),
+    this.beneficiario = const Value.absent(),
+    this.cnpj = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RecurringExpensesCompanion.insert({
+    required String id,
+    required String description,
+    required int amountInCents,
+    required String category,
+    required String frequency,
+    this.dayOfMonth = const Value.absent(),
+    required DateTime referenceDate,
+    required DateTime nextDueDate,
+    this.beneficiario = const Value.absent(),
+    this.cnpj = const Value.absent(),
+    this.isActive = const Value.absent(),
+    required DateTime createdAt,
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       description = Value(description),
+       amountInCents = Value(amountInCents),
+       category = Value(category),
+       frequency = Value(frequency),
+       referenceDate = Value(referenceDate),
+       nextDueDate = Value(nextDueDate),
+       createdAt = Value(createdAt);
+  static Insertable<RecurringExpense> custom({
+    Expression<String>? id,
+    Expression<String>? description,
+    Expression<int>? amountInCents,
+    Expression<String>? category,
+    Expression<String>? frequency,
+    Expression<int>? dayOfMonth,
+    Expression<DateTime>? referenceDate,
+    Expression<DateTime>? nextDueDate,
+    Expression<String>? beneficiario,
+    Expression<String>? cnpj,
+    Expression<bool>? isActive,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (description != null) 'description': description,
+      if (amountInCents != null) 'amount_in_cents': amountInCents,
+      if (category != null) 'category': category,
+      if (frequency != null) 'frequency': frequency,
+      if (dayOfMonth != null) 'day_of_month': dayOfMonth,
+      if (referenceDate != null) 'reference_date': referenceDate,
+      if (nextDueDate != null) 'next_due_date': nextDueDate,
+      if (beneficiario != null) 'beneficiario': beneficiario,
+      if (cnpj != null) 'cnpj': cnpj,
+      if (isActive != null) 'is_active': isActive,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RecurringExpensesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? description,
+    Value<int>? amountInCents,
+    Value<String>? category,
+    Value<String>? frequency,
+    Value<int?>? dayOfMonth,
+    Value<DateTime>? referenceDate,
+    Value<DateTime>? nextDueDate,
+    Value<String?>? beneficiario,
+    Value<String?>? cnpj,
+    Value<bool>? isActive,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return RecurringExpensesCompanion(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      amountInCents: amountInCents ?? this.amountInCents,
+      category: category ?? this.category,
+      frequency: frequency ?? this.frequency,
+      dayOfMonth: dayOfMonth ?? this.dayOfMonth,
+      referenceDate: referenceDate ?? this.referenceDate,
+      nextDueDate: nextDueDate ?? this.nextDueDate,
+      beneficiario: beneficiario ?? this.beneficiario,
+      cnpj: cnpj ?? this.cnpj,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (amountInCents.present) {
+      map['amount_in_cents'] = Variable<int>(amountInCents.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (frequency.present) {
+      map['frequency'] = Variable<String>(frequency.value);
+    }
+    if (dayOfMonth.present) {
+      map['day_of_month'] = Variable<int>(dayOfMonth.value);
+    }
+    if (referenceDate.present) {
+      map['reference_date'] = Variable<DateTime>(referenceDate.value);
+    }
+    if (nextDueDate.present) {
+      map['next_due_date'] = Variable<DateTime>(nextDueDate.value);
+    }
+    if (beneficiario.present) {
+      map['beneficiario'] = Variable<String>(beneficiario.value);
+    }
+    if (cnpj.present) {
+      map['cnpj'] = Variable<String>(cnpj.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecurringExpensesCompanion(')
+          ..write('id: $id, ')
+          ..write('description: $description, ')
+          ..write('amountInCents: $amountInCents, ')
+          ..write('category: $category, ')
+          ..write('frequency: $frequency, ')
+          ..write('dayOfMonth: $dayOfMonth, ')
+          ..write('referenceDate: $referenceDate, ')
+          ..write('nextDueDate: $nextDueDate, ')
+          ..write('beneficiario: $beneficiario, ')
+          ..write('cnpj: $cnpj, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FilterFavoritesTable extends FilterFavorites
+    with TableInfo<$FilterFavoritesTable, FilterFavorite> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FilterFavoritesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nomeMeta = const VerificationMeta('nome');
+  @override
+  late final GeneratedColumn<String> nome = GeneratedColumn<String>(
+    'nome',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoriasMeta = const VerificationMeta(
+    'categorias',
+  );
+  @override
+  late final GeneratedColumn<String> categorias = GeneratedColumn<String>(
+    'categorias',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataInicioMeta = const VerificationMeta(
+    'dataInicio',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataInicio = GeneratedColumn<DateTime>(
+    'data_inicio',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataFimMeta = const VerificationMeta(
+    'dataFim',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataFim = GeneratedColumn<DateTime>(
+    'data_fim',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _valorMinMeta = const VerificationMeta(
+    'valorMin',
+  );
+  @override
+  late final GeneratedColumn<int> valorMin = GeneratedColumn<int>(
+    'valor_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _valorMaxMeta = const VerificationMeta(
+    'valorMax',
+  );
+  @override
+  late final GeneratedColumn<int> valorMax = GeneratedColumn<int>(
+    'valor_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _comComprovanteMeta = const VerificationMeta(
+    'comComprovante',
+  );
+  @override
+  late final GeneratedColumn<bool> comComprovante = GeneratedColumn<bool>(
+    'com_comprovante',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("com_comprovante" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _criadoEmMeta = const VerificationMeta(
+    'criadoEm',
+  );
+  @override
+  late final GeneratedColumn<DateTime> criadoEm = GeneratedColumn<DateTime>(
+    'criado_em',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _atualizadoEmMeta = const VerificationMeta(
+    'atualizadoEm',
+  );
+  @override
+  late final GeneratedColumn<DateTime> atualizadoEm = GeneratedColumn<DateTime>(
+    'atualizado_em',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nome,
+    categorias,
+    dataInicio,
+    dataFim,
+    valorMin,
+    valorMax,
+    comComprovante,
+    criadoEm,
+    atualizadoEm,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'filter_favorites';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FilterFavorite> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('nome')) {
+      context.handle(
+        _nomeMeta,
+        nome.isAcceptableOrUnknown(data['nome']!, _nomeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nomeMeta);
+    }
+    if (data.containsKey('categorias')) {
+      context.handle(
+        _categoriasMeta,
+        categorias.isAcceptableOrUnknown(data['categorias']!, _categoriasMeta),
+      );
+    }
+    if (data.containsKey('data_inicio')) {
+      context.handle(
+        _dataInicioMeta,
+        dataInicio.isAcceptableOrUnknown(data['data_inicio']!, _dataInicioMeta),
+      );
+    }
+    if (data.containsKey('data_fim')) {
+      context.handle(
+        _dataFimMeta,
+        dataFim.isAcceptableOrUnknown(data['data_fim']!, _dataFimMeta),
+      );
+    }
+    if (data.containsKey('valor_min')) {
+      context.handle(
+        _valorMinMeta,
+        valorMin.isAcceptableOrUnknown(data['valor_min']!, _valorMinMeta),
+      );
+    }
+    if (data.containsKey('valor_max')) {
+      context.handle(
+        _valorMaxMeta,
+        valorMax.isAcceptableOrUnknown(data['valor_max']!, _valorMaxMeta),
+      );
+    }
+    if (data.containsKey('com_comprovante')) {
+      context.handle(
+        _comComprovanteMeta,
+        comComprovante.isAcceptableOrUnknown(
+          data['com_comprovante']!,
+          _comComprovanteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('criado_em')) {
+      context.handle(
+        _criadoEmMeta,
+        criadoEm.isAcceptableOrUnknown(data['criado_em']!, _criadoEmMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_criadoEmMeta);
+    }
+    if (data.containsKey('atualizado_em')) {
+      context.handle(
+        _atualizadoEmMeta,
+        atualizadoEm.isAcceptableOrUnknown(
+          data['atualizado_em']!,
+          _atualizadoEmMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_atualizadoEmMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FilterFavorite map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FilterFavorite(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      nome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome'],
+      )!,
+      categorias: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}categorias'],
+      ),
+      dataInicio: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_inicio'],
+      ),
+      dataFim: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_fim'],
+      ),
+      valorMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_min'],
+      ),
+      valorMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_max'],
+      ),
+      comComprovante: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}com_comprovante'],
+      ),
+      criadoEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}criado_em'],
+      )!,
+      atualizadoEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}atualizado_em'],
+      )!,
+    );
+  }
+
+  @override
+  $FilterFavoritesTable createAlias(String alias) {
+    return $FilterFavoritesTable(attachedDatabase, alias);
+  }
+}
+
+class FilterFavorite extends DataClass implements Insertable<FilterFavorite> {
+  final String id;
+  final String nome;
+  final String? categorias;
+  final DateTime? dataInicio;
+  final DateTime? dataFim;
+  final int? valorMin;
+  final int? valorMax;
+  final bool? comComprovante;
+  final DateTime criadoEm;
+  final DateTime atualizadoEm;
+  const FilterFavorite({
+    required this.id,
+    required this.nome,
+    this.categorias,
+    this.dataInicio,
+    this.dataFim,
+    this.valorMin,
+    this.valorMax,
+    this.comComprovante,
+    required this.criadoEm,
+    required this.atualizadoEm,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['nome'] = Variable<String>(nome);
+    if (!nullToAbsent || categorias != null) {
+      map['categorias'] = Variable<String>(categorias);
+    }
+    if (!nullToAbsent || dataInicio != null) {
+      map['data_inicio'] = Variable<DateTime>(dataInicio);
+    }
+    if (!nullToAbsent || dataFim != null) {
+      map['data_fim'] = Variable<DateTime>(dataFim);
+    }
+    if (!nullToAbsent || valorMin != null) {
+      map['valor_min'] = Variable<int>(valorMin);
+    }
+    if (!nullToAbsent || valorMax != null) {
+      map['valor_max'] = Variable<int>(valorMax);
+    }
+    if (!nullToAbsent || comComprovante != null) {
+      map['com_comprovante'] = Variable<bool>(comComprovante);
+    }
+    map['criado_em'] = Variable<DateTime>(criadoEm);
+    map['atualizado_em'] = Variable<DateTime>(atualizadoEm);
+    return map;
+  }
+
+  FilterFavoritesCompanion toCompanion(bool nullToAbsent) {
+    return FilterFavoritesCompanion(
+      id: Value(id),
+      nome: Value(nome),
+      categorias: categorias == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categorias),
+      dataInicio: dataInicio == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataInicio),
+      dataFim: dataFim == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataFim),
+      valorMin: valorMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorMin),
+      valorMax: valorMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorMax),
+      comComprovante: comComprovante == null && nullToAbsent
+          ? const Value.absent()
+          : Value(comComprovante),
+      criadoEm: Value(criadoEm),
+      atualizadoEm: Value(atualizadoEm),
+    );
+  }
+
+  factory FilterFavorite.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FilterFavorite(
+      id: serializer.fromJson<String>(json['id']),
+      nome: serializer.fromJson<String>(json['nome']),
+      categorias: serializer.fromJson<String?>(json['categorias']),
+      dataInicio: serializer.fromJson<DateTime?>(json['dataInicio']),
+      dataFim: serializer.fromJson<DateTime?>(json['dataFim']),
+      valorMin: serializer.fromJson<int?>(json['valorMin']),
+      valorMax: serializer.fromJson<int?>(json['valorMax']),
+      comComprovante: serializer.fromJson<bool?>(json['comComprovante']),
+      criadoEm: serializer.fromJson<DateTime>(json['criadoEm']),
+      atualizadoEm: serializer.fromJson<DateTime>(json['atualizadoEm']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'nome': serializer.toJson<String>(nome),
+      'categorias': serializer.toJson<String?>(categorias),
+      'dataInicio': serializer.toJson<DateTime?>(dataInicio),
+      'dataFim': serializer.toJson<DateTime?>(dataFim),
+      'valorMin': serializer.toJson<int?>(valorMin),
+      'valorMax': serializer.toJson<int?>(valorMax),
+      'comComprovante': serializer.toJson<bool?>(comComprovante),
+      'criadoEm': serializer.toJson<DateTime>(criadoEm),
+      'atualizadoEm': serializer.toJson<DateTime>(atualizadoEm),
+    };
+  }
+
+  FilterFavorite copyWith({
+    String? id,
+    String? nome,
+    Value<String?> categorias = const Value.absent(),
+    Value<DateTime?> dataInicio = const Value.absent(),
+    Value<DateTime?> dataFim = const Value.absent(),
+    Value<int?> valorMin = const Value.absent(),
+    Value<int?> valorMax = const Value.absent(),
+    Value<bool?> comComprovante = const Value.absent(),
+    DateTime? criadoEm,
+    DateTime? atualizadoEm,
+  }) => FilterFavorite(
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    categorias: categorias.present ? categorias.value : this.categorias,
+    dataInicio: dataInicio.present ? dataInicio.value : this.dataInicio,
+    dataFim: dataFim.present ? dataFim.value : this.dataFim,
+    valorMin: valorMin.present ? valorMin.value : this.valorMin,
+    valorMax: valorMax.present ? valorMax.value : this.valorMax,
+    comComprovante: comComprovante.present
+        ? comComprovante.value
+        : this.comComprovante,
+    criadoEm: criadoEm ?? this.criadoEm,
+    atualizadoEm: atualizadoEm ?? this.atualizadoEm,
+  );
+  FilterFavorite copyWithCompanion(FilterFavoritesCompanion data) {
+    return FilterFavorite(
+      id: data.id.present ? data.id.value : this.id,
+      nome: data.nome.present ? data.nome.value : this.nome,
+      categorias: data.categorias.present
+          ? data.categorias.value
+          : this.categorias,
+      dataInicio: data.dataInicio.present
+          ? data.dataInicio.value
+          : this.dataInicio,
+      dataFim: data.dataFim.present ? data.dataFim.value : this.dataFim,
+      valorMin: data.valorMin.present ? data.valorMin.value : this.valorMin,
+      valorMax: data.valorMax.present ? data.valorMax.value : this.valorMax,
+      comComprovante: data.comComprovante.present
+          ? data.comComprovante.value
+          : this.comComprovante,
+      criadoEm: data.criadoEm.present ? data.criadoEm.value : this.criadoEm,
+      atualizadoEm: data.atualizadoEm.present
+          ? data.atualizadoEm.value
+          : this.atualizadoEm,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FilterFavorite(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('categorias: $categorias, ')
+          ..write('dataInicio: $dataInicio, ')
+          ..write('dataFim: $dataFim, ')
+          ..write('valorMin: $valorMin, ')
+          ..write('valorMax: $valorMax, ')
+          ..write('comComprovante: $comComprovante, ')
+          ..write('criadoEm: $criadoEm, ')
+          ..write('atualizadoEm: $atualizadoEm')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    nome,
+    categorias,
+    dataInicio,
+    dataFim,
+    valorMin,
+    valorMax,
+    comComprovante,
+    criadoEm,
+    atualizadoEm,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FilterFavorite &&
+          other.id == this.id &&
+          other.nome == this.nome &&
+          other.categorias == this.categorias &&
+          other.dataInicio == this.dataInicio &&
+          other.dataFim == this.dataFim &&
+          other.valorMin == this.valorMin &&
+          other.valorMax == this.valorMax &&
+          other.comComprovante == this.comComprovante &&
+          other.criadoEm == this.criadoEm &&
+          other.atualizadoEm == this.atualizadoEm);
+}
+
+class FilterFavoritesCompanion extends UpdateCompanion<FilterFavorite> {
+  final Value<String> id;
+  final Value<String> nome;
+  final Value<String?> categorias;
+  final Value<DateTime?> dataInicio;
+  final Value<DateTime?> dataFim;
+  final Value<int?> valorMin;
+  final Value<int?> valorMax;
+  final Value<bool?> comComprovante;
+  final Value<DateTime> criadoEm;
+  final Value<DateTime> atualizadoEm;
+  final Value<int> rowid;
+  const FilterFavoritesCompanion({
+    this.id = const Value.absent(),
+    this.nome = const Value.absent(),
+    this.categorias = const Value.absent(),
+    this.dataInicio = const Value.absent(),
+    this.dataFim = const Value.absent(),
+    this.valorMin = const Value.absent(),
+    this.valorMax = const Value.absent(),
+    this.comComprovante = const Value.absent(),
+    this.criadoEm = const Value.absent(),
+    this.atualizadoEm = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FilterFavoritesCompanion.insert({
+    required String id,
+    required String nome,
+    this.categorias = const Value.absent(),
+    this.dataInicio = const Value.absent(),
+    this.dataFim = const Value.absent(),
+    this.valorMin = const Value.absent(),
+    this.valorMax = const Value.absent(),
+    this.comComprovante = const Value.absent(),
+    required DateTime criadoEm,
+    required DateTime atualizadoEm,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       nome = Value(nome),
+       criadoEm = Value(criadoEm),
+       atualizadoEm = Value(atualizadoEm);
+  static Insertable<FilterFavorite> custom({
+    Expression<String>? id,
+    Expression<String>? nome,
+    Expression<String>? categorias,
+    Expression<DateTime>? dataInicio,
+    Expression<DateTime>? dataFim,
+    Expression<int>? valorMin,
+    Expression<int>? valorMax,
+    Expression<bool>? comComprovante,
+    Expression<DateTime>? criadoEm,
+    Expression<DateTime>? atualizadoEm,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nome != null) 'nome': nome,
+      if (categorias != null) 'categorias': categorias,
+      if (dataInicio != null) 'data_inicio': dataInicio,
+      if (dataFim != null) 'data_fim': dataFim,
+      if (valorMin != null) 'valor_min': valorMin,
+      if (valorMax != null) 'valor_max': valorMax,
+      if (comComprovante != null) 'com_comprovante': comComprovante,
+      if (criadoEm != null) 'criado_em': criadoEm,
+      if (atualizadoEm != null) 'atualizado_em': atualizadoEm,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FilterFavoritesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? nome,
+    Value<String?>? categorias,
+    Value<DateTime?>? dataInicio,
+    Value<DateTime?>? dataFim,
+    Value<int?>? valorMin,
+    Value<int?>? valorMax,
+    Value<bool?>? comComprovante,
+    Value<DateTime>? criadoEm,
+    Value<DateTime>? atualizadoEm,
+    Value<int>? rowid,
+  }) {
+    return FilterFavoritesCompanion(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      categorias: categorias ?? this.categorias,
+      dataInicio: dataInicio ?? this.dataInicio,
+      dataFim: dataFim ?? this.dataFim,
+      valorMin: valorMin ?? this.valorMin,
+      valorMax: valorMax ?? this.valorMax,
+      comComprovante: comComprovante ?? this.comComprovante,
+      criadoEm: criadoEm ?? this.criadoEm,
+      atualizadoEm: atualizadoEm ?? this.atualizadoEm,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (nome.present) {
+      map['nome'] = Variable<String>(nome.value);
+    }
+    if (categorias.present) {
+      map['categorias'] = Variable<String>(categorias.value);
+    }
+    if (dataInicio.present) {
+      map['data_inicio'] = Variable<DateTime>(dataInicio.value);
+    }
+    if (dataFim.present) {
+      map['data_fim'] = Variable<DateTime>(dataFim.value);
+    }
+    if (valorMin.present) {
+      map['valor_min'] = Variable<int>(valorMin.value);
+    }
+    if (valorMax.present) {
+      map['valor_max'] = Variable<int>(valorMax.value);
+    }
+    if (comComprovante.present) {
+      map['com_comprovante'] = Variable<bool>(comComprovante.value);
+    }
+    if (criadoEm.present) {
+      map['criado_em'] = Variable<DateTime>(criadoEm.value);
+    }
+    if (atualizadoEm.present) {
+      map['atualizado_em'] = Variable<DateTime>(atualizadoEm.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FilterFavoritesCompanion(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('categorias: $categorias, ')
+          ..write('dataInicio: $dataInicio, ')
+          ..write('dataFim: $dataFim, ')
+          ..write('valorMin: $valorMin, ')
+          ..write('valorMax: $valorMax, ')
+          ..write('comComprovante: $comComprovante, ')
+          ..write('criadoEm: $criadoEm, ')
+          ..write('atualizadoEm: $atualizadoEm, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1792,12 +3257,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $RecurringExpensesTable recurringExpenses =
+      $RecurringExpensesTable(this);
+  late final $FilterFavoritesTable filterFavorites = $FilterFavoritesTable(
+    this,
+  );
   late final ExpenseDao expenseDao = ExpenseDao(this as AppDatabase);
   late final ReceiptDao receiptDao = ReceiptDao(this as AppDatabase);
   late final CnpjPreferenceDao cnpjPreferenceDao = CnpjPreferenceDao(
     this as AppDatabase,
   );
   late final AppSettingsDao appSettingsDao = AppSettingsDao(
+    this as AppDatabase,
+  );
+  late final RecurringExpenseDao recurringExpenseDao = RecurringExpenseDao(
+    this as AppDatabase,
+  );
+  late final FilterFavoriteDao filterFavoriteDao = FilterFavoriteDao(
     this as AppDatabase,
   );
   @override
@@ -1809,6 +3285,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     receipts,
     cnpjPreferences,
     appSettings,
+    recurringExpenses,
+    filterFavorites,
   ];
 }
 
@@ -2953,6 +4431,711 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$RecurringExpensesTableCreateCompanionBuilder =
+    RecurringExpensesCompanion Function({
+      required String id,
+      required String description,
+      required int amountInCents,
+      required String category,
+      required String frequency,
+      Value<int?> dayOfMonth,
+      required DateTime referenceDate,
+      required DateTime nextDueDate,
+      Value<String?> beneficiario,
+      Value<String?> cnpj,
+      Value<bool> isActive,
+      required DateTime createdAt,
+      Value<DateTime?> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$RecurringExpensesTableUpdateCompanionBuilder =
+    RecurringExpensesCompanion Function({
+      Value<String> id,
+      Value<String> description,
+      Value<int> amountInCents,
+      Value<String> category,
+      Value<String> frequency,
+      Value<int?> dayOfMonth,
+      Value<DateTime> referenceDate,
+      Value<DateTime> nextDueDate,
+      Value<String?> beneficiario,
+      Value<String?> cnpj,
+      Value<bool> isActive,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+class $$RecurringExpensesTableFilterComposer
+    extends Composer<_$AppDatabase, $RecurringExpensesTable> {
+  $$RecurringExpensesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountInCents => $composableBuilder(
+    column: $table.amountInCents,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frequency => $composableBuilder(
+    column: $table.frequency,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dayOfMonth => $composableBuilder(
+    column: $table.dayOfMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get referenceDate => $composableBuilder(
+    column: $table.referenceDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get nextDueDate => $composableBuilder(
+    column: $table.nextDueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RecurringExpensesTableOrderingComposer
+    extends Composer<_$AppDatabase, $RecurringExpensesTable> {
+  $$RecurringExpensesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountInCents => $composableBuilder(
+    column: $table.amountInCents,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frequency => $composableBuilder(
+    column: $table.frequency,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dayOfMonth => $composableBuilder(
+    column: $table.dayOfMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get referenceDate => $composableBuilder(
+    column: $table.referenceDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get nextDueDate => $composableBuilder(
+    column: $table.nextDueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RecurringExpensesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RecurringExpensesTable> {
+  $$RecurringExpensesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get amountInCents => $composableBuilder(
+    column: $table.amountInCents,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get frequency =>
+      $composableBuilder(column: $table.frequency, builder: (column) => column);
+
+  GeneratedColumn<int> get dayOfMonth => $composableBuilder(
+    column: $table.dayOfMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get referenceDate => $composableBuilder(
+    column: $table.referenceDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get nextDueDate => $composableBuilder(
+    column: $table.nextDueDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cnpj =>
+      $composableBuilder(column: $table.cnpj, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$RecurringExpensesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RecurringExpensesTable,
+          RecurringExpense,
+          $$RecurringExpensesTableFilterComposer,
+          $$RecurringExpensesTableOrderingComposer,
+          $$RecurringExpensesTableAnnotationComposer,
+          $$RecurringExpensesTableCreateCompanionBuilder,
+          $$RecurringExpensesTableUpdateCompanionBuilder,
+          (
+            RecurringExpense,
+            BaseReferences<
+              _$AppDatabase,
+              $RecurringExpensesTable,
+              RecurringExpense
+            >,
+          ),
+          RecurringExpense,
+          PrefetchHooks Function()
+        > {
+  $$RecurringExpensesTableTableManager(
+    _$AppDatabase db,
+    $RecurringExpensesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RecurringExpensesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RecurringExpensesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RecurringExpensesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<int> amountInCents = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String> frequency = const Value.absent(),
+                Value<int?> dayOfMonth = const Value.absent(),
+                Value<DateTime> referenceDate = const Value.absent(),
+                Value<DateTime> nextDueDate = const Value.absent(),
+                Value<String?> beneficiario = const Value.absent(),
+                Value<String?> cnpj = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecurringExpensesCompanion(
+                id: id,
+                description: description,
+                amountInCents: amountInCents,
+                category: category,
+                frequency: frequency,
+                dayOfMonth: dayOfMonth,
+                referenceDate: referenceDate,
+                nextDueDate: nextDueDate,
+                beneficiario: beneficiario,
+                cnpj: cnpj,
+                isActive: isActive,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String description,
+                required int amountInCents,
+                required String category,
+                required String frequency,
+                Value<int?> dayOfMonth = const Value.absent(),
+                required DateTime referenceDate,
+                required DateTime nextDueDate,
+                Value<String?> beneficiario = const Value.absent(),
+                Value<String?> cnpj = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                required DateTime createdAt,
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecurringExpensesCompanion.insert(
+                id: id,
+                description: description,
+                amountInCents: amountInCents,
+                category: category,
+                frequency: frequency,
+                dayOfMonth: dayOfMonth,
+                referenceDate: referenceDate,
+                nextDueDate: nextDueDate,
+                beneficiario: beneficiario,
+                cnpj: cnpj,
+                isActive: isActive,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RecurringExpensesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RecurringExpensesTable,
+      RecurringExpense,
+      $$RecurringExpensesTableFilterComposer,
+      $$RecurringExpensesTableOrderingComposer,
+      $$RecurringExpensesTableAnnotationComposer,
+      $$RecurringExpensesTableCreateCompanionBuilder,
+      $$RecurringExpensesTableUpdateCompanionBuilder,
+      (
+        RecurringExpense,
+        BaseReferences<
+          _$AppDatabase,
+          $RecurringExpensesTable,
+          RecurringExpense
+        >,
+      ),
+      RecurringExpense,
+      PrefetchHooks Function()
+    >;
+typedef $$FilterFavoritesTableCreateCompanionBuilder =
+    FilterFavoritesCompanion Function({
+      required String id,
+      required String nome,
+      Value<String?> categorias,
+      Value<DateTime?> dataInicio,
+      Value<DateTime?> dataFim,
+      Value<int?> valorMin,
+      Value<int?> valorMax,
+      Value<bool?> comComprovante,
+      required DateTime criadoEm,
+      required DateTime atualizadoEm,
+      Value<int> rowid,
+    });
+typedef $$FilterFavoritesTableUpdateCompanionBuilder =
+    FilterFavoritesCompanion Function({
+      Value<String> id,
+      Value<String> nome,
+      Value<String?> categorias,
+      Value<DateTime?> dataInicio,
+      Value<DateTime?> dataFim,
+      Value<int?> valorMin,
+      Value<int?> valorMax,
+      Value<bool?> comComprovante,
+      Value<DateTime> criadoEm,
+      Value<DateTime> atualizadoEm,
+      Value<int> rowid,
+    });
+
+class $$FilterFavoritesTableFilterComposer
+    extends Composer<_$AppDatabase, $FilterFavoritesTable> {
+  $$FilterFavoritesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categorias => $composableBuilder(
+    column: $table.categorias,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataInicio => $composableBuilder(
+    column: $table.dataInicio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataFim => $composableBuilder(
+    column: $table.dataFim,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorMin => $composableBuilder(
+    column: $table.valorMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorMax => $composableBuilder(
+    column: $table.valorMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get comComprovante => $composableBuilder(
+    column: $table.comComprovante,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get criadoEm => $composableBuilder(
+    column: $table.criadoEm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get atualizadoEm => $composableBuilder(
+    column: $table.atualizadoEm,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FilterFavoritesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FilterFavoritesTable> {
+  $$FilterFavoritesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categorias => $composableBuilder(
+    column: $table.categorias,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataInicio => $composableBuilder(
+    column: $table.dataInicio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataFim => $composableBuilder(
+    column: $table.dataFim,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorMin => $composableBuilder(
+    column: $table.valorMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorMax => $composableBuilder(
+    column: $table.valorMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get comComprovante => $composableBuilder(
+    column: $table.comComprovante,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get criadoEm => $composableBuilder(
+    column: $table.criadoEm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get atualizadoEm => $composableBuilder(
+    column: $table.atualizadoEm,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FilterFavoritesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FilterFavoritesTable> {
+  $$FilterFavoritesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nome =>
+      $composableBuilder(column: $table.nome, builder: (column) => column);
+
+  GeneratedColumn<String> get categorias => $composableBuilder(
+    column: $table.categorias,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataInicio => $composableBuilder(
+    column: $table.dataInicio,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataFim =>
+      $composableBuilder(column: $table.dataFim, builder: (column) => column);
+
+  GeneratedColumn<int> get valorMin =>
+      $composableBuilder(column: $table.valorMin, builder: (column) => column);
+
+  GeneratedColumn<int> get valorMax =>
+      $composableBuilder(column: $table.valorMax, builder: (column) => column);
+
+  GeneratedColumn<bool> get comComprovante => $composableBuilder(
+    column: $table.comComprovante,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get criadoEm =>
+      $composableBuilder(column: $table.criadoEm, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get atualizadoEm => $composableBuilder(
+    column: $table.atualizadoEm,
+    builder: (column) => column,
+  );
+}
+
+class $$FilterFavoritesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FilterFavoritesTable,
+          FilterFavorite,
+          $$FilterFavoritesTableFilterComposer,
+          $$FilterFavoritesTableOrderingComposer,
+          $$FilterFavoritesTableAnnotationComposer,
+          $$FilterFavoritesTableCreateCompanionBuilder,
+          $$FilterFavoritesTableUpdateCompanionBuilder,
+          (
+            FilterFavorite,
+            BaseReferences<
+              _$AppDatabase,
+              $FilterFavoritesTable,
+              FilterFavorite
+            >,
+          ),
+          FilterFavorite,
+          PrefetchHooks Function()
+        > {
+  $$FilterFavoritesTableTableManager(
+    _$AppDatabase db,
+    $FilterFavoritesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FilterFavoritesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FilterFavoritesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FilterFavoritesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> nome = const Value.absent(),
+                Value<String?> categorias = const Value.absent(),
+                Value<DateTime?> dataInicio = const Value.absent(),
+                Value<DateTime?> dataFim = const Value.absent(),
+                Value<int?> valorMin = const Value.absent(),
+                Value<int?> valorMax = const Value.absent(),
+                Value<bool?> comComprovante = const Value.absent(),
+                Value<DateTime> criadoEm = const Value.absent(),
+                Value<DateTime> atualizadoEm = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FilterFavoritesCompanion(
+                id: id,
+                nome: nome,
+                categorias: categorias,
+                dataInicio: dataInicio,
+                dataFim: dataFim,
+                valorMin: valorMin,
+                valorMax: valorMax,
+                comComprovante: comComprovante,
+                criadoEm: criadoEm,
+                atualizadoEm: atualizadoEm,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String nome,
+                Value<String?> categorias = const Value.absent(),
+                Value<DateTime?> dataInicio = const Value.absent(),
+                Value<DateTime?> dataFim = const Value.absent(),
+                Value<int?> valorMin = const Value.absent(),
+                Value<int?> valorMax = const Value.absent(),
+                Value<bool?> comComprovante = const Value.absent(),
+                required DateTime criadoEm,
+                required DateTime atualizadoEm,
+                Value<int> rowid = const Value.absent(),
+              }) => FilterFavoritesCompanion.insert(
+                id: id,
+                nome: nome,
+                categorias: categorias,
+                dataInicio: dataInicio,
+                dataFim: dataFim,
+                valorMin: valorMin,
+                valorMax: valorMax,
+                comComprovante: comComprovante,
+                criadoEm: criadoEm,
+                atualizadoEm: atualizadoEm,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FilterFavoritesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FilterFavoritesTable,
+      FilterFavorite,
+      $$FilterFavoritesTableFilterComposer,
+      $$FilterFavoritesTableOrderingComposer,
+      $$FilterFavoritesTableAnnotationComposer,
+      $$FilterFavoritesTableCreateCompanionBuilder,
+      $$FilterFavoritesTableUpdateCompanionBuilder,
+      (
+        FilterFavorite,
+        BaseReferences<_$AppDatabase, $FilterFavoritesTable, FilterFavorite>,
+      ),
+      FilterFavorite,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2965,4 +5148,8 @@ class $AppDatabaseManager {
       $$CnpjPreferencesTableTableManager(_db, _db.cnpjPreferences);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$RecurringExpensesTableTableManager get recurringExpenses =>
+      $$RecurringExpensesTableTableManager(_db, _db.recurringExpenses);
+  $$FilterFavoritesTableTableManager get filterFavorites =>
+      $$FilterFavoritesTableTableManager(_db, _db.filterFavorites);
 }
