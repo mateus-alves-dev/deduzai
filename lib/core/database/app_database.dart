@@ -43,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +75,23 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 9) {
         await m.createTable(filterFavorites);
+      }
+      if (from < 10) {
+        await customStatement(
+          'CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)',
+        );
+        await customStatement(
+          'CREATE INDEX IF NOT EXISTS idx_expenses_deleted_at '
+          'ON expenses(deleted_at)',
+        );
+        await customStatement(
+          'CREATE INDEX IF NOT EXISTS idx_expenses_category '
+          'ON expenses(category)',
+        );
+        await customStatement(
+          'CREATE INDEX IF NOT EXISTS idx_receipts_expense_id '
+          'ON receipts(expense_id)',
+        );
       }
     },
   );

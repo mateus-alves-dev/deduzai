@@ -5,9 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final expenseListProvider = StreamProvider<List<Expense>>((ref) =>
     ref.watch(expenseDaoProvider).watchByYear(DateTime.now().year));
 
+/// Single stream that tracks ALL expense IDs with receipts.
+/// One DB stream replaces N per-tile streams, reducing I/O and rebuilds.
+final _receiptExpenseIdsProvider = StreamProvider<Set<String>>((ref) =>
+    ref.watch(receiptDaoProvider).watchAllExpenseIdsWithReceipts());
+
 /// Emits true when [expenseId] has at least one receipt attached (Spec 4.2).
+/// Backed by a single batch query instead of per-expense streams.
 final expenseHasReceiptProvider =
-    StreamProvider.family<bool, String>((ref, expenseId) => ref
-        .watch(receiptDaoProvider)
-        .watchByExpenseId(expenseId)
-        .map((list) => list.isNotEmpty));
+    Provider.family<AsyncValue<bool>, String>((ref, expenseId) =>
+        ref.watch(_receiptExpenseIdsProvider).whenData(
+              (ids) => ids.contains(expenseId),
+            ));

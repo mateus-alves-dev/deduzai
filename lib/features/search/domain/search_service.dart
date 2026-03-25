@@ -8,6 +8,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_service.g.dart';
 
+// Pre-compiled regex patterns for accent normalization.
+final _accentPatterns = [
+  (RegExp('[àáâãä]'), 'a'),
+  (RegExp('[èéêë]'), 'e'),
+  (RegExp('[ìíîï]'), 'i'),
+  (RegExp('[òóôõö]'), 'o'),
+  (RegExp('[ùúûü]'), 'u'),
+  (RegExp('[ç]'), 'c'),
+];
+
 @riverpod
 SearchService searchService(Ref ref) => SearchService(
       ref.watch(expenseDaoProvider),
@@ -46,7 +56,7 @@ class SearchService {
     }
 
     if (filter.receiptFilter != SearchReceiptFilter.all) {
-      final idsWithReceipt = await _getExpenseIdsWithReceipt(
+      final idsWithReceipt = await _receiptDao.getExpenseIdsWithReceipts(
         filtered.map((Expense e) => e.id).toList(),
       );
       filtered = filtered.where((Expense e) {
@@ -60,21 +70,11 @@ class SearchService {
     return filtered;
   }
 
-  Future<Set<String>> _getExpenseIdsWithReceipt(List<String> ids) async {
-    final result = <String>{};
-    for (final id in ids) {
-      final receipts = await _receiptDao.watchByExpenseId(id).first;
-      if (receipts.isNotEmpty) result.add(id);
+  static String normalizeText(String text) {
+    var result = text.toLowerCase();
+    for (final (pattern, replacement) in _accentPatterns) {
+      result = result.replaceAll(pattern, replacement);
     }
     return result;
   }
-
-  static String normalizeText(String text) => text
-      .toLowerCase()
-      .replaceAll(RegExp('[àáâãä]'), 'a')
-      .replaceAll(RegExp('[èéêë]'), 'e')
-      .replaceAll(RegExp('[ìíîï]'), 'i')
-      .replaceAll(RegExp('[òóôõö]'), 'o')
-      .replaceAll(RegExp('[ùúûü]'), 'u')
-      .replaceAll(RegExp('[ç]'), 'c');
 }

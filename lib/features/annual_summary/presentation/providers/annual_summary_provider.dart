@@ -19,13 +19,16 @@ class SelectedYear extends Notifier<int> {
 /// Reactive stream of [AnnualSummary] for [year].
 ///
 /// Recomputes whenever the underlying expenses change (Drift stream).
+/// Heavy computation runs in a background isolate via [AnnualSummaryService].
 final annualSummaryProvider =
     StreamProvider.family<AnnualSummary, int>((ref, year) {
   final service = ref.watch(annualSummaryServiceProvider);
   return ref
       .watch(expenseDaoProvider)
       .watchByYear(year)
-      .map((List<Expense> expenses) => service.compute(expenses, year));
+      .asyncMap(
+        (List<Expense> expenses) => service.computeAsync(expenses, year),
+      );
 });
 
 /// Raw expenses for [year] — used by the export service to build exports.

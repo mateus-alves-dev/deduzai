@@ -51,8 +51,8 @@ class MonthlySummaryService {
     required int year,
     required int month,
   }) {
-    final monthlySummary = _annualService.compute(monthExpenses, year);
-    final ytdSummary = _annualService.compute(yearToDateExpenses, year);
+    final monthlySummary = _annualService.computeSync(monthExpenses, year);
+    final ytdSummary = _annualService.computeSync(yearToDateExpenses, year);
 
     final currentTotal =
         monthExpenses.fold(0, (s, e) => s + e.amountInCents);

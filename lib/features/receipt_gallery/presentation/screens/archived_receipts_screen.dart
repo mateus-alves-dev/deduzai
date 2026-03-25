@@ -62,6 +62,8 @@ class ArchivedReceiptsScreen extends ConsumerWidget {
                       File(receipt.localPath),
                       width: 56,
                       height: 56,
+                      cacheWidth: 112,
+                      cacheHeight: 112,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const SizedBox(
                         width: 56,

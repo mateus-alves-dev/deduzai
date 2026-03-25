@@ -2,6 +2,7 @@ import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/deduction_caps.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,12 +12,27 @@ part 'annual_summary_service.g.dart';
 AnnualSummaryService annualSummaryService(Ref ref) =>
     const AnnualSummaryService();
 
+/// Top-level function for [compute] — runs [AnnualSummaryService] in a
+/// background isolate so the UI thread stays responsive with large datasets.
+AnnualSummary _computeInIsolate((List<Expense>, int) args) {
+  final (expenses, fiscalYear) = args;
+  return const AnnualSummaryService().computeSync(expenses, fiscalYear);
+}
+
 /// Aggregates a list of [Expense] rows into an [AnnualSummary], applying
 /// deduction caps from [DeductionCaps].
 class AnnualSummaryService {
   const AnnualSummaryService();
 
-  AnnualSummary compute(List<Expense> expenses, int fiscalYear) {
+  /// Computes the summary in a background isolate (use for large datasets).
+  Future<AnnualSummary> computeAsync(
+    List<Expense> expenses,
+    int fiscalYear,
+  ) =>
+      compute(_computeInIsolate, (expenses, fiscalYear));
+
+  /// Synchronous computation — fine for small datasets (e.g. single month).
+  AnnualSummary computeSync(List<Expense> expenses, int fiscalYear) {
     final caps = DeductionCaps.forYear(fiscalYear);
 
     // Group expenses by DeductionCategory.

@@ -28,7 +28,7 @@ class _CameraCaptureScreenState extends ConsumerState<CameraCaptureScreen> {
 
   Future<void> _captureFromSource(ImageSource source) async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: source, imageQuality: 100);
+    final picked = await picker.pickImage(source: source, imageQuality: 85);
     if (picked == null || !mounted) return;
 
     final service = ref.read(ocrServiceProvider);

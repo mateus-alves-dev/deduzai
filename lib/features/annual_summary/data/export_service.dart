@@ -4,6 +4,7 @@ import 'package:csv/csv.dart';
 import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/core/domain/models/category.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,6 +16,14 @@ part 'export_service.g.dart';
 
 @riverpod
 ExportService exportService(Ref ref) => const ExportService();
+
+/// Top-level function for [compute] — builds PDF bytes in a background isolate.
+Future<Uint8List> _buildPdfInIsolate(
+  (AnnualSummary, List<Expense>, DateTime) args,
+) {
+  final (summary, expenses, now) = args;
+  return const ExportService().buildPdfBytes(summary, expenses, now);
+}
 
 /// Generates PDF and CSV export files for a given [AnnualSummary].
 class ExportService {
@@ -36,13 +45,33 @@ class ExportService {
 
   /// Generates a PDF report and saves it to the temp directory.
   ///
-  /// Returns the generated [File]. Share it via `share_plus`.
+  /// PDF byte generation runs in a background isolate to keep the UI
+  /// responsive.  Returns the generated [File]. Share it via `share_plus`.
   Future<File> generatePdf(
     AnnualSummary summary,
     List<Expense> expenses,
   ) async {
-    final doc = pw.Document();
     final now = DateTime.now();
+    final bytes = await compute(
+      _buildPdfInIsolate,
+      (summary, expenses, now),
+    );
+    final dir = await getTemporaryDirectory();
+    final fileName =
+        'DeduzAi_IR_${summary.fiscalYear}_${_timestampFormat.format(now)}.pdf';
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsBytes(bytes);
+    return file;
+  }
+
+  /// Builds the PDF document bytes (called from isolate).
+  @visibleForTesting
+  Future<Uint8List> buildPdfBytes(
+    AnnualSummary summary,
+    List<Expense> expenses,
+    DateTime now,
+  ) async {
+    final doc = pw.Document();
 
     final groupedByCategory = <DeductionCategory, List<Expense>>{};
     for (final expense in expenses) {
@@ -64,13 +93,7 @@ class ExportService {
       ),
     );
 
-    final bytes = await doc.save();
-    final dir = await getTemporaryDirectory();
-    final fileName =
-        'DeduzAi_IR_${summary.fiscalYear}_${_timestampFormat.format(now)}.pdf';
-    final file = File('${dir.path}/$fileName');
-    await file.writeAsBytes(bytes);
-    return file;
+    return doc.save();
   }
 
   /// Generates a CSV export and saves it to the temp directory.
