@@ -7,6 +7,7 @@ import 'package:deduzai/features/notifications/data/notification_service.dart';
 import 'package:deduzai/features/notifications/domain/notification_scheduler.dart';
 import 'package:deduzai/features/notifications/presentation/providers/notification_providers.dart';
 import 'package:deduzai/features/settings/presentation/providers/app_info_providers.dart';
+import 'package:deduzai/features/settings/presentation/providers/theme_mode_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,11 +20,13 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final frequencyAsync = ref.watch(reminderFrequencyProvider);
     final timeOfDayAsync = ref.watch(reminderTimeOfDayProvider);
+    final themeModeAsync = ref.watch(themeModeProvider);
 
     final frequency =
         frequencyAsync.value ?? ReminderFrequency.monthly;
     final timeOfDay =
         timeOfDayAsync.value ?? ReminderTimeOfDay.morning;
+    final currentThemeMode = themeModeAsync.value ?? ThemeMode.system;
 
     return Scaffold(
       appBar: const DeduzaiAppBar(title: 'Configurações'),
@@ -188,6 +191,75 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _SectionHeader('Aparência'),
+          Card(
+            margin: EdgeInsets.zero,
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.palette_outlined,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Tema',
+                        style: AppTextStyles.titleMedium,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: SegmentedButton<ThemeMode>(
+                      segments: const [
+                        ButtonSegment(
+                          value: ThemeMode.system,
+                          label: Text('Sistema'),
+                        ),
+                        ButtonSegment(
+                          value: ThemeMode.light,
+                          label: Text('Claro'),
+                        ),
+                        ButtonSegment(
+                          value: ThemeMode.dark,
+                          label: Text('Escuro'),
+                        ),
+                      ],
+                      selected: {currentThemeMode},
+                      showSelectedIcon: false,
+                      style: ButtonStyle(
+                        textStyle: WidgetStateProperty.all(
+                          AppTextStyles.labelMedium,
+                        ),
+                      ),
+                      onSelectionChanged: (selected) async {
+                        final newMode = selected.first;
+                        final dao = ref.read(appSettingsDaoProvider);
+                        final value = switch (newMode) {
+                          ThemeMode.light => 'light',
+                          ThemeMode.dark => 'dark',
+                          _ => 'system',
+                        };
+                        await dao.setValue(
+                          AppSettingsKeys.themeMode,
+                          value,
+                        );
+                        ref.invalidate(themeModeProvider);
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),

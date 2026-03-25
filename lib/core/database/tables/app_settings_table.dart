@@ -14,6 +14,7 @@ abstract final class AppSettingsKeys {
   static const summaryLastAccessedYear = 'summary_last_accessed_year';
   static const reminderFrequency = 'reminder_frequency';
   static const reminderTimeOfDay = 'reminder_time_of_day';
+  static const themeMode = 'theme_mode';
 }
 
 enum ReminderFrequency { none, daily, weekly, monthly }
