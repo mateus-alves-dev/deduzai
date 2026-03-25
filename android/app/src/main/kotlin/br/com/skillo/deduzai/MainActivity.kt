@@ -1,4 +1,4 @@
-package com.deduzai.deduzai
+package br.com.skillo.deduzai
 
 import io.flutter.embedding.android.FlutterActivity
 

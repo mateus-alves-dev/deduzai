@@ -1,0 +1,118 @@
+name: Deploy Android to Play Store (internal)
+
+on:
+  push:
+    branches:
+      - main
+
+# Allow only one concurrent deployment per branch
+concurrency:
+  group: deploy-android-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & Upload AAB
+    runs-on: ubuntu-latest
+
+    steps:
+      # ──────────────────────────────────────────────────────────────────────
+      # 1. Checkout
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 2. Java 17 (required by Gradle 8.x and compileSdk 35)
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 3. Flutter stable
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 4. Cache pub packages
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 5. Cache Gradle
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/*.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 6. Install Dart/Flutter dependencies
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Install dependencies
+        run: flutter pub get
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 7. Code generation (Drift, Riverpod, Freezed)
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Run build_runner (codegen)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 8. Decode keystore from GitHub secret (base64-encoded .jks)
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 9. Write key.properties
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Write key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          EOF
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 10. Build release AAB (prod flavor)
+      #     versionCode = GITHUB_RUN_NUMBER so it auto-increments on every run
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Build Android App Bundle
+        run: |
+          flutter build appbundle \
+            --target lib/main_prod.dart \
+            --release \
+            --build-number=${{ github.run_number }}
+
+      # ──────────────────────────────────────────────────────────────────────
+      # 11. Upload AAB to Play Store — internal track
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Upload to Play Store (internal track)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: br.com.skillo.deduzai
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
