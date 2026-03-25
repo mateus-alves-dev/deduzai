@@ -81,9 +81,11 @@ class ArchivedReceiptsScreen extends ConsumerWidget {
                     tooltip: 'Compartilhar',
                     onPressed: () async {
                       try {
-                        await Share.shareXFiles(
-                          [XFile(receipt.localPath)],
-                          subject: 'Comprovante de gasto — DeduzAí',
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            files: [XFile(receipt.localPath)],
+                            subject: 'Comprovante de gasto — DeduzAí',
+                          ),
                         );
                       } on Exception catch (_) {
                         if (context.mounted) {

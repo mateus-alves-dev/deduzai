@@ -31,7 +31,7 @@ class NotificationPermissionBanner extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () => ref
-                  .read(notificationBannerNotifierProvider.notifier)
+                  .read(notificationBannerProvider.notifier)
                   .dismiss(),
               child: const Text('Fechar'),
             ),

@@ -31,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text(
               'Notificação quando você não registrou gastos no mês',
             ),
-            value: monthlyEnabledAsync.valueOrNull ?? true,
+            value: monthlyEnabledAsync.value ?? true,
             onChanged: (enabled) async {
               final dao = ref.read(appSettingsDaoProvider);
               await dao.setValue(

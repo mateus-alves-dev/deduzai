@@ -99,7 +99,7 @@ class ExportService {
       }),
     ];
 
-    final csvContent = const ListToCsvConverter().convert(rows);
+    final csvContent = const CsvEncoder().convert(rows);
     // UTF-8 BOM for Excel compatibility (Spec 5.4)
     const bom = '\uFEFF';
     final now = DateTime.now();

@@ -6,22 +6,46 @@ part of 'expense_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$expenseServiceHash() => r'a9de326eca14e3cb913d751719fb6325f7268f15';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [expenseService].
 @ProviderFor(expenseService)
-final expenseServiceProvider = AutoDisposeProvider<ExpenseService>.internal(
-  expenseService,
-  name: r'expenseServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$expenseServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final expenseServiceProvider = ExpenseServiceProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ExpenseServiceRef = AutoDisposeProviderRef<ExpenseService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ExpenseServiceProvider
+    extends $FunctionalProvider<ExpenseService, ExpenseService, ExpenseService>
+    with $Provider<ExpenseService> {
+  ExpenseServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'expenseServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$expenseServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<ExpenseService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ExpenseService create(Ref ref) {
+    return expenseService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ExpenseService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ExpenseService>(value),
+    );
+  }
+}
+
+String _$expenseServiceHash() => r'a9de326eca14e3cb913d751719fb6325f7268f15';

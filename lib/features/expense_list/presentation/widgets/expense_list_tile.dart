@@ -98,7 +98,7 @@ class _ReceiptIcon extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hasReceipt =
-        ref.watch(expenseHasReceiptProvider(expenseId)).valueOrNull ?? false;
+        ref.watch(expenseHasReceiptProvider(expenseId)).value ?? false;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,

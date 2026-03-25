@@ -37,7 +37,7 @@ class NotificationService {
     );
 
     await plugin.initialize(
-      const InitializationSettings(
+      settings: const InitializationSettings(
         android: androidSettings,
         iOS: iosSettings,
       ),
@@ -82,14 +82,14 @@ class NotificationService {
   }
 
   Future<void> scheduleMonthlyReminder(DateTime fireAt) async {
-    await _plugin.cancel(_monthlyReminderId);
+    await _plugin.cancel(id: _monthlyReminderId);
     await _plugin.zonedSchedule(
-      _monthlyReminderId,
-      'DeduzAí',
-      'Você registrou gastos dedutíveis este mês? '
+      id: _monthlyReminderId,
+      title: 'DeduzAí',
+      body: 'Você registrou gastos dedutíveis este mês? '
           'Não esqueça remédios, consultas e terapia.',
-      tz.TZDateTime.from(fireAt, tz.local),
-      const NotificationDetails(
+      scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -97,20 +97,18 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
   Future<void> scheduleIrSeasonReminder(DateTime fireAt, int year) async {
-    await _plugin.cancel(_irSeasonReminderId);
+    await _plugin.cancel(id: _irSeasonReminderId);
     await _plugin.zonedSchedule(
-      _irSeasonReminderId,
-      'DeduzAí',
-      'A época do IR chegou. Seus gastos de $year estão '
+      id: _irSeasonReminderId,
+      title: 'DeduzAí',
+      body: 'A época do IR chegou. Seus gastos de $year estão '
           'organizados. Veja o resumo.',
-      tz.TZDateTime.from(fireAt, tz.local),
-      const NotificationDetails(
+      scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -118,17 +116,15 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: 'summary:$year',
     );
   }
 
   Future<void> cancelMonthlyReminder() =>
-      _plugin.cancel(_monthlyReminderId);
+      _plugin.cancel(id: _monthlyReminderId);
 
   Future<void> cancelIrSeasonReminder() =>
-      _plugin.cancel(_irSeasonReminderId);
+      _plugin.cancel(id: _irSeasonReminderId);
 }
 
 @Riverpod(keepAlive: true)

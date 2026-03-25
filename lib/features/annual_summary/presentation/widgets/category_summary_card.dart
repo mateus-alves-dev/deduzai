@@ -1,5 +1,7 @@
 import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/core/domain/models/category.dart';
+import 'package:deduzai/core/theme/app_spacing.dart';
+import 'package:deduzai/features/annual_summary/presentation/widgets/category_color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,81 +20,115 @@ class CategorySummaryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final hasCap = summary.capInCents != null;
     final capExceeded = summary.surplusInCents != null;
+    final categoryColor = colorForCategory(summary.category);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
           children: [
-            Row(
-              children: [
-                Icon(
-                  _iconFor(summary.category),
-                  color: theme.colorScheme.primary,
+            Container(width: 4, color: categoryColor),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          _iconFor(summary.category),
+                          color: categoryColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            summary.category.label,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                        ),
+                        Text(
+                          '${summary.count} '
+                          'gasto${summary.count != 1 ? 's' : ''}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.outline,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _AmountRow(
+                      label: 'Total registrado',
+                      amountInCents: summary.totalInCents,
+                      currency: _currency,
+                    ),
+                    const SizedBox(height: 4),
+                    _AmountRow(
+                      label: 'Dedutível',
+                      amountInCents: summary.deductibleInCents,
+                      currency: _currency,
+                      bold: true,
+                      color: capExceeded ? theme.colorScheme.primary : null,
+                    ),
+                    if (hasCap) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      LinearProgressIndicator(
+                        value: (summary.totalInCents / summary.capInCents!)
+                            .clamp(0.0, 1.0),
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        color: capExceeded
+                            ? theme.colorScheme.error
+                            : categoryColor,
+                        borderRadius: BorderRadius.circular(4),
+                        minHeight: 6,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _currency.format(summary.totalInCents / 100),
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.outline,
+                            ),
+                          ),
+                          Text(
+                            'Teto: '
+                            '${_currency.format(summary.capInCents! / 100)}',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.outline,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    if (capExceeded) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.errorContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Teto atingido — excedente '
+                          'de ${_currency.format(summary.surplusInCents! / 100)}'
+                          ' não dedutível',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    summary.category.label,
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                Text(
-                  '${summary.count} gasto${summary.count != 1 ? 's' : ''}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.outline,
-                  ),
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: 12),
-            _AmountRow(
-              label: 'Total registrado',
-              amountInCents: summary.totalInCents,
-              currency: _currency,
-            ),
-            if (hasCap) ...[
-              const SizedBox(height: 4),
-              _AmountRow(
-                label: 'Dedutível',
-                amountInCents: summary.deductibleInCents,
-                currency: _currency,
-                bold: true,
-                color: capExceeded ? theme.colorScheme.primary : null,
-              ),
-            ],
-            if (capExceeded) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Teto atingido — excedente de '
-                  '${_currency.format(summary.surplusInCents! / 100)}'
-                  ' não dedutível',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onErrorContainer,
-                  ),
-                ),
-              ),
-            ],
-            if (!hasCap) ...[
-              const SizedBox(height: 4),
-              _AmountRow(
-                label: 'Dedutível',
-                amountInCents: summary.deductibleInCents,
-                currency: _currency,
-                bold: true,
-              ),
-            ],
           ],
         ),
       ),
@@ -132,9 +168,9 @@ class _AmountRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      fontWeight: bold ? FontWeight.bold : null,
-      color: color,
-    );
+          fontWeight: bold ? FontWeight.bold : null,
+          color: color,
+        );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

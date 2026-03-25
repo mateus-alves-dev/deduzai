@@ -6,25 +6,53 @@ part of 'notification_scheduler.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(notificationScheduler)
+final notificationSchedulerProvider = NotificationSchedulerProvider._();
+
+final class NotificationSchedulerProvider
+    extends
+        $FunctionalProvider<
+          NotificationScheduler,
+          NotificationScheduler,
+          NotificationScheduler
+        >
+    with $Provider<NotificationScheduler> {
+  NotificationSchedulerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationSchedulerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationSchedulerHash();
+
+  @$internal
+  @override
+  $ProviderElement<NotificationScheduler> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  NotificationScheduler create(Ref ref) {
+    return notificationScheduler(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NotificationScheduler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<NotificationScheduler>(value),
+    );
+  }
+}
+
 String _$notificationSchedulerHash() =>
     r'f53801eed806458cad89b2e5023447e2937f4048';
-
-/// See also [notificationScheduler].
-@ProviderFor(notificationScheduler)
-final notificationSchedulerProvider =
-    AutoDisposeProvider<NotificationScheduler>.internal(
-      notificationScheduler,
-      name: r'notificationSchedulerProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$notificationSchedulerHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef NotificationSchedulerRef =
-    AutoDisposeProviderRef<NotificationScheduler>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

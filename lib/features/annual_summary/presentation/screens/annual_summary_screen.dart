@@ -5,7 +5,9 @@ import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/features/annual_summary/data/export_service.dart';
 import 'package:deduzai/features/annual_summary/presentation/providers/annual_summary_provider.dart';
+import 'package:deduzai/features/annual_summary/presentation/widgets/category_breakdown_bar.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/category_summary_card.dart';
+import 'package:deduzai/features/annual_summary/presentation/widgets/hero_summary_header.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/year_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -139,8 +141,8 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen> {
   }
 
   Future<void> _share(File file, String mimeType) async {
-    await Share.shareXFiles(
-      [XFile(file.path, mimeType: mimeType)],
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path, mimeType: mimeType)]),
     );
   }
 }
@@ -158,20 +160,30 @@ class _SummaryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final cappedCategories =
         summary.categories.where((c) => c.surplusInCents != null).toList();
 
     return ListView(
+      padding: const EdgeInsets.only(bottom: 24),
       children: [
+        HeroSummaryHeader(summary: summary, currency: currency),
+        CategoryBreakdownBar(summary: summary),
         if (cappedCategories.isNotEmpty)
           _CapWarningBanner(
             summaries: cappedCategories,
             currency: currency,
           ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Text(
+            'Categorias',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+        ),
         ...summary.categories.map((c) => CategorySummaryCard(summary: c)),
-        const SizedBox(height: 8),
-        _TotalCard(summary: summary, currency: currency),
-        const SizedBox(height: 24),
       ],
     );
   }
@@ -223,44 +235,6 @@ class _CapWarningBanner extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TotalCard extends StatelessWidget {
-  const _TotalCard({required this.summary, required this.currency});
-
-  final AnnualSummary summary;
-  final NumberFormat currency;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      color: theme.colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Total dedutível',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-            ),
-            Text(
-              currency.format(summary.totalDeductibleInCents / 100),
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

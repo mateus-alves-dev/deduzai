@@ -60,9 +60,11 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
 
   Future<void> _shareReceipt(String path) async {
     try {
-      await Share.shareXFiles(
-        [XFile(path)],
-        subject: 'Comprovante de gasto — DeduzAí',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(path)],
+          subject: 'Comprovante de gasto — DeduzAí',
+        ),
       );
     } on Exception catch (_) {
       if (mounted) {
@@ -117,7 +119,7 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
         ref.watch(receiptViewerExpenseProvider(widget.expenseId));
 
     final hasReceipt =
-        receiptsAsync.valueOrNull?.isNotEmpty ?? false;
+        receiptsAsync.value?.isNotEmpty ?? false;
 
     return Scaffold(
       appBar: AppBar(
@@ -128,7 +130,7 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
               icon: const Icon(Icons.share_outlined),
               tooltip: 'Compartilhar',
               onPressed: () {
-                final path = receiptsAsync.valueOrNull!.first.localPath;
+                final path = receiptsAsync.value!.first.localPath;
                 _shareReceipt(path);
               },
             ),
@@ -214,7 +216,7 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
           (expense) => expense != null
               ? ReceiptMetadataPanel(expense: expense)
               : const SizedBox.shrink(),
-        ).valueOrNull ?? const SizedBox.shrink(),
+        ).value ?? const SizedBox.shrink(),
         SafeArea(
           top: false,
           child: Padding(

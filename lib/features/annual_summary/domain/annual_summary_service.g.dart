@@ -6,24 +6,53 @@ part of 'annual_summary_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(annualSummaryService)
+final annualSummaryServiceProvider = AnnualSummaryServiceProvider._();
+
+final class AnnualSummaryServiceProvider
+    extends
+        $FunctionalProvider<
+          AnnualSummaryService,
+          AnnualSummaryService,
+          AnnualSummaryService
+        >
+    with $Provider<AnnualSummaryService> {
+  AnnualSummaryServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'annualSummaryServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$annualSummaryServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<AnnualSummaryService> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AnnualSummaryService create(Ref ref) {
+    return annualSummaryService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AnnualSummaryService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AnnualSummaryService>(value),
+    );
+  }
+}
+
 String _$annualSummaryServiceHash() =>
     r'a5e18566e71df191119b6d4647efac8ce6ba97c3';
-
-/// See also [annualSummaryService].
-@ProviderFor(annualSummaryService)
-final annualSummaryServiceProvider =
-    AutoDisposeProvider<AnnualSummaryService>.internal(
-      annualSummaryService,
-      name: r'annualSummaryServiceProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$annualSummaryServiceHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AnnualSummaryServiceRef = AutoDisposeProviderRef<AnnualSummaryService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

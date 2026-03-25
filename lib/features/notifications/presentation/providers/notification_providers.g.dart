@@ -6,78 +6,162 @@ part of 'notification_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(notificationPermissionGranted)
+final notificationPermissionGrantedProvider =
+    NotificationPermissionGrantedProvider._();
+
+final class NotificationPermissionGrantedProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  NotificationPermissionGrantedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationPermissionGrantedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationPermissionGrantedHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    return notificationPermissionGranted(ref);
+  }
+}
+
 String _$notificationPermissionGrantedHash() =>
     r'7225cfb114443c5af1cda6731df2fbf6deb0ffd3';
 
-/// See also [notificationPermissionGranted].
-@ProviderFor(notificationPermissionGranted)
-final notificationPermissionGrantedProvider =
-    AutoDisposeFutureProvider<bool>.internal(
-      notificationPermissionGranted,
-      name: r'notificationPermissionGrantedProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$notificationPermissionGrantedHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+@ProviderFor(notificationBannerShouldShow)
+final notificationBannerShouldShowProvider =
+    NotificationBannerShouldShowProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef NotificationPermissionGrantedRef = AutoDisposeFutureProviderRef<bool>;
+final class NotificationBannerShouldShowProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  NotificationBannerShouldShowProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationBannerShouldShowProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationBannerShouldShowHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    return notificationBannerShouldShow(ref);
+  }
+}
+
 String _$notificationBannerShouldShowHash() =>
     r'cb64ac461d93888b034a7ef1e8cb43ee1006d075';
 
-/// See also [notificationBannerShouldShow].
-@ProviderFor(notificationBannerShouldShow)
-final notificationBannerShouldShowProvider =
-    AutoDisposeFutureProvider<bool>.internal(
-      notificationBannerShouldShow,
-      name: r'notificationBannerShouldShowProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$notificationBannerShouldShowHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
+@ProviderFor(NotificationBannerNotifier)
+final notificationBannerProvider = NotificationBannerNotifierProvider._();
+
+final class NotificationBannerNotifierProvider
+    extends $NotifierProvider<NotificationBannerNotifier, void> {
+  NotificationBannerNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationBannerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationBannerNotifierHash();
+
+  @$internal
+  @override
+  NotificationBannerNotifier create() => NotificationBannerNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
     );
+  }
+}
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef NotificationBannerShouldShowRef = AutoDisposeFutureProviderRef<bool>;
-String _$monthlyReminderEnabledHash() =>
-    r'6d4ce6ce37f309fbb62015f2fbafa8bbcad21f82';
-
-/// See also [monthlyReminderEnabled].
-@ProviderFor(monthlyReminderEnabled)
-final monthlyReminderEnabledProvider = AutoDisposeFutureProvider<bool>.internal(
-  monthlyReminderEnabled,
-  name: r'monthlyReminderEnabledProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$monthlyReminderEnabledHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef MonthlyReminderEnabledRef = AutoDisposeFutureProviderRef<bool>;
 String _$notificationBannerNotifierHash() =>
     r'e56319130d7d9bba41deb3bc958f9cb10ea2cac6';
 
-/// See also [NotificationBannerNotifier].
-@ProviderFor(NotificationBannerNotifier)
-final notificationBannerNotifierProvider =
-    AutoDisposeNotifierProvider<NotificationBannerNotifier, void>.internal(
-      NotificationBannerNotifier.new,
-      name: r'notificationBannerNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$notificationBannerNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+abstract class _$NotificationBannerNotifier extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<void, void>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$NotificationBannerNotifier = AutoDisposeNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(monthlyReminderEnabled)
+final monthlyReminderEnabledProvider = MonthlyReminderEnabledProvider._();
+
+final class MonthlyReminderEnabledProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  MonthlyReminderEnabledProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'monthlyReminderEnabledProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$monthlyReminderEnabledHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    return monthlyReminderEnabled(ref);
+  }
+}
+
+String _$monthlyReminderEnabledHash() =>
+    r'6d4ce6ce37f309fbb62015f2fbafa8bbcad21f82';

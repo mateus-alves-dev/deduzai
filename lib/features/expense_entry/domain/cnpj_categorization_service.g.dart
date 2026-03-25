@@ -6,25 +6,53 @@ part of 'cnpj_categorization_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(cnpjCategorizationService)
+final cnpjCategorizationServiceProvider = CnpjCategorizationServiceProvider._();
+
+final class CnpjCategorizationServiceProvider
+    extends
+        $FunctionalProvider<
+          CnpjCategorizationService,
+          CnpjCategorizationService,
+          CnpjCategorizationService
+        >
+    with $Provider<CnpjCategorizationService> {
+  CnpjCategorizationServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'cnpjCategorizationServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$cnpjCategorizationServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<CnpjCategorizationService> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  CnpjCategorizationService create(Ref ref) {
+    return cnpjCategorizationService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CnpjCategorizationService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CnpjCategorizationService>(value),
+    );
+  }
+}
+
 String _$cnpjCategorizationServiceHash() =>
     r'1cf0d43caad8ca1b5047a8f1ed6185a317a2df85';
-
-/// See also [cnpjCategorizationService].
-@ProviderFor(cnpjCategorizationService)
-final cnpjCategorizationServiceProvider =
-    AutoDisposeProvider<CnpjCategorizationService>.internal(
-      cnpjCategorizationService,
-      name: r'cnpjCategorizationServiceProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$cnpjCategorizationServiceHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CnpjCategorizationServiceRef =
-    AutoDisposeProviderRef<CnpjCategorizationService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

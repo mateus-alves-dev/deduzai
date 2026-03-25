@@ -6,90 +6,216 @@ part of 'database_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(database)
+final databaseProvider = DatabaseProvider._();
+
+final class DatabaseProvider
+    extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
+    with $Provider<AppDatabase> {
+  DatabaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'databaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$databaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<AppDatabase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  AppDatabase create(Ref ref) {
+    return database(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppDatabase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppDatabase>(value),
+    );
+  }
+}
+
 String _$databaseHash() => r'd6e05638b723b0524e474cecb5226cbaac2e507a';
 
-/// See also [database].
-@ProviderFor(database)
-final databaseProvider = Provider<AppDatabase>.internal(
-  database,
-  name: r'databaseProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$databaseHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(expenseDao)
+final expenseDaoProvider = ExpenseDaoProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DatabaseRef = ProviderRef<AppDatabase>;
+final class ExpenseDaoProvider
+    extends $FunctionalProvider<ExpenseDao, ExpenseDao, ExpenseDao>
+    with $Provider<ExpenseDao> {
+  ExpenseDaoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'expenseDaoProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$expenseDaoHash();
+
+  @$internal
+  @override
+  $ProviderElement<ExpenseDao> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ExpenseDao create(Ref ref) {
+    return expenseDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ExpenseDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ExpenseDao>(value),
+    );
+  }
+}
+
 String _$expenseDaoHash() => r'3608ecba0df1903e7b5da617a71c40afb2db9659';
 
-/// See also [expenseDao].
-@ProviderFor(expenseDao)
-final expenseDaoProvider = Provider<ExpenseDao>.internal(
-  expenseDao,
-  name: r'expenseDaoProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$expenseDaoHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(receiptDao)
+final receiptDaoProvider = ReceiptDaoProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ExpenseDaoRef = ProviderRef<ExpenseDao>;
+final class ReceiptDaoProvider
+    extends $FunctionalProvider<ReceiptDao, ReceiptDao, ReceiptDao>
+    with $Provider<ReceiptDao> {
+  ReceiptDaoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'receiptDaoProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$receiptDaoHash();
+
+  @$internal
+  @override
+  $ProviderElement<ReceiptDao> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ReceiptDao create(Ref ref) {
+    return receiptDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ReceiptDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ReceiptDao>(value),
+    );
+  }
+}
+
 String _$receiptDaoHash() => r'8d461c97b3f37c74b9d046a340eacaacd71d476a';
 
-/// See also [receiptDao].
-@ProviderFor(receiptDao)
-final receiptDaoProvider = Provider<ReceiptDao>.internal(
-  receiptDao,
-  name: r'receiptDaoProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$receiptDaoHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(cnpjPreferenceDao)
+final cnpjPreferenceDaoProvider = CnpjPreferenceDaoProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ReceiptDaoRef = ProviderRef<ReceiptDao>;
+final class CnpjPreferenceDaoProvider
+    extends
+        $FunctionalProvider<
+          CnpjPreferenceDao,
+          CnpjPreferenceDao,
+          CnpjPreferenceDao
+        >
+    with $Provider<CnpjPreferenceDao> {
+  CnpjPreferenceDaoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'cnpjPreferenceDaoProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$cnpjPreferenceDaoHash();
+
+  @$internal
+  @override
+  $ProviderElement<CnpjPreferenceDao> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  CnpjPreferenceDao create(Ref ref) {
+    return cnpjPreferenceDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CnpjPreferenceDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CnpjPreferenceDao>(value),
+    );
+  }
+}
+
 String _$cnpjPreferenceDaoHash() => r'a13e517ac2fc0a140be4aa8ffd3b28133fdf9a4c';
 
-/// See also [cnpjPreferenceDao].
-@ProviderFor(cnpjPreferenceDao)
-final cnpjPreferenceDaoProvider = Provider<CnpjPreferenceDao>.internal(
-  cnpjPreferenceDao,
-  name: r'cnpjPreferenceDaoProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$cnpjPreferenceDaoHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CnpjPreferenceDaoRef = ProviderRef<CnpjPreferenceDao>;
-String _$appSettingsDaoHash() => r'744fed9d19bd0a178b347f584ca3fdaca6275d63';
-
-/// See also [appSettingsDao].
 @ProviderFor(appSettingsDao)
-final appSettingsDaoProvider = Provider<AppSettingsDao>.internal(
-  appSettingsDao,
-  name: r'appSettingsDaoProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$appSettingsDaoHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final appSettingsDaoProvider = AppSettingsDaoProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AppSettingsDaoRef = ProviderRef<AppSettingsDao>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class AppSettingsDaoProvider
+    extends $FunctionalProvider<AppSettingsDao, AppSettingsDao, AppSettingsDao>
+    with $Provider<AppSettingsDao> {
+  AppSettingsDaoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'appSettingsDaoProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$appSettingsDaoHash();
+
+  @$internal
+  @override
+  $ProviderElement<AppSettingsDao> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  AppSettingsDao create(Ref ref) {
+    return appSettingsDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppSettingsDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppSettingsDao>(value),
+    );
+  }
+}
+
+String _$appSettingsDaoHash() => r'744fed9d19bd0a178b347f584ca3fdaca6275d63';
