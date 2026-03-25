@@ -3,8 +3,11 @@ import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
 import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
+import 'package:deduzai/features/notifications/data/notification_service.dart';
 import 'package:deduzai/features/notifications/domain/notification_scheduler.dart';
 import 'package:deduzai/features/notifications/presentation/providers/notification_providers.dart';
+import 'package:deduzai/features/settings/presentation/providers/app_info_providers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -96,6 +99,51 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
 
+                  // Debug: test notification (dev only)
+                  if (kDebugMode) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonalIcon(
+                        icon: const Icon(Icons.bug_report, size: 18),
+                        label: const Text('Testar notificação (10s)'),
+                        onPressed: () async {
+                          final service =
+                              ref.read(notificationServiceProvider);
+                          final hasPermission =
+                              await service.checkPermission();
+                          if (!hasPermission) {
+                            final granted =
+                                await service.requestPermission();
+                            if (!granted && context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Permissão de notificação negada.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                          }
+                          await service.scheduleMonthlyReminder(
+                            DateTime.now()
+                                .add(const Duration(seconds: 10)),
+                          );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Notificação agendada para 10 segundos!',
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+
                   // Time of day (hidden when disabled)
                   if (frequency != ReminderFrequency.none) ...[
                     const SizedBox(height: AppSpacing.md),
@@ -178,6 +226,37 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => context.push('/receipts/archived'),
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
+          const _SectionHeader('Legal'),
+          Card(
+            margin: EdgeInsets.zero,
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.privacy_tip_outlined),
+                  title: const Text('Política de Privacidade'),
+                  trailing: const Icon(Icons.chevron_right),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.xs,
+                  ),
+                  onTap: () => context.push('/settings/privacy'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.description_outlined),
+                  title: const Text('Termos de Uso'),
+                  trailing: const Icon(Icons.chevron_right),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.xs,
+                  ),
+                  onTap: () => context.push('/settings/terms'),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: AppSpacing.xl),
           const _AppInfoFooter(),
         ],
@@ -208,11 +287,14 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _AppInfoFooter extends StatelessWidget {
+class _AppInfoFooter extends ConsumerWidget {
   const _AppInfoFooter();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final versionAsync = ref.watch(appVersionProvider);
+    final version = versionAsync.value;
+
     return Column(
       children: [
         Text(
@@ -221,6 +303,15 @@ class _AppInfoFooter extends StatelessWidget {
             color: Theme.of(context).colorScheme.outline,
           ),
         ),
+        if (version != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            'Versão $version',
+            style: AppTextStyles.labelMedium.copyWith(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpacing.xs),
         Text(
           '© 2026 DeduzAí',

@@ -8,7 +8,9 @@ import 'package:deduzai/features/receipt_gallery/presentation/screens/receipt_vi
 import 'package:deduzai/features/recurring_expenses/presentation/screens/recurring_expense_form_screen.dart';
 import 'package:deduzai/features/recurring_expenses/presentation/screens/recurring_expenses_screen.dart';
 import 'package:deduzai/features/search/presentation/screens/search_screen.dart';
+import 'package:deduzai/features/settings/presentation/screens/privacy_policy_screen.dart';
 import 'package:deduzai/features/settings/presentation/screens/settings_screen.dart';
+import 'package:deduzai/features/settings/presentation/screens/terms_of_use_screen.dart';
 import 'package:deduzai/features/tips/presentation/screens/tips_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -71,6 +73,18 @@ final router = GoRouter(
           pageBuilder: (context, state) => const NoTransitionPage(
             child: SettingsScreen(),
           ),
+          routes: [
+            GoRoute(
+              path: 'privacy',
+              parentNavigatorKey: _rootNavigatorKey,
+              builder: (context, state) => const PrivacyPolicyScreen(),
+            ),
+            GoRoute(
+              path: 'terms',
+              parentNavigatorKey: _rootNavigatorKey,
+              builder: (context, state) => const TermsOfUseScreen(),
+            ),
+          ],
         ),
       ],
     ),
