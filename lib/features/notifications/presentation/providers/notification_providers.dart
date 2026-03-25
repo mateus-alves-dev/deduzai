@@ -46,3 +46,28 @@ Future<bool> monthlyReminderEnabled(Ref ref) async {
   final raw = await dao.getValue(AppSettingsKeys.monthlyReminderEnabled);
   return raw != 'false'; // default true
 }
+
+@riverpod
+Future<ReminderFrequency> reminderFrequency(Ref ref) async {
+  final dao = ref.watch(appSettingsDaoProvider);
+  final raw = await dao.getValue(AppSettingsKeys.reminderFrequency);
+  if (raw != null) {
+    return ReminderFrequency.values.firstWhere(
+      (f) => f.name == raw,
+      orElse: () => ReminderFrequency.monthly,
+    );
+  }
+  // Backwards compat: read from legacy key.
+  final legacy = await dao.getValue(AppSettingsKeys.monthlyReminderEnabled);
+  return legacy == 'false' ? ReminderFrequency.none : ReminderFrequency.monthly;
+}
+
+@riverpod
+Future<ReminderTimeOfDay> reminderTimeOfDay(Ref ref) async {
+  final dao = ref.watch(appSettingsDaoProvider);
+  final raw = await dao.getValue(AppSettingsKeys.reminderTimeOfDay);
+  return ReminderTimeOfDay.values.firstWhere(
+    (t) => t.name == raw,
+    orElse: () => ReminderTimeOfDay.morning,
+  );
+}

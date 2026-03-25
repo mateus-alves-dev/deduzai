@@ -28,6 +28,12 @@ class ExportService {
   static final _csvDateFormat = DateFormat('yyyy-MM-dd');
   static final _timestampFormat = DateFormat('yyyyMMdd_HHmmss');
 
+  // Design colors (matches AppColors.primary #2E7D32)
+  static final _green800 = PdfColor.fromHex('#2E7D32');
+  static final _green50 = PdfColor.fromHex('#E8F5E9');
+  static final _green100 = PdfColor.fromHex('#C8E6C9');
+  static final _rowAlt = PdfColor.fromHex('#FAFAFA');
+
   /// Generates a PDF report and saves it to the temp directory.
   ///
   /// Returns the generated [File]. Share it via `share_plus`.
@@ -48,7 +54,7 @@ class ExportService {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
-        header: (_) => _buildPdfHeader(summary.fiscalYear),
+        header: (_) => _buildPdfHeader(summary.fiscalYear, now),
         footer: (ctx) => _buildPdfFooter(ctx, now),
         build: (ctx) => [
           ..._buildCategorySections(summary, groupedByCategory),
@@ -113,23 +119,41 @@ class ExportService {
 
   // ── PDF helpers ──────────────────────────────────────────────────────────
 
-  pw.Widget _buildPdfHeader(int fiscalYear) {
+  pw.Widget _buildPdfHeader(int fiscalYear, DateTime generatedAt) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(
-          'DeduzAí — Resumo IR $fiscalYear',
-          style: pw.TextStyle(
-            fontSize: 18,
-            fontWeight: pw.FontWeight.bold,
-          ),
+        // Green accent bar across the top
+        pw.Container(
+          height: 4,
+          decoration: pw.BoxDecoration(color: _green800),
         ),
-        pw.SizedBox(height: 4),
+        pw.SizedBox(height: 8),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.end,
+          children: [
+            pw.Text(
+              'DeduzAí: Resumo IR $fiscalYear',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: _green800,
+              ),
+            ),
+            pw.Text(
+              'Gerado em ${_dateFormat.format(generatedAt)}',
+              style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 3),
         pw.Text(
           'CPF: ***.***.***-**',
-          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
         ),
-        pw.Divider(thickness: 1, color: PdfColors.grey400),
+        pw.SizedBox(height: 6),
+        pw.Divider(thickness: 0.5, color: PdfColors.grey400),
         pw.SizedBox(height: 8),
       ],
     );
@@ -172,16 +196,25 @@ class ExportService {
     final widgets = <pw.Widget>[];
 
     for (final categorySummary in summary.categories) {
-      final categoryExpenses =
-          grouped[categorySummary.category] ?? [];
+      final categoryExpenses = grouped[categorySummary.category] ?? [];
 
+      // Category heading bar with green left accent
       widgets
         ..add(
-          pw.Text(
-            categorySummary.category.label,
-            style: pw.TextStyle(
-              fontSize: 13,
-              fontWeight: pw.FontWeight.bold,
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            decoration: pw.BoxDecoration(
+              color: _green50,
+              border: pw.Border(
+                left: pw.BorderSide(color: _green800, width: 3),
+              ),
+            ),
+            child: pw.Text(
+              categorySummary.category.label,
+              style: pw.TextStyle(
+                fontSize: 12,
+                fontWeight: pw.FontWeight.bold,
+              ),
             ),
           ),
         )
@@ -197,46 +230,50 @@ class ExportService {
             },
             children: [
               _tableHeaderRow(),
-              ...categoryExpenses.map(_tableDataRow),
+              ...categoryExpenses.indexed.map(
+                (entry) => _tableDataRow(entry.$2, entry.$1),
+              ),
             ],
           ),
         )
-        ..add(pw.SizedBox(height: 4))
-        ..add(
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.end,
-            children: [
-              pw.Text(
-                'Total ${categorySummary.category.label}: '
-                '${_currencyFormat.format(categorySummary.totalInCents / 100)}',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              ),
-            ],
-          ),
-        );
+        ..add(pw.SizedBox(height: 4));
 
-      if (categorySummary.surplusInCents != null) {
-        final deductible = _currencyFormat.format(
-          categorySummary.deductibleInCents / 100,
-        );
-        final surplus = _currencyFormat.format(
-          categorySummary.surplusInCents! / 100,
-        );
-        widgets.add(
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.end,
-            children: [
-              pw.Text(
-                'Dedutível: $deductible (excedente: $surplus)',
-                style: const pw.TextStyle(
-                  fontSize: 9,
-                  color: PdfColors.orange800,
+      // Subtotal box (right-aligned)
+      final subtotalFormatted = _currencyFormat.format(
+        categorySummary.totalInCents / 100,
+      );
+      widgets.add(
+        pw.Align(
+          alignment: pw.Alignment.centerRight,
+          child: pw.Container(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: pw.BoxDecoration(
+              color: PdfColors.grey100,
+              border: pw.Border.all(color: PdfColors.grey300, width: 0.5),
+            ),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Text(
+                  'Total ${categorySummary.category.label}: $subtotalFormatted',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 ),
-              ),
-            ],
+                if (categorySummary.surplusInCents != null) ...[
+                  pw.SizedBox(height: 2),
+                  pw.Text(
+                    'Dedutível: ${_currencyFormat.format(categorySummary.deductibleInCents / 100)}'
+                    '  ·  Excedente: ${_currencyFormat.format(categorySummary.surplusInCents! / 100)}',
+                    style: pw.TextStyle(
+                      fontSize: 8,
+                      color: PdfColors.orange800,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-        );
-      }
+        ),
+      );
 
       widgets.add(pw.SizedBox(height: 16));
     }
@@ -246,11 +283,11 @@ class ExportService {
 
   pw.TableRow _tableHeaderRow() {
     return pw.TableRow(
-      decoration: const pw.BoxDecoration(color: PdfColors.grey200),
-      children: ['Data', 'Beneficiário', 'Valor', 'Comp.']
+      decoration: pw.BoxDecoration(color: _green100),
+      children: ['Data', 'Beneficiário / CNPJ', 'Valor', 'Comp.']
           .map(
             (h) => pw.Padding(
-              padding: const pw.EdgeInsets.all(4),
+              padding: const pw.EdgeInsets.all(5),
               child: pw.Text(
                 h,
                 style: pw.TextStyle(
@@ -264,8 +301,12 @@ class ExportService {
     );
   }
 
-  pw.TableRow _tableDataRow(Expense e) {
+  pw.TableRow _tableDataRow(Expense e, int index) {
+    final rowColor = index.isOdd ? _rowAlt : PdfColors.white;
+    final hasCnpj = e.cnpj != null && e.cnpj!.isNotEmpty;
+
     return pw.TableRow(
+      decoration: pw.BoxDecoration(color: rowColor),
       children: [
         pw.Padding(
           padding: const pw.EdgeInsets.all(4),
@@ -276,9 +317,22 @@ class ExportService {
         ),
         pw.Padding(
           padding: const pw.EdgeInsets.all(4),
-          child: pw.Text(
-            e.beneficiario ?? e.description,
-            style: const pw.TextStyle(fontSize: 9),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                e.beneficiario ?? e.description,
+                style: const pw.TextStyle(fontSize: 9),
+              ),
+              if (hasCnpj)
+                pw.Text(
+                  _formatCnpj(e.cnpj!),
+                  style: pw.TextStyle(
+                    fontSize: 7.5,
+                    color: PdfColors.grey600,
+                  ),
+                ),
+            ],
           ),
         ),
         pw.Padding(
@@ -300,23 +354,43 @@ class ExportService {
   }
 
   pw.Widget _buildTotalRow(AnnualSummary summary) {
+    final formatted = _currencyFormat.format(
+      summary.totalDeductibleInCents / 100,
+    );
     return pw.Container(
-      padding: const pw.EdgeInsets.all(8),
-      decoration: const pw.BoxDecoration(color: PdfColors.grey100),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: pw.BoxDecoration(
+        color: _green800,
+        borderRadius: pw.BorderRadius.circular(4),
+      ),
       child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.end,
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            'Total dedutível geral: '
-            '${_currencyFormat.format(summary.totalDeductibleInCents / 100)}',
+            'Total dedutível geral',
             style: pw.TextStyle(
               fontSize: 13,
               fontWeight: pw.FontWeight.bold,
+              color: PdfColors.white,
+            ),
+          ),
+          pw.Text(
+            formatted,
+            style: pw.TextStyle(
+              fontSize: 13,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.white,
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _formatCnpj(String raw) {
+    final d = raw.replaceAll(RegExp(r'\D'), '');
+    if (d.length != 14) return raw;
+    return '${d.substring(0, 2)}.${d.substring(2, 5)}.${d.substring(5, 8)}/${d.substring(8, 12)}-${d.substring(12)}';
   }
 
   DeductionCategory _parseCategory(String raw) {

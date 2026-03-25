@@ -165,3 +165,85 @@ final class MonthlyReminderEnabledProvider
 
 String _$monthlyReminderEnabledHash() =>
     r'6d4ce6ce37f309fbb62015f2fbafa8bbcad21f82';
+
+@ProviderFor(reminderFrequency)
+final reminderFrequencyProvider = ReminderFrequencyProvider._();
+
+final class ReminderFrequencyProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ReminderFrequency>,
+          ReminderFrequency,
+          FutureOr<ReminderFrequency>
+        >
+    with
+        $FutureModifier<ReminderFrequency>,
+        $FutureProvider<ReminderFrequency> {
+  ReminderFrequencyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'reminderFrequencyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$reminderFrequencyHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<ReminderFrequency> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ReminderFrequency> create(Ref ref) {
+    return reminderFrequency(ref);
+  }
+}
+
+String _$reminderFrequencyHash() => r'ae1a7a53f9d83d456a1bed3c1b4048282619bad7';
+
+@ProviderFor(reminderTimeOfDay)
+final reminderTimeOfDayProvider = ReminderTimeOfDayProvider._();
+
+final class ReminderTimeOfDayProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ReminderTimeOfDay>,
+          ReminderTimeOfDay,
+          FutureOr<ReminderTimeOfDay>
+        >
+    with
+        $FutureModifier<ReminderTimeOfDay>,
+        $FutureProvider<ReminderTimeOfDay> {
+  ReminderTimeOfDayProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'reminderTimeOfDayProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$reminderTimeOfDayHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<ReminderTimeOfDay> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ReminderTimeOfDay> create(Ref ref) {
+    return reminderTimeOfDay(ref);
+  }
+}
+
+String _$reminderTimeOfDayHash() => r'569c9dd880a2da22eb429a80735273e0c466134f';

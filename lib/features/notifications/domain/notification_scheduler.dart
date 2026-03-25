@@ -25,75 +25,92 @@ class NotificationScheduler {
 
   Future<void> scheduleAll() async {
     final now = DateTime.now();
-    await _scheduleMonthlyReminder(now);
+    await _scheduleReminder(now);
     await _scheduleIrSeasonReminder(now);
   }
 
-  // ── Spec 6.1 — Monthly reminder ────────────────────────────────────────
+  // ── Reminder (daily / weekly / monthly / none) ──────────────────────────
 
-  Future<void> _scheduleMonthlyReminder(DateTime now) async {
-    final enabledRaw =
-        await _settings.getValue(AppSettingsKeys.monthlyReminderEnabled);
-    final enabled = enabledRaw != 'false'; // default true
+  Future<void> _scheduleReminder(DateTime now) async {
+    final frequency = await _readFrequency();
+    final tod = await _readTimeOfDay();
+    final hour = tod.hour;
 
-    if (!enabled) {
-      await _service.cancelMonthlyReminder();
-      return;
-    }
-
-    // Schedule for current month.
-    await _scheduleForMonth(now, now.year, now.month);
-
-    // Always also schedule for next month so the reminder survives between
-    // app opens even when the user doesn't open the app near month-end.
-    final nextMonth = now.month == 12 ? 1 : now.month + 1;
-    final nextYear = now.month == 12 ? now.year + 1 : now.year;
-    final nextTrigger =
-        BusinessDayHelper.monthlyReminderTrigger(nextYear, nextMonth);
-    // Only schedule next month if it's in the future and would override the
-    // current-month notification. We re-schedule: cancel then set.
-    // Since we can only have one scheduled ID 1001 at a time, we only set
-    // the next-month trigger if the current month trigger has already passed
-    // (handled inside _scheduleForMonth, which cancels when count >= 1).
-    // We handle this by scheduling next month only if we didn't schedule for
-    // the current month AND the trigger is in the future.
-    final currentTrigger =
-        BusinessDayHelper.monthlyReminderTrigger(now.year, now.month);
-    if (now.isAfter(currentTrigger) && nextTrigger.isAfter(now)) {
-      await _service.scheduleMonthlyReminder(nextTrigger);
+    switch (frequency) {
+      case ReminderFrequency.none:
+        await _service.cancelMonthlyReminder();
+      case ReminderFrequency.daily:
+        await _service.scheduleDailyReminder(hour);
+      case ReminderFrequency.weekly:
+        await _service.scheduleWeeklyReminder(hour);
+      case ReminderFrequency.monthly:
+        await _scheduleForMonth(now, now.year, now.month, hour);
+        // Pre-schedule next month if current trigger has passed
+        final nextMonth = now.month == 12 ? 1 : now.month + 1;
+        final nextYear = now.month == 12 ? now.year + 1 : now.year;
+        final currentTrigger =
+            BusinessDayHelper.monthlyReminderTrigger(now.year, now.month, hour);
+        final nextTrigger =
+            BusinessDayHelper.monthlyReminderTrigger(nextYear, nextMonth, hour);
+        if (now.isAfter(currentTrigger) && nextTrigger.isAfter(now)) {
+          await _service.scheduleMonthlyReminder(nextTrigger);
+        }
     }
   }
 
-  Future<void> _scheduleForMonth(DateTime now, int year, int month) async {
-    final trigger = BusinessDayHelper.monthlyReminderTrigger(year, month);
+  Future<void> _scheduleForMonth(
+    DateTime now,
+    int year,
+    int month,
+    int hour,
+  ) async {
+    final trigger =
+        BusinessDayHelper.monthlyReminderTrigger(year, month, hour);
 
     if (trigger.isAfter(now)) {
-      // Trigger date is still in the future — schedule for it.
       await _service.scheduleMonthlyReminder(trigger);
       return;
     }
 
-    // Trigger date has passed or is today — check if user has expenses.
+    // Trigger date has passed — check if user has expenses.
     final lastDayOfMonth = DateTime(year, month + 1, 0);
-    if (now.isAfter(lastDayOfMonth)) {
-      // Month already ended — nothing to schedule for this month.
-      return;
-    }
+    if (now.isAfter(lastDayOfMonth)) return; // Month ended
 
     final count = await _expenseDao.countExpensesInMonth(year, month);
     if (count > 0) {
       await _service.cancelMonthlyReminder();
     } else {
-      // No expenses yet — fire as soon as possible (next day at 10:00 if
-      // it's already past 10:00, otherwise today at 10:00).
-      final today10 = DateTime(now.year, now.month, now.day, 10);
-      final fireAt = now.isAfter(today10)
-          ? DateTime(now.year, now.month, now.day + 1, 10)
-          : today10;
+      // No expenses yet — fire as soon as possible at the user's chosen hour.
+      final todayAtHour = DateTime(now.year, now.month, now.day, hour);
+      final fireAt = now.isAfter(todayAtHour)
+          ? DateTime(now.year, now.month, now.day + 1, hour)
+          : todayAtHour;
       if (fireAt.isBefore(lastDayOfMonth)) {
         await _service.scheduleMonthlyReminder(fireAt);
       }
     }
+  }
+
+  Future<ReminderFrequency> _readFrequency() async {
+    final raw = await _settings.getValue(AppSettingsKeys.reminderFrequency);
+    if (raw != null) {
+      return ReminderFrequency.values.firstWhere(
+        (f) => f.name == raw,
+        orElse: () => ReminderFrequency.monthly,
+      );
+    }
+    // Backwards compat: migrate from old monthlyReminderEnabled key.
+    final legacy =
+        await _settings.getValue(AppSettingsKeys.monthlyReminderEnabled);
+    return legacy == 'false' ? ReminderFrequency.none : ReminderFrequency.monthly;
+  }
+
+  Future<ReminderTimeOfDay> _readTimeOfDay() async {
+    final raw = await _settings.getValue(AppSettingsKeys.reminderTimeOfDay);
+    return ReminderTimeOfDay.values.firstWhere(
+      (t) => t.name == raw,
+      orElse: () => ReminderTimeOfDay.morning,
+    );
   }
 
   // ── Spec 6.2 — IR season reminder ─────────────────────────────────────
@@ -106,18 +123,14 @@ class NotificationScheduler {
         await _settings.getValue(AppSettingsKeys.summaryLastAccessedYear);
 
     if (accessedYearRaw == lastYear.toString()) {
-      // User already accessed the summary for the last fiscal year.
       await _service.cancelIrSeasonReminder();
       return;
     }
 
-    // Schedule notification. Prefer March 5 at 09:00; if already past, use
-    // tomorrow at 09:00.
     final march5 = DateTime(now.year, 3, 5, 9);
     final tomorrow9 = DateTime(now.year, now.month, now.day + 1, 9);
     final fireAt = now.isBefore(march5) ? march5 : tomorrow9;
 
-    // Only schedule if still within March.
     final endOfMarch = DateTime(now.year, 4);
     if (fireAt.isBefore(endOfMarch)) {
       await _service.scheduleIrSeasonReminder(fireAt, lastYear);

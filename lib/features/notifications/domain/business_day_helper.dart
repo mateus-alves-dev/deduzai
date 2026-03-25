@@ -25,10 +25,10 @@ abstract final class BusinessDayHelper {
   }
 
   /// The D-2 trigger date (2 business days before last business day of month)
-  /// at 10:00 local time.
-  static DateTime monthlyReminderTrigger(int year, int month) {
+  /// at [hour]:00 local time. Defaults to 08:00 if not specified.
+  static DateTime monthlyReminderTrigger(int year, int month, [int hour = 8]) {
     final lastBd = lastBusinessDayOfMonth(year, month);
     final trigger = subtractBusinessDays(lastBd, 2);
-    return DateTime(trigger.year, trigger.month, trigger.day, 10);
+    return DateTime(trigger.year, trigger.month, trigger.day, hour);
   }
 }

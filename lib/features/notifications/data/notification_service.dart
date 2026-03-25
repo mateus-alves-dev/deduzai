@@ -14,6 +14,11 @@ const _irSeasonReminderId = 1002;
 const _channelId = 'deduzai_reminders';
 const _channelName = 'Lembretes DeduzAí';
 
+const _defaultDetails = NotificationDetails(
+  android: AndroidNotificationDetails(_channelId, _channelName),
+  iOS: DarwinNotificationDetails(),
+);
+
 class NotificationService {
   NotificationService._();
 
@@ -81,6 +86,7 @@ class NotificationService {
     return false;
   }
 
+  /// Schedules a one-off or repeating monthly reminder at [fireAt].
   Future<void> scheduleMonthlyReminder(DateTime fireAt) async {
     await _plugin.cancel(id: _monthlyReminderId);
     await _plugin.zonedSchedule(
@@ -89,14 +95,51 @@ class NotificationService {
       body: 'Você registrou gastos dedutíveis este mês? '
           'Não esqueça remédios, consultas e terapia.',
       scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
+      notificationDetails: _defaultDetails,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
+
+  /// Schedules a daily reminder at [hour]:00, repeating every day.
+  Future<void> scheduleDailyReminder(int hour) async {
+    await _plugin.cancel(id: _monthlyReminderId);
+    final now = DateTime.now();
+    var fireAt = DateTime(now.year, now.month, now.day, hour);
+    if (!now.isBefore(fireAt)) {
+      fireAt = fireAt.add(const Duration(days: 1));
+    }
+    await _plugin.zonedSchedule(
+      id: _monthlyReminderId,
+      title: 'DeduzAí',
+      body: 'Lembrete: registre seus gastos dedutíveis de hoje.',
+      scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
+      notificationDetails: _defaultDetails,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  /// Schedules a weekly reminder on Monday at [hour]:00.
+  Future<void> scheduleWeeklyReminder(int hour) async {
+    await _plugin.cancel(id: _monthlyReminderId);
+    final now = DateTime.now();
+    var fireAt = DateTime(now.year, now.month, now.day, hour);
+    // Days until next Monday (0 means today is Monday)
+    final daysUntilMonday = (DateTime.monday - now.weekday + 7) % 7;
+    if (daysUntilMonday == 0 && !now.isBefore(fireAt)) {
+      // Today is Monday but time has passed — schedule for next Monday
+      fireAt = fireAt.add(const Duration(days: 7));
+    } else {
+      fireAt = fireAt.add(Duration(days: daysUntilMonday));
+    }
+    await _plugin.zonedSchedule(
+      id: _monthlyReminderId,
+      title: 'DeduzAí',
+      body: 'Lembrete semanal: registre os gastos dedutíveis da semana.',
+      scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
+      notificationDetails: _defaultDetails,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
   }
 
@@ -108,13 +151,7 @@ class NotificationService {
       body: 'A época do IR chegou. Seus gastos de $year estão '
           'organizados. Veja o resumo.',
       scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
+      notificationDetails: _defaultDetails,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: 'summary:$year',
     );
