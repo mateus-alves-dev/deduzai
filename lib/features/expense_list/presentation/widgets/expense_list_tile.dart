@@ -72,6 +72,9 @@ class _CategoryDot extends StatelessWidget {
     DeductionCategory.pensaoAlimenticia => AppColors.categoryPensao,
     DeductionCategory.previdenciaPrivada => AppColors.categoryPrevidencia,
     DeductionCategory.dependentes => AppColors.categoryDependentes,
+    DeductionCategory.previdenciaSocial => AppColors.categoryPrevidenciaSocial,
+    DeductionCategory.doacoesIncentivadas => AppColors.categoryDoacoes,
+    DeductionCategory.livroCaixa => AppColors.categoryLivroCaixa,
   };
 
   @override

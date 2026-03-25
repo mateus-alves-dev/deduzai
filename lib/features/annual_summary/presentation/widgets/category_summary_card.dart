@@ -60,16 +60,16 @@ class CategorySummaryCard extends StatelessWidget {
                 amountInCents: summary.deductibleInCents,
                 currency: _currency,
                 bold: true,
-                color: capExceeded
-                    ? theme.colorScheme.primary
-                    : null,
+                color: capExceeded ? theme.colorScheme.primary : null,
               ),
             ],
             if (capExceeded) ...[
               const SizedBox(height: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.errorContainer,
                   borderRadius: BorderRadius.circular(12),
@@ -106,6 +106,10 @@ class CategorySummaryCard extends StatelessWidget {
       DeductionCategory.pensaoAlimenticia => Icons.family_restroom_outlined,
       DeductionCategory.previdenciaPrivada => Icons.savings_outlined,
       DeductionCategory.dependentes => Icons.people_outline,
+      DeductionCategory.previdenciaSocial => Icons.account_balance_outlined,
+      DeductionCategory.doacoesIncentivadas =>
+        Icons.volunteer_activism_outlined,
+      DeductionCategory.livroCaixa => Icons.menu_book_outlined,
     };
   }
 }
@@ -128,9 +132,9 @@ class _AmountRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontWeight: bold ? FontWeight.bold : null,
-          color: color,
-        );
+      fontWeight: bold ? FontWeight.bold : null,
+      color: color,
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

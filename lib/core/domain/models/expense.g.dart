@@ -46,6 +46,9 @@ const _$DeductionCategoryEnumMap = {
   DeductionCategory.pensaoAlimenticia: 'pensaoAlimenticia',
   DeductionCategory.previdenciaPrivada: 'previdenciaPrivada',
   DeductionCategory.dependentes: 'dependentes',
+  DeductionCategory.previdenciaSocial: 'previdenciaSocial',
+  DeductionCategory.doacoesIncentivadas: 'doacoesIncentivadas',
+  DeductionCategory.livroCaixa: 'livroCaixa',
 };
 
 const _$ExpenseOrigemEnumMap = {

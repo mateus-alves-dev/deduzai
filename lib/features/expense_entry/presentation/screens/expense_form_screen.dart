@@ -47,6 +47,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
   // CNPJ auto-categorization state (F3)
   bool _categorySuggested = false;
+  bool _beneficiarioAutoFilled = false;
+  String? _cnaeDescricao;
 
   @override
   void initState() {
@@ -81,21 +83,36 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     _existingExpense = expense;
     _cnpj = expense.cnpj;
     _initialized = true;
-    // Attempt to suggest a category if this expense has a CNPJ but editing
-    // it might benefit from the user's learned preference.
-    if (expense.cnpj != null) _tryAutoCategory(expense.cnpj);
+    // Attempt to lookup CNPJ for category + beneficiário suggestions
+    if (expense.cnpj != null) _tryCnpjLookup(expense.cnpj);
   }
 
-  Future<void> _tryAutoCategory(String? cnpj) async {
+  Future<void> _tryCnpjLookup(String? cnpj) async {
     if (cnpj == null || cnpj.isEmpty) return;
     final service = ref.read(cnpjCategorizationServiceProvider);
-    final suggestion = await service.suggestCategory(cnpj);
-    if (suggestion != null && mounted) {
-      setState(() {
-        _selectedCategory = suggestion;
+    final result = await service.lookup(cnpj);
+    if (!mounted) return;
+
+    setState(() {
+      // Auto-fill category if suggestion exists
+      if (result.suggestedCategory != null) {
+        _selectedCategory = result.suggestedCategory;
         _categorySuggested = true;
-      });
-    }
+      }
+
+      // Auto-fill beneficiário if provided AND field is empty
+      if (result.beneficiario != null &&
+          result.beneficiario!.isNotEmpty &&
+          _beneficiarioController.text.isEmpty &&
+          !_ocrFilledFields.contains('beneficiario')) {
+        _beneficiarioController.text = result.beneficiario!;
+        _beneficiarioAutoFilled = true;
+      }
+
+      if (result.cnaeDescricao != null) {
+        _cnaeDescricao = result.cnaeDescricao;
+      }
+    });
   }
 
   void _applyOcrResult(OcrResult result) {
@@ -136,7 +153,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
         OcrStatus.success => null,
       };
     });
-    if (result.cnpj != null) _tryAutoCategory(result.cnpj);
+    if (result.cnpj != null) _tryCnpjLookup(result.cnpj);
   }
 
   String? _validateAmount(String? value) {
@@ -478,15 +495,50 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                       decoration: InputDecoration(
                         labelText: 'Beneficiário (opcional)',
                         hintText: 'Ex: Clínica São Lucas',
-                        suffixIcon: _ocrFilledFields.contains('beneficiario')
+                        suffixIcon:
+                            _ocrFilledFields.contains('beneficiario') ||
+                                _beneficiarioAutoFilled
                             ? const _OcrBadge()
                             : null,
                       ),
-                      onChanged: (_) => setState(
-                        () => _ocrFilledFields.remove('beneficiario'),
-                      ),
+                      onChanged: (_) {
+                        setState(() {
+                          _ocrFilledFields.remove('beneficiario');
+                          _beneficiarioAutoFilled = false;
+                        });
+                      },
                       maxLength: 255,
                     ),
+                    if (_beneficiarioAutoFilled &&
+                        !_ocrFilledFields.contains('beneficiario')) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Beneficiário preenchido automaticamente',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // CNPJ / CNAE info card
+                    if (_cnpj != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _CnpjInfoCard(
+                        cnpj: _cnpj!,
+                        cnaeDescricao: _cnaeDescricao,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -516,6 +568,66 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                       )
                     : const Text('Salvar'),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _formatCnpj(String raw) {
+  final d = raw.replaceAll(RegExp(r'\D'), '');
+  if (d.length != 14) return raw;
+  return '${d.substring(0, 2)}.${d.substring(2, 5)}.${d.substring(5, 8)}/${d.substring(8, 12)}-${d.substring(12)}';
+}
+
+/// Read-only card showing CNPJ and CNAE info obtained from lookup.
+class _CnpjInfoCard extends StatelessWidget {
+  const _CnpjInfoCard({required this.cnpj, this.cnaeDescricao});
+
+  final String cnpj;
+  final String? cnaeDescricao;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.business_outlined,
+            size: 18,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _formatCnpj(cnpj),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (cnaeDescricao != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    cnaeDescricao!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

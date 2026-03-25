@@ -1221,6 +1221,28 @@ class $CnpjPreferencesTable extends CnpjPreferences
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _beneficiarioMeta = const VerificationMeta(
+    'beneficiario',
+  );
+  @override
+  late final GeneratedColumn<String> beneficiario = GeneratedColumn<String>(
+    'beneficiario',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cnaeDescricaoMeta = const VerificationMeta(
+    'cnaeDescricao',
+  );
+  @override
+  late final GeneratedColumn<String> cnaeDescricao = GeneratedColumn<String>(
+    'cnae_descricao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -1233,7 +1255,13 @@ class $CnpjPreferencesTable extends CnpjPreferences
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [cnpj, category, updatedAt];
+  List<GeneratedColumn> get $columns => [
+    cnpj,
+    category,
+    beneficiario,
+    cnaeDescricao,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1262,6 +1290,24 @@ class $CnpjPreferencesTable extends CnpjPreferences
     } else if (isInserting) {
       context.missing(_categoryMeta);
     }
+    if (data.containsKey('beneficiario')) {
+      context.handle(
+        _beneficiarioMeta,
+        beneficiario.isAcceptableOrUnknown(
+          data['beneficiario']!,
+          _beneficiarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cnae_descricao')) {
+      context.handle(
+        _cnaeDescricaoMeta,
+        cnaeDescricao.isAcceptableOrUnknown(
+          data['cnae_descricao']!,
+          _cnaeDescricaoMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -1287,6 +1333,14 @@ class $CnpjPreferencesTable extends CnpjPreferences
         DriftSqlType.string,
         data['${effectivePrefix}category'],
       )!,
+      beneficiario: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}beneficiario'],
+      ),
+      cnaeDescricao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cnae_descricao'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -1303,10 +1357,14 @@ class $CnpjPreferencesTable extends CnpjPreferences
 class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
   final String cnpj;
   final String category;
+  final String? beneficiario;
+  final String? cnaeDescricao;
   final DateTime updatedAt;
   const CnpjPreference({
     required this.cnpj,
     required this.category,
+    this.beneficiario,
+    this.cnaeDescricao,
     required this.updatedAt,
   });
   @override
@@ -1314,6 +1372,12 @@ class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
     final map = <String, Expression>{};
     map['cnpj'] = Variable<String>(cnpj);
     map['category'] = Variable<String>(category);
+    if (!nullToAbsent || beneficiario != null) {
+      map['beneficiario'] = Variable<String>(beneficiario);
+    }
+    if (!nullToAbsent || cnaeDescricao != null) {
+      map['cnae_descricao'] = Variable<String>(cnaeDescricao);
+    }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -1322,6 +1386,12 @@ class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
     return CnpjPreferencesCompanion(
       cnpj: Value(cnpj),
       category: Value(category),
+      beneficiario: beneficiario == null && nullToAbsent
+          ? const Value.absent()
+          : Value(beneficiario),
+      cnaeDescricao: cnaeDescricao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cnaeDescricao),
       updatedAt: Value(updatedAt),
     );
   }
@@ -1334,6 +1404,8 @@ class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
     return CnpjPreference(
       cnpj: serializer.fromJson<String>(json['cnpj']),
       category: serializer.fromJson<String>(json['category']),
+      beneficiario: serializer.fromJson<String?>(json['beneficiario']),
+      cnaeDescricao: serializer.fromJson<String?>(json['cnaeDescricao']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -1343,6 +1415,8 @@ class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
     return <String, dynamic>{
       'cnpj': serializer.toJson<String>(cnpj),
       'category': serializer.toJson<String>(category),
+      'beneficiario': serializer.toJson<String?>(beneficiario),
+      'cnaeDescricao': serializer.toJson<String?>(cnaeDescricao),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -1350,16 +1424,28 @@ class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
   CnpjPreference copyWith({
     String? cnpj,
     String? category,
+    Value<String?> beneficiario = const Value.absent(),
+    Value<String?> cnaeDescricao = const Value.absent(),
     DateTime? updatedAt,
   }) => CnpjPreference(
     cnpj: cnpj ?? this.cnpj,
     category: category ?? this.category,
+    beneficiario: beneficiario.present ? beneficiario.value : this.beneficiario,
+    cnaeDescricao: cnaeDescricao.present
+        ? cnaeDescricao.value
+        : this.cnaeDescricao,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   CnpjPreference copyWithCompanion(CnpjPreferencesCompanion data) {
     return CnpjPreference(
       cnpj: data.cnpj.present ? data.cnpj.value : this.cnpj,
       category: data.category.present ? data.category.value : this.category,
+      beneficiario: data.beneficiario.present
+          ? data.beneficiario.value
+          : this.beneficiario,
+      cnaeDescricao: data.cnaeDescricao.present
+          ? data.cnaeDescricao.value
+          : this.cnaeDescricao,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1369,36 +1455,47 @@ class CnpjPreference extends DataClass implements Insertable<CnpjPreference> {
     return (StringBuffer('CnpjPreference(')
           ..write('cnpj: $cnpj, ')
           ..write('category: $category, ')
+          ..write('beneficiario: $beneficiario, ')
+          ..write('cnaeDescricao: $cnaeDescricao, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(cnpj, category, updatedAt);
+  int get hashCode =>
+      Object.hash(cnpj, category, beneficiario, cnaeDescricao, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is CnpjPreference &&
           other.cnpj == this.cnpj &&
           other.category == this.category &&
+          other.beneficiario == this.beneficiario &&
+          other.cnaeDescricao == this.cnaeDescricao &&
           other.updatedAt == this.updatedAt);
 }
 
 class CnpjPreferencesCompanion extends UpdateCompanion<CnpjPreference> {
   final Value<String> cnpj;
   final Value<String> category;
+  final Value<String?> beneficiario;
+  final Value<String?> cnaeDescricao;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const CnpjPreferencesCompanion({
     this.cnpj = const Value.absent(),
     this.category = const Value.absent(),
+    this.beneficiario = const Value.absent(),
+    this.cnaeDescricao = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CnpjPreferencesCompanion.insert({
     required String cnpj,
     required String category,
+    this.beneficiario = const Value.absent(),
+    this.cnaeDescricao = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : cnpj = Value(cnpj),
@@ -1407,12 +1504,16 @@ class CnpjPreferencesCompanion extends UpdateCompanion<CnpjPreference> {
   static Insertable<CnpjPreference> custom({
     Expression<String>? cnpj,
     Expression<String>? category,
+    Expression<String>? beneficiario,
+    Expression<String>? cnaeDescricao,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (cnpj != null) 'cnpj': cnpj,
       if (category != null) 'category': category,
+      if (beneficiario != null) 'beneficiario': beneficiario,
+      if (cnaeDescricao != null) 'cnae_descricao': cnaeDescricao,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1421,12 +1522,16 @@ class CnpjPreferencesCompanion extends UpdateCompanion<CnpjPreference> {
   CnpjPreferencesCompanion copyWith({
     Value<String>? cnpj,
     Value<String>? category,
+    Value<String?>? beneficiario,
+    Value<String?>? cnaeDescricao,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
     return CnpjPreferencesCompanion(
       cnpj: cnpj ?? this.cnpj,
       category: category ?? this.category,
+      beneficiario: beneficiario ?? this.beneficiario,
+      cnaeDescricao: cnaeDescricao ?? this.cnaeDescricao,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -1440,6 +1545,12 @@ class CnpjPreferencesCompanion extends UpdateCompanion<CnpjPreference> {
     }
     if (category.present) {
       map['category'] = Variable<String>(category.value);
+    }
+    if (beneficiario.present) {
+      map['beneficiario'] = Variable<String>(beneficiario.value);
+    }
+    if (cnaeDescricao.present) {
+      map['cnae_descricao'] = Variable<String>(cnaeDescricao.value);
     }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
@@ -1455,6 +1566,8 @@ class CnpjPreferencesCompanion extends UpdateCompanion<CnpjPreference> {
     return (StringBuffer('CnpjPreferencesCompanion(')
           ..write('cnpj: $cnpj, ')
           ..write('category: $category, ')
+          ..write('beneficiario: $beneficiario, ')
+          ..write('cnaeDescricao: $cnaeDescricao, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2495,6 +2608,8 @@ typedef $$CnpjPreferencesTableCreateCompanionBuilder =
     CnpjPreferencesCompanion Function({
       required String cnpj,
       required String category,
+      Value<String?> beneficiario,
+      Value<String?> cnaeDescricao,
       required DateTime updatedAt,
       Value<int> rowid,
     });
@@ -2502,6 +2617,8 @@ typedef $$CnpjPreferencesTableUpdateCompanionBuilder =
     CnpjPreferencesCompanion Function({
       Value<String> cnpj,
       Value<String> category,
+      Value<String?> beneficiario,
+      Value<String?> cnaeDescricao,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -2522,6 +2639,16 @@ class $$CnpjPreferencesTableFilterComposer
 
   ColumnFilters<String> get category => $composableBuilder(
     column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cnaeDescricao => $composableBuilder(
+    column: $table.cnaeDescricao,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2550,6 +2677,16 @@ class $$CnpjPreferencesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cnaeDescricao => $composableBuilder(
+    column: $table.cnaeDescricao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -2570,6 +2707,16 @@ class $$CnpjPreferencesTableAnnotationComposer
 
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get beneficiario => $composableBuilder(
+    column: $table.beneficiario,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cnaeDescricao => $composableBuilder(
+    column: $table.cnaeDescricao,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
@@ -2614,11 +2761,15 @@ class $$CnpjPreferencesTableTableManager
               ({
                 Value<String> cnpj = const Value.absent(),
                 Value<String> category = const Value.absent(),
+                Value<String?> beneficiario = const Value.absent(),
+                Value<String?> cnaeDescricao = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CnpjPreferencesCompanion(
                 cnpj: cnpj,
                 category: category,
+                beneficiario: beneficiario,
+                cnaeDescricao: cnaeDescricao,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -2626,11 +2777,15 @@ class $$CnpjPreferencesTableTableManager
               ({
                 required String cnpj,
                 required String category,
+                Value<String?> beneficiario = const Value.absent(),
+                Value<String?> cnaeDescricao = const Value.absent(),
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => CnpjPreferencesCompanion.insert(
                 cnpj: cnpj,
                 category: category,
+                beneficiario: beneficiario,
+                cnaeDescricao: cnaeDescricao,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

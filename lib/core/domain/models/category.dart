@@ -3,7 +3,10 @@ enum DeductionCategory {
   educacao('Educação'),
   pensaoAlimenticia('Pensão Alimentícia'),
   previdenciaPrivada('Previdência Privada'),
-  dependentes('Dependentes');
+  dependentes('Dependentes'),
+  previdenciaSocial('Previdência Social (INSS)'),
+  doacoesIncentivadas('Doações Incentivadas'),
+  livroCaixa('Livro-Caixa');
 
   const DeductionCategory(this.label);
 

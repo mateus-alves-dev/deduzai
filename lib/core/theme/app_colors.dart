@@ -20,4 +20,7 @@ abstract final class AppColors {
   static const categoryPensao = Color(0xFF8E24AA);
   static const categoryPrevidencia = Color(0xFF43A047);
   static const categoryDependentes = Color(0xFF757575);
+  static const categoryPrevidenciaSocial = Color(0xFF00897B);
+  static const categoryDoacoes = Color(0xFFFB8C00);
+  static const categoryLivroCaixa = Color(0xFF5C6BC0);
 }

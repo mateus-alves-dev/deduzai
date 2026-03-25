@@ -13,12 +13,18 @@ class CnpjPreferenceDao extends DatabaseAccessor<AppDatabase>
     cnpjPreferences,
   )..where((r) => r.cnpj.equals(cnpj))).getSingleOrNull();
 
-  Future<void> upsert(String cnpj, String category) =>
-      into(cnpjPreferences).insertOnConflictUpdate(
-        CnpjPreferencesCompanion.insert(
-          cnpj: cnpj,
-          category: category,
-          updatedAt: DateTime.now(),
-        ),
-      );
+  Future<void> upsert(
+    String cnpj,
+    String category, {
+    String? beneficiario,
+    String? cnaeDescricao,
+  }) => into(cnpjPreferences).insertOnConflictUpdate(
+    CnpjPreferencesCompanion.insert(
+      cnpj: cnpj,
+      category: category,
+      beneficiario: Value(beneficiario),
+      cnaeDescricao: Value(cnaeDescricao),
+      updatedAt: DateTime.now(),
+    ),
+  );
 }

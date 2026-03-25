@@ -7,7 +7,7 @@ part of 'cnpj_categorization_service.dart';
 // **************************************************************************
 
 String _$cnpjCategorizationServiceHash() =>
-    r'2f432c0076612497cfa61f8685c1903a7505bb53';
+    r'1cf0d43caad8ca1b5047a8f1ed6185a317a2df85';
 
 /// See also [cnpjCategorizationService].
 @ProviderFor(cnpjCategorizationService)

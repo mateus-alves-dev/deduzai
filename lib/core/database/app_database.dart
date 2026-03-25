@@ -25,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -45,6 +45,12 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await m.createTable(appSettings);
+      }
+      if (from < 6) {
+        await m.addColumn(cnpjPreferences, cnpjPreferences.beneficiario);
+      }
+      if (from < 7) {
+        await m.addColumn(cnpjPreferences, cnpjPreferences.cnaeDescricao);
       }
     },
   );
