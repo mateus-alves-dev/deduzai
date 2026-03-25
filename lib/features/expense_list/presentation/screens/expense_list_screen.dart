@@ -39,11 +39,11 @@ class ExpenseListScreen extends ConsumerWidget {
           return _GroupedExpenseList(expenses: expenses);
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/expenses/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Novo gasto'),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => context.push('/expenses/new'),
+      //   icon: const Icon(Icons.add),
+      //   label: const Text('Novo gasto'),
+      // ),
     );
   }
 }
