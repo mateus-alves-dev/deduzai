@@ -1,7 +1,8 @@
 import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/domain/models/category.dart';
-import 'package:deduzai/core/theme/app_colors.dart';
+import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/theme/category_utils.dart';
 import 'package:deduzai/features/expense_list/presentation/providers/expense_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,7 @@ class ExpenseListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final category = DeductionCategory.values.byName(expense.category);
+    final categoryColor = colorForCategory(category);
     final amount = expense.amountInCents / 100;
     final formatted = NumberFormat.currency(
       locale: 'pt_BR',
@@ -28,70 +30,109 @@ class ExpenseListTile extends ConsumerWidget {
     ).format(amount);
     final date = DateFormat('dd/MM/yyyy').format(expense.date);
     final hasBeneficiario = expense.beneficiario?.isNotEmpty ?? false;
-    final subtitle = hasBeneficiario ? expense.beneficiario! : date;
+    final theme = Theme.of(context);
 
-    return ListTile(
-      onTap: onTap,
-      leading: _CategoryDot(category: category),
-      title: Text(
-        expense.description.isNotEmpty ? expense.description : category.label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: AppTextStyles.titleMedium,
+    return Card(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
       ),
-      subtitle: Text(
-        '$subtitle · $date',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: AppTextStyles.bodyMedium,
-      ),
-      trailing: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            formatted,
-            style: AppTextStyles.amountDisplay.copyWith(fontSize: 15),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              Container(width: 4, color: categoryColor),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      // Left: text info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              expense.description.isNotEmpty
+                                  ? expense.description
+                                  : category.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.titleMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            // Category pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: categoryColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                category.label,
+                                style: AppTextStyles.labelMedium.copyWith(
+                                  color: categoryColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            if (hasBeneficiario) ...[
+                              Text(
+                                expense.beneficiario!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                            ],
+                            Text(
+                              date,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: theme.colorScheme.outline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      // Right: amount + receipt badge
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            formatted,
+                            style: AppTextStyles.titleLarge.copyWith(
+                              fontFeatures: [
+                                const FontFeature.tabularFigures(),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          _ReceiptBadge(expenseId: expense.id),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 2),
-          _ReceiptIcon(expenseId: expense.id),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _CategoryDot extends StatelessWidget {
-  const _CategoryDot({required this.category});
-
-  final DeductionCategory category;
-
-  static Color _colorFor(DeductionCategory c) => switch (c) {
-    DeductionCategory.saude => AppColors.categorySaude,
-    DeductionCategory.educacao => AppColors.categoryEducacao,
-    DeductionCategory.pensaoAlimenticia => AppColors.categoryPensao,
-    DeductionCategory.previdenciaPrivada => AppColors.categoryPrevidencia,
-    DeductionCategory.dependentes => AppColors.categoryDependentes,
-    DeductionCategory.previdenciaSocial => AppColors.categoryPrevidenciaSocial,
-    DeductionCategory.doacoesIncentivadas => AppColors.categoryDoacoes,
-    DeductionCategory.livroCaixa => AppColors.categoryLivroCaixa,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 12,
-      height: 12,
-      decoration: BoxDecoration(
-        color: _colorFor(category),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-}
-
-class _ReceiptIcon extends ConsumerWidget {
-  const _ReceiptIcon({required this.expenseId});
+class _ReceiptBadge extends ConsumerWidget {
+  const _ReceiptBadge({required this.expenseId});
 
   final String expenseId;
 
@@ -99,6 +140,7 @@ class _ReceiptIcon extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hasReceipt =
         ref.watch(expenseHasReceiptProvider(expenseId)).value ?? false;
+    final theme = Theme.of(context);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -121,14 +163,35 @@ class _ReceiptIcon extends ConsumerWidget {
           );
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(2),
-        child: Icon(
-          Icons.receipt_outlined,
-          size: 16,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
           color: hasReceipt
-              ? AppColors.success
-              : Theme.of(context).colorScheme.outlineVariant,
+              ? Colors.green.withValues(alpha: 0.12)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              hasReceipt ? Icons.check_circle : Icons.add_a_photo_outlined,
+              size: 14,
+              color: hasReceipt
+                  ? Colors.green
+                  : theme.colorScheme.outline,
+            ),
+            const SizedBox(width: 3),
+            Text(
+              hasReceipt ? 'Nota' : 'Sem nota',
+              style: AppTextStyles.labelMedium.copyWith(
+                fontSize: 11,
+                color: hasReceipt
+                    ? Colors.green
+                    : theme.colorScheme.outline,
+              ),
+            ),
+          ],
         ),
       ),
     );

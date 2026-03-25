@@ -1,7 +1,6 @@
 import 'package:deduzai/core/domain/models/annual_summary.dart';
-import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
-import 'package:deduzai/features/annual_summary/presentation/widgets/category_color_utils.dart';
+import 'package:deduzai/core/theme/category_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -38,7 +37,7 @@ class CategorySummaryCard extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          _iconFor(summary.category),
+                          iconForCategory(summary.category),
                           color: categoryColor,
                         ),
                         const SizedBox(width: 8),
@@ -135,19 +134,6 @@ class CategorySummaryCard extends StatelessWidget {
     );
   }
 
-  IconData _iconFor(DeductionCategory category) {
-    return switch (category) {
-      DeductionCategory.saude => Icons.health_and_safety_outlined,
-      DeductionCategory.educacao => Icons.school_outlined,
-      DeductionCategory.pensaoAlimenticia => Icons.family_restroom_outlined,
-      DeductionCategory.previdenciaPrivada => Icons.savings_outlined,
-      DeductionCategory.dependentes => Icons.people_outline,
-      DeductionCategory.previdenciaSocial => Icons.account_balance_outlined,
-      DeductionCategory.doacoesIncentivadas =>
-        Icons.volunteer_activism_outlined,
-      DeductionCategory.livroCaixa => Icons.menu_book_outlined,
-    };
-  }
 }
 
 class _AmountRow extends StatelessWidget {

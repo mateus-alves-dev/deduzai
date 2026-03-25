@@ -3,9 +3,11 @@ import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/expense_origem.dart';
 import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
+import 'package:deduzai/core/theme/app_text_styles.dart';
 import 'package:deduzai/features/expense_entry/domain/cnpj_categorization_service.dart';
 import 'package:deduzai/features/expense_entry/domain/expense_service.dart';
 import 'package:deduzai/features/expense_entry/presentation/providers/expense_form_provider.dart';
+import 'package:deduzai/features/expense_entry/presentation/widgets/category_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,6 +39,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   db.Expense? _existingExpense;
   bool _initialized = false;
   bool _isSaving = false;
+  bool _showCategoryError = false;
 
   // OCR state
   OcrResult? _ocrResult;
@@ -209,7 +212,14 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
   Future<void> _submit() async {
     final dateError = _validateDate();
-    if (!_formKey.currentState!.validate() || dateError != null) {
+    final formValid = _formKey.currentState!.validate();
+    final categoryValid = _selectedCategory != null;
+
+    if (!categoryValid) {
+      setState(() => _showCategoryError = true);
+    }
+
+    if (!formValid || !categoryValid || dateError != null) {
       if (dateError != null) {
         ScaffoldMessenger.of(
           context,
@@ -315,7 +325,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     return formAsync.when(
       loading: () => Scaffold(
         appBar: AppBar(
-          title: Text(widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto'),
+          title:
+              Text(widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto'),
         ),
         body: const Center(child: CircularProgressIndicator()),
       ),
@@ -328,6 +339,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   }
 
   Widget _buildForm(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.expenseId != null ? 'Editar Gasto' : 'Novo Gasto'),
@@ -350,14 +363,10 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // OCR button (only for new expenses)
+                    // OCR card (only for new expenses)
                     if (widget.expenseId == null) ...[
-                      OutlinedButton.icon(
-                        onPressed: _openCamera,
-                        icon: const Icon(Icons.document_scanner_outlined),
-                        label: const Text('Fotografar nota'),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
+                      _buildOcrCard(theme),
+                      const SizedBox(height: AppSpacing.sm),
                     ],
 
                     // OCR message banner
@@ -365,9 +374,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.sm),
                         decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.secondaryContainer,
+                          color: theme.colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -375,18 +382,15 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                             Icon(
                               Icons.info_outline,
                               size: 18,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSecondaryContainer,
+                              color: theme.colorScheme.onSecondaryContainer,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 _ocrMessage!,
                                 style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSecondaryContainer,
+                                  color:
+                                      theme.colorScheme.onSecondaryContainer,
                                   fontSize: 13,
                                 ),
                               ),
@@ -394,52 +398,23 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      const SizedBox(height: AppSpacing.sm),
                     ],
 
-                    // Valor
-                    TextFormField(
-                      key: const Key('amountField'),
-                      controller: _amountController,
-                      autofocus: widget.expenseId != null,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp('[0-9,.]')),
-                      ],
-                      decoration: InputDecoration(
-                        labelText: 'Valor',
-                        prefixText: r'R$ ',
-                        hintText: '0,00',
-                        suffixIcon: _ocrFilledFields.contains('valor')
-                            ? const _OcrBadge()
-                            : null,
-                      ),
-                      onChanged: (_) =>
-                          setState(() => _ocrFilledFields.remove('valor')),
-                      validator: _validateAmount,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
+                    // Hero amount field
+                    _buildHeroAmount(theme),
 
-                    // Categoria
-                    DropdownButtonFormField<DeductionCategory>(
-                      initialValue: _selectedCategory,
-                      decoration: const InputDecoration(labelText: 'Categoria'),
-                      items: DeductionCategory.values
-                          .map(
-                            (c) => DropdownMenuItem(
-                              value: c,
-                              child: Text(c.label),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (v) => setState(() {
-                        _selectedCategory = v;
+                    const Divider(height: AppSpacing.xl),
+
+                    // Category chip selector
+                    CategorySelector(
+                      selected: _selectedCategory,
+                      onChanged: (cat) => setState(() {
+                        _selectedCategory = cat;
                         _categorySuggested = false;
+                        _showCategoryError = false;
                       }),
-                      validator: (v) =>
-                          v == null ? 'Selecione uma categoria' : null,
+                      showError: _showCategoryError,
                     ),
                     if (_categorySuggested) ...[
                       const SizedBox(height: AppSpacing.sm),
@@ -448,14 +423,14 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                           Icon(
                             Icons.auto_awesome,
                             size: 14,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: theme.colorScheme.primary,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Categoria sugerida',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ],
@@ -497,9 +472,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                         hintText: 'Ex: Clínica São Lucas',
                         suffixIcon:
                             _ocrFilledFields.contains('beneficiario') ||
-                                _beneficiarioAutoFilled
-                            ? const _OcrBadge()
-                            : null,
+                                    _beneficiarioAutoFilled
+                                ? const _OcrBadge()
+                                : null,
                       ),
                       onChanged: (_) {
                         setState(() {
@@ -517,14 +492,14 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                           Icon(
                             Icons.auto_awesome,
                             size: 14,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: theme.colorScheme.primary,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Beneficiário preenchido automaticamente',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ],
@@ -569,6 +544,126 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                     : const Text('Salvar'),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOcrCard(ThemeData theme) {
+    return Card(
+      color: theme.colorScheme.secondaryContainer,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: _openCamera,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondary.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.document_scanner_outlined,
+                  color: theme.colorScheme.onSecondaryContainer,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Fotografar nota fiscal',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer,
+                      ),
+                    ),
+                    Text(
+                      'Preencha automaticamente com OCR',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer
+                            .withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSecondaryContainer,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroAmount(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          Text(
+            'Valor',
+            style: AppTextStyles.labelMedium.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                r'R$ ',
+                style: AppTextStyles.headlineMedium.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              IntrinsicWidth(
+                child: TextFormField(
+                  key: const Key('amountField'),
+                  controller: _amountController,
+                  autofocus: widget.expenseId == null,
+                  style: AppTextStyles.headlineLarge.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontFeatures: [const FontFeature.tabularFigures()],
+                  ),
+                  textAlign: TextAlign.center,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[0-9,.]')),
+                  ],
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    filled: false,
+                    hintText: '0,00',
+                    hintStyle: AppTextStyles.headlineLarge.copyWith(
+                      color: theme.colorScheme.outlineVariant,
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    errorStyle: const TextStyle(fontSize: 12),
+                  ),
+                  onChanged: (_) =>
+                      setState(() => _ocrFilledFields.remove('valor')),
+                  validator: _validateAmount,
+                ),
+              ),
+              if (_ocrFilledFields.contains('valor')) ...[
+                const SizedBox(width: AppSpacing.xs),
+                const _OcrBadge(),
+              ],
+            ],
           ),
         ],
       ),
