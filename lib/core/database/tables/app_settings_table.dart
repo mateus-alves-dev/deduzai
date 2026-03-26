@@ -15,6 +15,9 @@ abstract final class AppSettingsKeys {
   static const reminderFrequency = 'reminder_frequency';
   static const reminderTimeOfDay = 'reminder_time_of_day';
   static const themeMode = 'theme_mode';
+
+  /// Key for gross annual income in centavos, per fiscal year.
+  static String grossAnnualIncome(int year) => 'gross_annual_income_$year';
 }
 
 enum ReminderFrequency { none, daily, weekly, monthly }

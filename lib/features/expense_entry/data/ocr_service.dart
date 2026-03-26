@@ -110,11 +110,11 @@ class OcrService {
     final cnpj = _extractCnpj(rawText);
     final beneficiario = _extractBeneficiario(rawText);
 
-    final hasKeyField = valor != null || cnpj != null;
+    // success requires valor; partial if any other field was extracted
     final hasAnyField =
-        hasKeyField || data != null || beneficiario != null;
+        valor != null || cnpj != null || data != null || beneficiario != null;
 
-    final status = hasKeyField
+    final status = valor != null
         ? OcrStatus.success
         : hasAnyField
             ? OcrStatus.partial
@@ -134,30 +134,80 @@ class OcrService {
   // Parsing helpers
   // ---------------------------------------------------------------------------
 
+  /// Guard: amount must be > 0 centavos and ≤ R$ 1.000.000,00
+  static const _minCentavos = 1;
+  static const _maxCentavos = 100000000;
+
+  bool _isValidAmount(int cents) =>
+      cents >= _minCentavos && cents <= _maxCentavos;
+
   /// Extracts the total amount in centavos from a Brazilian receipt.
   int? _extractValor(String text) {
-    // Prioritise lines containing TOTAL, VALOR, SUBTOTAL
-    final totalPatterns = [
-      RegExp(
-        r'(?:total|valor\s*total|subtotal)[^\d]*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})',
-        caseSensitive: false,
-      ),
-      RegExp(
-        r'R\$\s*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})',
-        caseSensitive: false,
-      ),
-    ];
+    const keywords =
+        r'total\s*a\s*pagar|valor\s*a\s*pagar|total\s*geral'
+        r'|valor\s*total|valor\s*l[ií]quido|total\s*due'
+        r'|vlr\s*total|v\.\s*total|tot\s*geral'
+        r'|vlr\s*a\s*pagar|valor\s*a\s*cobrar|valor\s*bruto'
+        r'|a\s*pagar|total|subtotal';
+    const amount = r'(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})';
 
-    for (final pattern in totalPatterns) {
-      final matches = pattern.allMatches(text).toList();
-      if (matches.isNotEmpty) {
-        // Take the last match (usually the grand total is at the bottom)
-        final raw = matches.last.group(1)!;
-        final cents = _parseBrMoney(raw);
-        if (cents != null && cents > 0) return cents;
+    // Stage 1a: keyword + amount on same line
+    final keywordPattern = RegExp(
+      '(?:$keywords)[^\\d]*$amount',
+      caseSensitive: false,
+    );
+    int? best;
+    for (final m in keywordPattern.allMatches(text)) {
+      final cents = _parseBrMoney(m.group(1)!);
+      if (cents != null && _isValidAmount(cents)) {
+        if (best == null || cents > best) best = cents;
       }
     }
-    return null;
+    if (best != null) return best;
+
+    // Stage 1b: keyword on one line, amount on the next line
+    final lines = text.split('\n');
+    final keywordLinePattern = RegExp(keywords, caseSensitive: false);
+    final amountLinePattern = RegExp(
+      r'^\s*R?\$?\s*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*$',
+    );
+    for (var i = 0; i < lines.length - 1; i++) {
+      if (keywordLinePattern.hasMatch(lines[i])) {
+        final nextMatch = amountLinePattern.firstMatch(lines[i + 1]);
+        if (nextMatch != null) {
+          final cents = _parseBrMoney(nextMatch.group(1)!);
+          if (cents != null && _isValidAmount(cents)) {
+            if (best == null || cents > best) best = cents;
+          }
+        }
+      }
+    }
+    if (best != null) return best;
+
+    // Stage 2: fallback to any R$ amount — take the largest value found
+    final currencyPattern = RegExp(
+      r'R\$\s*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})',
+      caseSensitive: false,
+    );
+    for (final m in currencyPattern.allMatches(text)) {
+      final cents = _parseBrMoney(m.group(1)!);
+      if (cents != null && _isValidAmount(cents)) {
+        if (best == null || cents > best) best = cents;
+      }
+    }
+    if (best != null) return best;
+
+    // Stage 3: any standalone monetary amount — take the largest value
+    final standalonePattern = RegExp(
+      r'(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})',
+    );
+    for (final m in standalonePattern.allMatches(text)) {
+      final cents = _parseBrMoney(m.group(1)!);
+      if (cents != null && _isValidAmount(cents)) {
+        if (best == null || cents > best) best = cents;
+      }
+    }
+    return best;
   }
 
   int? _parseBrMoney(String raw) {
@@ -179,18 +229,63 @@ class OcrService {
 
   /// Extracts emission date from receipt text.
   DateTime? _extractData(String text) {
-    final pattern = RegExp(r'(\d{2})[\/\-](\d{2})[\/\-](\d{4})');
-    final match = pattern.firstMatch(text);
-    if (match == null) return null;
-    try {
-      final raw = '${match.group(1)}/${match.group(2)}/${match.group(3)}';
-      final date = DateFormat('dd/MM/yyyy').parseStrict(raw);
-      final now = DateTime.now();
-      // Sanity: reject future dates and dates > 10 years ago
-      final tenYearsAgo = now.subtract(const Duration(days: 3650));
-      if (date.isAfter(now) || date.isBefore(tenYearsAgo)) {
-        return null;
+    final now = DateTime.now();
+    final tenYearsAgo = now.subtract(const Duration(days: 3650));
+
+    // Supports DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, and DD/MM/YY
+    final pattern = RegExp(r'(\d{2})[\/\-\.](\d{2})[\/\-\.](\d{2,4})');
+
+    // Keyword priority: prefer dates near emission-related keywords
+    final keywordPattern = RegExp(
+      r'(?:emiss[aã]o|data\s*:|dt\s*emiss|data\s*emiss)',
+      caseSensitive: false,
+    );
+    final keywordMatch = keywordPattern.firstMatch(text);
+    if (keywordMatch != null) {
+      // Look for a date within ~30 chars after the keyword
+      final searchEnd = math.min(
+        text.length,
+        keywordMatch.end + 30,
+      );
+      final nearbyText = text.substring(keywordMatch.end, searchEnd);
+      final nearbyDate = pattern.firstMatch(nearbyText);
+      if (nearbyDate != null) {
+        final parsed = _parseDate(nearbyDate, now, tenYearsAgo);
+        if (parsed != null) return parsed;
       }
+    }
+
+    // Collect all valid dates and prefer the most recent one
+    DateTime? bestDate;
+    for (final m in pattern.allMatches(text)) {
+      final parsed = _parseDate(m, now, tenYearsAgo);
+      if (parsed != null) {
+        if (bestDate == null || parsed.isAfter(bestDate)) {
+          bestDate = parsed;
+        }
+      }
+    }
+    return bestDate;
+  }
+
+  /// Parses a date match with support for 2- and 4-digit years.
+  DateTime? _parseDate(RegExpMatch match, DateTime now, DateTime tenYearsAgo) {
+    try {
+      final day = match.group(1)!;
+      final month = match.group(2)!;
+      final rawYear = match.group(3)!;
+
+      String yearStr;
+      if (rawYear.length == 2) {
+        final yy = int.parse(rawYear);
+        yearStr = (yy <= 50 ? 2000 + yy : 1900 + yy).toString();
+      } else {
+        yearStr = rawYear;
+      }
+
+      final raw = '$day/$month/$yearStr';
+      final date = DateFormat('dd/MM/yyyy').parseStrict(raw);
+      if (date.isAfter(now) || date.isBefore(tenYearsAgo)) return null;
       return date;
     } on FormatException catch (_) {
       return null;
@@ -202,9 +297,63 @@ class OcrService {
     final pattern = RegExp(
       r'\b(\d{2})[.\s]?(\d{3})[.\s]?(\d{3})[\/\s]?(\d{4})[-\s]?(\d{2})\b',
     );
-    final match = pattern.firstMatch(text);
-    if (match == null) return null;
-    return '${match.group(1)}${match.group(2)}${match.group(3)}${match.group(4)}${match.group(5)}';
+
+    String? fallback;
+
+    for (final match in pattern.allMatches(text)) {
+      final raw = '${match.group(1)}${match.group(2)}'
+          '${match.group(3)}${match.group(4)}${match.group(5)}';
+      fallback ??= raw;
+      if (_validateCnpj(raw)) return raw;
+
+      // Try OCR error corrections on the raw matched text
+      final rawText = match.group(0)!;
+      final corrected = _applyCnpjOcrFixes(rawText);
+      if (corrected != null && _validateCnpj(corrected)) return corrected;
+    }
+
+    // Return first match even if invalid — better than nothing
+    return fallback;
+  }
+
+  /// Validates CNPJ using modulo 11 algorithm.
+  bool _validateCnpj(String cnpj) {
+    if (cnpj.length != 14) return false;
+    final digits = cnpj.codeUnits.map((c) => c - 48).toList();
+    if (digits.any((d) => d < 0 || d > 9)) return false;
+
+    // First check digit
+    const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    var sum = 0;
+    for (var i = 0; i < 12; i++) {
+      sum += digits[i] * weights1[i];
+    }
+    var remainder = sum % 11;
+    final check1 = remainder < 2 ? 0 : 11 - remainder;
+    if (digits[12] != check1) return false;
+
+    // Second check digit
+    const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    sum = 0;
+    for (var i = 0; i < 13; i++) {
+      sum += digits[i] * weights2[i];
+    }
+    remainder = sum % 11;
+    final check2 = remainder < 2 ? 0 : 11 - remainder;
+    return digits[13] == check2;
+  }
+
+  /// Applies common OCR substitutions and returns a 14-digit
+  /// string if possible.
+  String? _applyCnpjOcrFixes(String rawText) {
+    final fixed = rawText
+        .replaceAll('O', '0')
+        .replaceAll('I', '1')
+        .replaceAll('l', '1')
+        .replaceAll('S', '5')
+        .replaceAll('B', '8');
+    final digits = fixed.replaceAll(RegExp(r'[^\d]'), '');
+    return digits.length == 14 ? digits : null;
   }
 
   /// Extracts beneficiary name (razão social) from receipt text.
@@ -212,17 +361,78 @@ class OcrService {
     final lines = text.split('\n');
     if (lines.isEmpty) return null;
 
-    // CNPJ line typically follows the company name; try first meaningful line
-    for (final line in lines.take(5)) {
-      final trimmed = line.trim();
-      // Skip lines that look like addresses, dates, or are too short
-      if (trimmed.length < 4) continue;
-      if (RegExp(r'^\d').hasMatch(trimmed)) continue;
-      if (trimmed.toLowerCase().contains('cnpj')) continue;
-      if (trimmed.toLowerCase().contains('cpf')) continue;
-      return trimmed.length > 100 ? trimmed.substring(0, 100) : trimmed;
+    // Patterns that indicate a line is NOT a company name
+    final skipPatterns = [
+      RegExp(r'^\d'), // starts with digit (address number, date, amount)
+      RegExp(r'cnpj|cpf|ie\s*:|insc\s*:', caseSensitive: false),
+      RegExp(
+        r'rua |av\.|avenida |travessa |rod\.|rodovia ',
+        caseSensitive: false,
+      ),
+      RegExp(r'cep\s*:?\s*\d{5}', caseSensitive: false),
+      RegExp(r'fone|tel\.|telefone', caseSensitive: false),
+      RegExp(r'^\d{2}[\/\-\.]\d{2}[\/\-\.]\d{2,4}'), // date line
+      RegExp(r'R\$'), // amount line
+      RegExp('inscri[cç][aã]o', caseSensitive: false),
+      RegExp('^valor', caseSensitive: false),
+      RegExp('^qtd', caseSensitive: false),
+      RegExp('^item', caseSensitive: false),
+      RegExp('^descri[cç][aã]o', caseSensitive: false),
+      RegExp(r'cupom\s*fiscal', caseSensitive: false),
+      RegExp('nf-?e', caseSensitive: false),
+      RegExp(r'nota\s*fiscal', caseSensitive: false),
+      RegExp('extrato', caseSensitive: false),
+      RegExp('comprovante', caseSensitive: false),
+    ];
+
+    // Keyword search: look for explicit labels in the first 12 lines
+    final keywordPattern = RegExp(
+      r'(?:raz[aã]o\s*social|nome\s*fantasia|nome)\s*:?\s*(.*)',
+      caseSensitive: false,
+    );
+    for (final line in lines.take(12)) {
+      final match = keywordPattern.firstMatch(line.trim());
+      if (match != null) {
+        final value = match.group(1)!.trim();
+        if (value.length >= 3) {
+          return value.length > 80 ? value.substring(0, 80) : value;
+        }
+      }
     }
-    return null;
+
+    // Scoring system for candidate lines
+    int? bestScore;
+    String? candidate;
+
+    for (final line in lines.take(12)) {
+      final trimmed = line.trim();
+      if (trimmed.length < 4) continue;
+      if (skipPatterns.any((p) => p.hasMatch(trimmed))) continue;
+
+      final score = _scoreBeneficiarioLine(trimmed);
+      if (bestScore == null || score > bestScore) {
+        bestScore = score;
+        candidate = trimmed.length > 80 ? trimmed.substring(0, 80) : trimmed;
+      }
+    }
+
+    return candidate;
+  }
+
+  /// Scores a candidate beneficiário line.
+  int _scoreBeneficiarioLine(String line) {
+    var score = 0;
+
+    final isUpperCase =
+        line == line.toUpperCase() && line.contains(RegExp('[A-Z]'));
+    if (isUpperCase) score += 2;
+    if (line.length >= 6) score += 1;
+
+    final digitCount = line.codeUnits.where((c) => c >= 48 && c <= 57).length;
+    if (digitCount > line.length * 0.5) score -= 1;
+    if (line.length < 6) score -= 1;
+
+    return score;
   }
 }
 
