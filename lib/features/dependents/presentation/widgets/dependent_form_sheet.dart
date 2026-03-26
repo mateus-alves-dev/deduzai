@@ -18,17 +18,15 @@ class DependentFormSheet extends ConsumerStatefulWidget {
   static Future<void> show(
     BuildContext context, {
     Dependent? dependent,
-  }) =>
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: true,
-        builder: (_) => DependentFormSheet(dependent: dependent),
-      );
+  }) => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (_) => DependentFormSheet(dependent: dependent),
+  );
 
   @override
-  ConsumerState<DependentFormSheet> createState() =>
-      _DependentFormSheetState();
+  ConsumerState<DependentFormSheet> createState() => _DependentFormSheetState();
 }
 
 class _DependentFormSheetState extends ConsumerState<DependentFormSheet> {
@@ -61,10 +59,10 @@ class _DependentFormSheetState extends ConsumerState<DependentFormSheet> {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
+      useRootNavigator: true,
       initialDate: _birthDate ?? DateTime(now.year - 5),
       firstDate: DateTime(1900),
       lastDate: now,
-      locale: const Locale('pt', 'BR'),
     );
     if (picked != null) setState(() => _birthDate = picked);
   }
