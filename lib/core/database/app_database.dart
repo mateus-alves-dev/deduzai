@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:deduzai/core/database/daos/app_settings_dao.dart';
 import 'package:deduzai/core/database/daos/cnpj_preference_dao.dart';
+import 'package:deduzai/core/database/daos/dependents_dao.dart';
 import 'package:deduzai/core/database/daos/expense_dao.dart';
 import 'package:deduzai/core/database/daos/filter_favorite_dao.dart';
 import 'package:deduzai/core/database/daos/receipt_dao.dart';
 import 'package:deduzai/core/database/daos/recurring_expense_dao.dart';
 import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/database/tables/cnpj_preferences_table.dart';
+import 'package:deduzai/core/database/tables/dependents_table.dart';
 import 'package:deduzai/core/database/tables/expenses_table.dart';
 import 'package:deduzai/core/database/tables/filter_favorites_table.dart';
 import 'package:deduzai/core/database/tables/receipts_table.dart';
@@ -27,6 +29,7 @@ part 'app_database.g.dart';
     AppSettings,
     RecurringExpenses,
     FilterFavorites,
+    Dependents,
   ],
   daos: [
     ExpenseDao,
@@ -35,6 +38,7 @@ part 'app_database.g.dart';
     AppSettingsDao,
     RecurringExpenseDao,
     FilterFavoriteDao,
+    DependentsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -43,7 +47,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -92,6 +96,9 @@ class AppDatabase extends _$AppDatabase {
           'CREATE INDEX IF NOT EXISTS idx_receipts_expense_id '
           'ON receipts(expense_id)',
         );
+      }
+      if (from < 11) {
+        await m.createTable(dependents);
       }
     },
   );

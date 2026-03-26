@@ -10,6 +10,7 @@ import 'package:deduzai/features/annual_summary/presentation/widgets/category_su
 import 'package:deduzai/features/annual_summary/presentation/widgets/hero_summary_header.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/refund_simulation_card.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/year_selector.dart';
+import 'package:deduzai/features/dependents/presentation/widgets/dependents_section.dart';
 import 'package:deduzai/features/monthly_summary/presentation/screens/monthly_summary_screen.dart';
 import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -194,6 +195,7 @@ class _SummaryBody extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 24),
       children: [
         HeroSummaryHeader(summary: summary, currency: currency),
+        DependentsSection(fiscalYear: summary.fiscalYear),
         RefundSimulationCard(
           totalDeductibleInCents: summary.totalDeductibleInCents,
           fiscalYear: summary.fiscalYear,

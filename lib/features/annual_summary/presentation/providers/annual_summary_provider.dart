@@ -16,18 +16,26 @@ class SelectedYear extends Notifier<int> {
   void select(int year) => state = year;
 }
 
+/// Reactive count of active dependents. Rebuilds when dependents change.
+final dependentCountProvider = StreamProvider<int>(
+  (ref) => ref.watch(dependentsDaoProvider).watchActiveCount(),
+);
+
 /// Reactive stream of [AnnualSummary] for [year].
 ///
-/// Recomputes whenever the underlying expenses change (Drift stream).
+/// Recomputes whenever the underlying expenses or dependent count change.
 /// Heavy computation runs in a background isolate via [AnnualSummaryService].
 final annualSummaryProvider =
     StreamProvider.family<AnnualSummary, int>((ref, year) {
   final service = ref.watch(annualSummaryServiceProvider);
+  final depCount = ref.watch(dependentCountProvider).value ?? 0;
+
   return ref
       .watch(expenseDaoProvider)
       .watchByYear(year)
       .asyncMap(
-        (List<Expense> expenses) => service.computeAsync(expenses, year),
+        (List<Expense> expenses) =>
+            service.computeAsync(expenses, year, dependentCount: depCount),
       );
 });
 

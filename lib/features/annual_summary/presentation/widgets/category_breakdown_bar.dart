@@ -1,4 +1,5 @@
 import 'package:deduzai/core/domain/models/annual_summary.dart';
+import 'package:deduzai/core/theme/app_colors.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/category_color_utils.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,18 @@ class CategoryBreakdownBar extends StatelessWidget {
         label: c.category.label,
       );
     }).toList();
+
+    // Add dependent deduction segment if present.
+    if (summary.dependentDeductionInCents > 0) {
+      segments.add(
+        _BarSegment(
+          color: AppColors.categoryDependentes,
+          fraction:
+              total > 0 ? summary.dependentDeductionInCents / total : 0.0,
+          label: 'Dependentes',
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

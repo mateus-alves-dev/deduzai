@@ -14,9 +14,10 @@ AnnualSummaryService annualSummaryService(Ref ref) =>
 
 /// Top-level function for [compute] — runs [AnnualSummaryService] in a
 /// background isolate so the UI thread stays responsive with large datasets.
-AnnualSummary _computeInIsolate((List<Expense>, int) args) {
-  final (expenses, fiscalYear) = args;
-  return const AnnualSummaryService().computeSync(expenses, fiscalYear);
+AnnualSummary _computeInIsolate((List<Expense>, int, int) args) {
+  final (expenses, fiscalYear, dependentCount) = args;
+  return const AnnualSummaryService()
+      .computeSync(expenses, fiscalYear, dependentCount: dependentCount);
 }
 
 /// Aggregates a list of [Expense] rows into an [AnnualSummary], applying
@@ -27,13 +28,26 @@ class AnnualSummaryService {
   /// Computes the summary in a background isolate (use for large datasets).
   Future<AnnualSummary> computeAsync(
     List<Expense> expenses,
-    int fiscalYear,
-  ) =>
-      compute(_computeInIsolate, (expenses, fiscalYear));
+    int fiscalYear, {
+    int dependentCount = 0,
+  }) =>
+      compute(_computeInIsolate, (expenses, fiscalYear, dependentCount));
 
   /// Synchronous computation — fine for small datasets (e.g. single month).
-  AnnualSummary computeSync(List<Expense> expenses, int fiscalYear) {
-    final caps = DeductionCaps.forYear(fiscalYear);
+  AnnualSummary computeSync(
+    List<Expense> expenses,
+    int fiscalYear, {
+    int dependentCount = 0,
+  }) {
+    final caps = Map<DeductionCategory, int?>.of(DeductionCaps.forYear(fiscalYear));
+
+    // Multiply education cap by (1 + dependentCount) — each person gets their own cap.
+    if (dependentCount > 0) {
+      final baseCap = caps[DeductionCategory.educacao];
+      if (baseCap != null) {
+        caps[DeductionCategory.educacao] = baseCap * (1 + dependentCount);
+      }
+    }
 
     // Group expenses by DeductionCategory.
     final grouped = <DeductionCategory, List<Expense>>{};
@@ -76,6 +90,11 @@ class AnnualSummaryService {
       totalDeductibleInCents += deductible;
     }
 
+    // Add fixed dependent deduction.
+    final perDependent = DeductionCaps.dependentDeductionFor(fiscalYear);
+    final dependentDeduction = dependentCount * perDependent;
+    totalDeductibleInCents += dependentDeduction;
+
     // Sort summaries by category label for a consistent display order.
     summaries.sort((a, b) => a.category.label.compareTo(b.category.label));
 
@@ -84,6 +103,8 @@ class AnnualSummaryService {
       categories: summaries,
       totalInCents: totalInCents,
       totalDeductibleInCents: totalDeductibleInCents,
+      dependentCount: dependentCount,
+      dependentDeductionInCents: dependentDeduction,
     );
   }
 

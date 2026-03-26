@@ -41,6 +41,8 @@ class AnnualSummary {
     required this.categories,
     required this.totalInCents,
     required this.totalDeductibleInCents,
+    this.dependentCount = 0,
+    this.dependentDeductionInCents = 0,
   });
 
   final int fiscalYear;
@@ -51,8 +53,16 @@ class AnnualSummary {
   /// Sum of all expense amounts (centavos), regardless of caps.
   final int totalInCents;
 
-  /// Sum of deductible amounts after applying caps (centavos).
+  /// Sum of deductible amounts after applying caps (centavos),
+  /// including the fixed dependent deduction.
   final int totalDeductibleInCents;
 
-  bool get isEmpty => categories.isEmpty;
+  /// Number of active dependents contributing to the deduction.
+  final int dependentCount;
+
+  /// Total fixed deduction from dependents (centavos):
+  /// [dependentCount] × per-dependent deduction for [fiscalYear].
+  final int dependentDeductionInCents;
+
+  bool get isEmpty => categories.isEmpty && dependentCount == 0;
 }

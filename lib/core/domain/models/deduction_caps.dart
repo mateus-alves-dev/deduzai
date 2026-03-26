@@ -24,6 +24,14 @@ class DeductionCaps {
     },
   };
 
+  /// Fixed deduction per dependent per year (centavos).
+  static const Map<int, int> _dependentDeductionByYear = {
+    2023: 227508, // R$ 2.275,08
+    2024: 227508, // R$ 2.275,08
+    2025: 227508, // R$ 2.275,08
+    2026: 227508, // R$ 2.275,08 — placeholder until RF publishes
+  };
+
   /// Returns a map of category → cap in centavos for [year].
   /// Categories absent from the map (or with null value) are unlimited.
   static Map<DeductionCategory, int?> forYear(int year) {
@@ -34,5 +42,11 @@ class DeductionCaps {
   /// or null if there is no ceiling.
   static int? capFor(DeductionCategory category, int year) {
     return _capsByYear[year]?[category];
+  }
+
+  /// Returns the fixed deduction per dependent in centavos for [year].
+  /// Defaults to the latest known value if [year] is not explicitly mapped.
+  static int dependentDeductionFor(int year) {
+    return _dependentDeductionByYear[year] ?? 227508;
   }
 }
