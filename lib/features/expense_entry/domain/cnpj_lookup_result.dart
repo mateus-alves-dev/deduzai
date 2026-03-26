@@ -1,5 +1,5 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:deduzai/core/domain/models/category.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'cnpj_lookup_result.freezed.dart';
 

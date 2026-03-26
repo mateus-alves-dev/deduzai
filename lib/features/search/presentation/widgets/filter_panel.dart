@@ -51,8 +51,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
                   return FilterChip(
                     label: Text(cat.label),
                     selected: selected,
-                    selectedColor:
-                        colorForCategory(cat).withValues(alpha: 0.2),
+                    selectedColor: colorForCategory(cat).withValues(alpha: 0.2),
                     checkmarkColor: colorForCategory(cat),
                     labelStyle: TextStyle(
                       color: selected ? colorForCategory(cat) : null,
@@ -77,8 +76,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
         ExpansionTile(
           title: const Text('Data'),
           leading: const Icon(Icons.date_range_outlined),
-          initiallyExpanded:
-              filter.dateFrom != null || filter.dateTo != null,
+          initiallyExpanded: filter.dateFrom != null || filter.dateTo != null,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -114,8 +112,8 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
         ExpansionTile(
           title: const Text('Valor'),
           leading: const Icon(Icons.attach_money_outlined),
-          initiallyExpanded: filter.amountMinCents != null ||
-              filter.amountMaxCents != null,
+          initiallyExpanded:
+              filter.amountMinCents != null || filter.amountMaxCents != null,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -126,7 +124,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
                       controller: _amountFromCtrl,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: 'De (R\$)',
+                        labelText: r'De (R$)',
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
@@ -135,9 +133,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
                           v.replaceAll(',', '.'),
                         );
                         notifier.setAmountRange(
-                          parsed != null
-                              ? (parsed * 100).round()
-                              : null,
+                          parsed != null ? (parsed * 100).round() : null,
                           filter.amountMaxCents,
                         );
                       },
@@ -149,7 +145,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
                       controller: _amountToCtrl,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: 'Até (R\$)',
+                        labelText: r'Até (R$)',
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
@@ -159,9 +155,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
                         );
                         notifier.setAmountRange(
                           filter.amountMinCents,
-                          parsed != null
-                              ? (parsed * 100).round()
-                              : null,
+                          parsed != null ? (parsed * 100).round() : null,
                         );
                       },
                     ),
@@ -176,8 +170,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
         ExpansionTile(
           title: const Text('Comprovante'),
           leading: const Icon(Icons.receipt_outlined),
-          initiallyExpanded:
-              filter.receiptFilter != SearchReceiptFilter.all,
+          initiallyExpanded: filter.receiptFilter != SearchReceiptFilter.all,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -199,8 +192,7 @@ class _FilterPanelState extends ConsumerState<FilterPanel> {
                   ),
                 ],
                 selected: {filter.receiptFilter},
-                onSelectionChanged: (s) =>
-                    notifier.setReceiptFilter(s.first),
+                onSelectionChanged: (s) => notifier.setReceiptFilter(s.first),
               ),
             ),
           ],

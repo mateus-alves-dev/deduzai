@@ -44,12 +44,10 @@ class ArchivedReceiptsScreen extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.md),
             itemCount: items.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: AppSpacing.sm),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
             itemBuilder: (context, i) {
               final (:receipt, :expense) = items[i];
-              final date =
-                  DateFormat('dd/MM/yyyy').format(expense.date);
+              final date = DateFormat('dd/MM/yyyy').format(expense.date);
               final description = expense.description.isNotEmpty
                   ? expense.description
                   : expense.beneficiario ?? 'Gasto excluído';
@@ -65,7 +63,7 @@ class ArchivedReceiptsScreen extends ConsumerWidget {
                       cacheWidth: 112,
                       cacheHeight: 112,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const SizedBox(
+                      errorBuilder: (_, _, _) => const SizedBox(
                         width: 56,
                         height: 56,
                         child: Icon(Icons.broken_image_outlined),

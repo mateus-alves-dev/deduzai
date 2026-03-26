@@ -6,12 +6,12 @@ import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:deduzai/core/domain/models/recurrence_frequency.dart';
 import 'package:deduzai/core/theme/app_spacing.dart';
 import 'package:deduzai/core/theme/app_text_styles.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/expense_entry/domain/cnpj_categorization_service.dart';
 import 'package:deduzai/features/expense_entry/domain/expense_service.dart';
 import 'package:deduzai/features/expense_entry/presentation/providers/expense_form_provider.dart';
 import 'package:deduzai/features/expense_entry/presentation/widgets/category_selector.dart';
 import 'package:deduzai/features/recurring_expenses/domain/recurring_expense_service.dart';
-import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -280,7 +280,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
           cnpj: _cnpj,
         );
 
-        final template = await ref.read(recurringExpenseDaoProvider).getById(id);
+        final template = await ref
+            .read(recurringExpenseDaoProvider)
+            .getById(id);
         if (template != null) {
           await recurringService.registerOccurrence(
             template,
@@ -445,8 +447,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                               child: Text(
                                 _ocrMessage!,
                                 style: TextStyle(
-                                  color:
-                                      theme.colorScheme.onSecondaryContainer,
+                                  color: theme.colorScheme.onSecondaryContainer,
                                   fontSize: 13,
                                 ),
                               ),
@@ -528,9 +529,9 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                         hintText: 'Ex: Clínica São Lucas',
                         suffixIcon:
                             _ocrFilledFields.contains('beneficiario') ||
-                                    _beneficiarioAutoFilled
-                                ? const _OcrBadge()
-                                : null,
+                                _beneficiarioAutoFilled
+                            ? const _OcrBadge()
+                            : null,
                       ),
                       onChanged: (_) {
                         setState(() {

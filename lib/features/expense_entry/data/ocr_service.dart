@@ -1,3 +1,4 @@
+import 'dart:async' show TimeoutException;
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -14,10 +15,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'ocr_service.g.dart';
 
 /// Maximum file size before compression (10 MB).
-const _maxFileSizeBytes = 10 * 1024 * 1024;
+const int _maxFileSizeBytes = 10 * 1024 * 1024;
 
 /// Target file size after compression (2 MB).
-const _targetFileSizeBytes = 2 * 1024 * 1024;
+const int _targetFileSizeBytes = 2 * 1024 * 1024;
 
 /// Minimum image dimension considered acceptable quality.
 const _minQualityDimension = 720;
@@ -90,8 +91,9 @@ class OcrService {
     final recognizer = TextRecognizer();
 
     try {
-      final recognized =
-          await recognizer.processImage(inputImage).timeout(_ocrTimeout);
+      final recognized = await recognizer
+          .processImage(inputImage)
+          .timeout(_ocrTimeout);
       final rawText = recognized.text;
       return _parseText(rawText, compressedPath);
     } finally {
@@ -117,8 +119,8 @@ class OcrService {
     final status = valor != null
         ? OcrStatus.success
         : hasAnyField
-            ? OcrStatus.partial
-            : OcrStatus.failure;
+        ? OcrStatus.partial
+        : OcrStatus.failure;
 
     return OcrResult(
       status: status,
@@ -301,7 +303,8 @@ class OcrService {
     String? fallback;
 
     for (final match in pattern.allMatches(text)) {
-      final raw = '${match.group(1)}${match.group(2)}'
+      final raw =
+          '${match.group(1)}${match.group(2)}'
           '${match.group(3)}${match.group(4)}${match.group(5)}';
       fallback ??= raw;
       if (_validateCnpj(raw)) return raw;
@@ -447,21 +450,16 @@ class OcrService {
         bytes[1] == 0x50 &&
         bytes[2] == 0x4E &&
         bytes[3] == 0x47) {
-      final w = (bytes[16] << 24) |
-          (bytes[17] << 16) |
-          (bytes[18] << 8) |
-          bytes[19];
-      final h = (bytes[20] << 24) |
-          (bytes[21] << 16) |
-          (bytes[22] << 8) |
-          bytes[23];
+      final w =
+          (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+      final h =
+          (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
       return (w, h);
     }
 
     // JPEG: scan for SOF marker (0xFF 0xC0/0xC2)
     for (var i = 2; i < bytes.length - 9; i++) {
-      if (bytes[i] == 0xFF &&
-          (bytes[i + 1] == 0xC0 || bytes[i + 1] == 0xC2)) {
+      if (bytes[i] == 0xFF && (bytes[i + 1] == 0xC0 || bytes[i + 1] == 0xC2)) {
         final h = (bytes[i + 5] << 8) | bytes[i + 6];
         final w = (bytes[i + 7] << 8) | bytes[i + 8];
         return (w, h);

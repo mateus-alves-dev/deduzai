@@ -59,7 +59,6 @@ class _DependentFormSheetState extends ConsumerState<DependentFormSheet> {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      useRootNavigator: true,
       initialDate: _birthDate ?? DateTime(now.year - 5),
       firstDate: DateTime(1900),
       lastDate: now,

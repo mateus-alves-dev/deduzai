@@ -1,8 +1,8 @@
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/recurring_expenses/domain/recurring_expense_service.dart';
 import 'package:deduzai/features/recurring_expenses/presentation/providers/recurring_expense_providers.dart';
 import 'package:deduzai/features/recurring_expenses/presentation/widgets/recurring_expense_tile.dart';
 import 'package:deduzai/features/recurring_expenses/presentation/widgets/recurring_registration_sheet.dart';
-import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

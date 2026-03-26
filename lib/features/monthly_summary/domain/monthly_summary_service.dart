@@ -1,7 +1,6 @@
 import 'package:deduzai/core/database/app_database.dart';
 import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/features/annual_summary/domain/annual_summary_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'monthly_summary_service.g.dart';
@@ -54,12 +53,11 @@ class MonthlySummaryService {
     final monthlySummary = _annualService.computeSync(monthExpenses, year);
     final ytdSummary = _annualService.computeSync(yearToDateExpenses, year);
 
-    final currentTotal =
-        monthExpenses.fold(0, (s, e) => s + e.amountInCents);
-    final prevTotal =
-        prevMonthExpenses.fold(0, (s, e) => s + e.amountInCents);
-    final percentChange =
-        prevTotal > 0 ? (currentTotal - prevTotal) / prevTotal * 100 : null;
+    final currentTotal = monthExpenses.fold(0, (s, e) => s + e.amountInCents);
+    final prevTotal = prevMonthExpenses.fold(0, (s, e) => s + e.amountInCents);
+    final percentChange = prevTotal > 0
+        ? (currentTotal - prevTotal) / prevTotal * 100
+        : null;
 
     return MonthlySummary(
       year: year,

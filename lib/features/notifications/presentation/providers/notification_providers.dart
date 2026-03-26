@@ -1,7 +1,6 @@
 import 'package:deduzai/core/database/providers/database_providers.dart';
 import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/features/notifications/data/notification_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notification_providers.g.dart';
@@ -12,8 +11,7 @@ Future<bool> notificationPermissionGranted(Ref ref) =>
 
 @riverpod
 Future<bool> notificationBannerShouldShow(Ref ref) async {
-  final granted =
-      await ref.watch(notificationPermissionGrantedProvider.future);
+  final granted = await ref.watch(notificationPermissionGrantedProvider.future);
   if (granted) return false;
 
   final dao = ref.watch(appSettingsDaoProvider);

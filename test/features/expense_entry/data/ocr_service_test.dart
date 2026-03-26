@@ -15,7 +15,7 @@ void main() {
   // ---------------------------------------------------------------------------
   group('Valor extraction', () {
     test('keyword TOTAL followed by amount', () {
-      final result = service.parseText('TOTAL  R\$ 123,45', imagePath);
+      final result = service.parseText(r'TOTAL  R$ 123,45', imagePath);
       expect(result.valor, 12345);
     });
 
@@ -29,7 +29,7 @@ void main() {
       expect(result.valor, 12345);
     });
 
-    test('R\$ fallback picks largest amount', () {
+    test(r'R$ fallback picks largest amount', () {
       final result = service.parseText(
         'Serviço R\$ 50,00\nOutro R\$ 200,00',
         imagePath,
@@ -45,7 +45,7 @@ void main() {
       expect(result.valor, 9990);
     });
 
-    test('guard: amount exceeding R\$ 1.000.000 is ignored', () {
+    test(r'guard: amount exceeding R$ 1.000.000 is ignored', () {
       final result = service.parseText('TOTAL 2.000.000,00', imagePath);
       expect(result.valor, isNull);
     });

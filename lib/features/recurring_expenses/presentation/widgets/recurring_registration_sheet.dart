@@ -63,7 +63,7 @@ class _RecurringRegistrationSheetState
       // Generate all pending occurrences for this template
       var current = template.nextDueDate;
       final todayEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
-      int safetyCount = 0;
+      var safetyCount = 0;
 
       while (!current.isAfter(todayEnd) && safetyCount < 36) {
         items.add(_PendingItem(template: template, dueDate: current));
@@ -90,7 +90,7 @@ class _RecurringRegistrationSheetState
 
     try {
       final service = ref.read(recurringExpenseServiceProvider);
-      int count = 0;
+      var count = 0;
 
       // Group selected items by template and register in order
       final selected = _selectedIndexes.map((i) => _items![i]).toList()
@@ -98,21 +98,20 @@ class _RecurringRegistrationSheetState
 
       // We need to re-fetch after each registration because nextDueDate advances.
       // Instead, we register by calling registerAllPending for selected templates.
-      final selectedTemplateIds =
-          selected.map((e) => e.template.id).toSet();
+      final selectedTemplateIds = selected.map((e) => e.template.id).toSet();
 
       for (final templateId in selectedTemplateIds) {
-        final templateItems =
-            selected.where((e) => e.template.id == templateId).toList();
+        final templateItems = selected
+            .where((e) => e.template.id == templateId)
+            .toList();
 
         for (var i = 0; i < templateItems.length; i++) {
           // Fetch latest template state before each registration
-          final RecurringExpense? latest = await ref
+          final latest = await ref
               .read(recurringExpenseDaoProvider)
               .getById(templateId);
           if (latest == null) break;
-          await service.registerOccurrence(
-              latest, forDate: latest.nextDueDate);
+          await service.registerOccurrence(latest, forDate: latest.nextDueDate);
           count++;
         }
       }
@@ -154,8 +153,10 @@ class _RecurringRegistrationSheetState
           children: [
             const Icon(Icons.check_circle_outline, size: 48),
             const SizedBox(height: AppSpacing.md),
-            Text('Nenhuma recorrência pendente',
-                style: AppTextStyles.titleMedium),
+            Text(
+              'Nenhuma recorrência pendente',
+              style: AppTextStyles.titleMedium,
+            ),
           ],
         ),
       );
@@ -198,8 +199,10 @@ class _RecurringRegistrationSheetState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Registrar recorrências',
-                          style: AppTextStyles.titleLarge),
+                      Text(
+                        'Registrar recorrências',
+                        style: AppTextStyles.titleLarge,
+                      ),
                       Text(
                         '${_selectedIndexes.length} item(s) · $totalFormatted',
                         style: AppTextStyles.bodyMedium.copyWith(
@@ -221,28 +224,31 @@ class _RecurringRegistrationSheetState
               itemCount: items.length,
               itemBuilder: (_, i) {
                 final item = items[i];
-                final category =
-                    DeductionCategory.values.byName(item.template.category);
+                final category = DeductionCategory.values.byName(
+                  item.template.category,
+                );
                 final color = colorForCategory(category);
                 final amount = item.template.amountInCents / 100;
                 final formatted = NumberFormat.currency(
                   locale: 'pt_BR',
                   symbol: r'R$',
                 ).format(amount);
-                final dateLabel =
-                    DateFormat('MMM/yyyy', 'pt_BR').format(item.dueDate);
+                final dateLabel = DateFormat(
+                  'MMM/yyyy',
+                  'pt_BR',
+                ).format(item.dueDate);
 
                 return CheckboxListTile(
                   value: _selectedIndexes.contains(i),
                   onChanged: _loading
                       ? null
                       : (v) => setState(() {
-                            if (v == true) {
-                              _selectedIndexes.add(i);
-                            } else {
-                              _selectedIndexes.remove(i);
-                            }
-                          }),
+                          if (v == true) {
+                            _selectedIndexes.add(i);
+                          } else {
+                            _selectedIndexes.remove(i);
+                          }
+                        }),
                   secondary: Container(
                     width: 4,
                     height: 36,
@@ -274,8 +280,7 @@ class _RecurringRegistrationSheetState
               AppSpacing.md,
               AppSpacing.sm,
               AppSpacing.md,
-              AppSpacing.md +
-                  MediaQuery.of(context).viewInsets.bottom,
+              AppSpacing.md + MediaQuery.of(context).viewInsets.bottom,
             ),
             child: SizedBox(
               width: double.infinity,

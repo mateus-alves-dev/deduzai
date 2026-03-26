@@ -81,7 +81,8 @@ class _RecurringExpenseFormScreenState
       _frequency = RecurrenceFrequency.fromValue(existing.frequency);
       _referenceDate = existing.referenceDate;
       _isActive = existing.isActive;
-      _dayController.text = existing.dayOfMonth?.toString() ??
+      _dayController.text =
+          existing.dayOfMonth?.toString() ??
           existing.referenceDate.day.toString();
     });
   }
@@ -96,9 +97,7 @@ class _RecurringExpenseFormScreenState
   }
 
   int? get _parsedAmountCents {
-    final raw = _amountController.text
-        .replaceAll('.', '')
-        .replaceAll(',', '.');
+    final raw = _amountController.text.replaceAll('.', '').replaceAll(',', '.');
     final parsed = double.tryParse(raw);
     if (parsed == null) return null;
     return (parsed * 100).round();
@@ -144,8 +143,8 @@ class _RecurringExpenseFormScreenState
     final dayOfMonth = _hasDayField
         ? int.tryParse(_dayController.text.trim())
         : _isAnnual
-            ? _referenceDate.day
-            : null;
+        ? _referenceDate.day
+        : null;
 
     final service = ref.read(recurringExpenseServiceProvider);
 
@@ -180,7 +179,9 @@ class _RecurringExpenseFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _existing != null ? 'Recorrência atualizada ✓' : 'Recorrência criada ✓',
+              _existing != null
+                  ? 'Recorrência atualizada ✓'
+                  : 'Recorrência criada ✓',
             ),
           ),
         );
@@ -233,8 +234,9 @@ class _RecurringExpenseFormScreenState
                 border: OutlineInputBorder(),
               ),
               maxLength: 255,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Informe uma descrição' : null,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Informe uma descrição'
+                  : null,
             ),
             const SizedBox(height: AppSpacing.md),
 
@@ -250,9 +252,12 @@ class _RecurringExpenseFormScreenState
             const SizedBox(height: AppSpacing.lg),
 
             // Frequency
-            Text('Frequência', style: AppTextStyles.labelMedium.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            )),
+            Text(
+              'Frequência',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             SegmentedButton<RecurrenceFrequency>(
               segments: RecurrenceFrequency.values
@@ -275,8 +280,7 @@ class _RecurringExpenseFormScreenState
                 leading: const Icon(Icons.calendar_month_outlined),
                 title: const Text('Data de referência'),
                 subtitle: Text(
-                  DateFormat('dd/MM', 'pt_BR').format(_referenceDate) +
-                      ' (dia e mês para vencimento anual)',
+                  '${DateFormat('dd/MM', 'pt_BR').format(_referenceDate)} (dia e mês para vencimento anual)',
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: _pickReferenceDate,
@@ -359,7 +363,7 @@ class _RecurringExpenseFormScreenState
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                'R\$ ',
+                r'R$ ',
                 style: AppTextStyles.titleLarge.copyWith(
                   color: theme.colorScheme.primary,
                   fontSize: 24,
@@ -368,7 +372,9 @@ class _RecurringExpenseFormScreenState
               Flexible(
                 child: TextFormField(
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 40,

@@ -8,7 +8,6 @@ import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/expense_origem.dart';
 import 'package:deduzai/core/domain/models/ocr_result.dart';
 import 'package:drift/drift.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,9 +15,9 @@ part 'expense_service.g.dart';
 
 @riverpod
 ExpenseService expenseService(Ref ref) => ExpenseService(
-      ref.watch(expenseDaoProvider),
-      ref.watch(receiptDaoProvider),
-    );
+  ref.watch(expenseDaoProvider),
+  ref.watch(receiptDaoProvider),
+);
 
 class ExpenseService {
   ExpenseService(this._dao, this._receiptDao);

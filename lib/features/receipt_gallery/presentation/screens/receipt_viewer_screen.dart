@@ -36,11 +36,13 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
       final result = await context.push<OcrResult>('/camera');
       if (result == null || !mounted) return;
 
-      await ref.read(expenseServiceProvider).attachReceipt(
-        expenseId: widget.expenseId,
-        imagePath: result.imagePath,
-        ocrStatus: result.status,
-      );
+      await ref
+          .read(expenseServiceProvider)
+          .attachReceipt(
+            expenseId: widget.expenseId,
+            imagePath: result.imagePath,
+            ocrStatus: result.status,
+          );
 
       if (!mounted) return;
 
@@ -95,15 +97,17 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
           FilledButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              await ref.read(expenseServiceProvider).updateExpense(
-                existing: expense,
-                date: expense.date,
-                category: DeductionCategory.values.byName(expense.category),
-                amountInCents: ocrValor,
-                description: expense.description,
-                beneficiario: expense.beneficiario,
-                cnpj: expense.cnpj,
-              );
+              await ref
+                  .read(expenseServiceProvider)
+                  .updateExpense(
+                    existing: expense,
+                    date: expense.date,
+                    category: DeductionCategory.values.byName(expense.category),
+                    amountInCents: ocrValor,
+                    description: expense.description,
+                    beneficiario: expense.beneficiario,
+                    cnpj: expense.cnpj,
+                  );
             },
             child: const Text('Atualizar valor'),
           ),
@@ -114,13 +118,14 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final receiptsAsync =
-        ref.watch(receiptsByExpenseProvider(widget.expenseId));
-    final expenseAsync =
-        ref.watch(receiptViewerExpenseProvider(widget.expenseId));
+    final receiptsAsync = ref.watch(
+      receiptsByExpenseProvider(widget.expenseId),
+    );
+    final expenseAsync = ref.watch(
+      receiptViewerExpenseProvider(widget.expenseId),
+    );
 
-    final hasReceipt =
-        receiptsAsync.value?.isNotEmpty ?? false;
+    final hasReceipt = receiptsAsync.value?.isNotEmpty ?? false;
 
     return Scaffold(
       appBar: DeduzaiAppBar(
@@ -207,17 +212,20 @@ class _ReceiptViewerScreenState extends ConsumerState<ReceiptViewerScreen> {
             child: Image.file(
               File(receipt.localPath),
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Center(
+              errorBuilder: (_, _, _) => const Center(
                 child: Icon(Icons.broken_image_outlined, size: 64),
               ),
             ),
           ),
         ),
-        expenseAsync.whenData(
-          (expense) => expense != null
-              ? ReceiptMetadataPanel(expense: expense)
-              : const SizedBox.shrink(),
-        ).value ?? const SizedBox.shrink(),
+        expenseAsync
+                .whenData(
+                  (expense) => expense != null
+                      ? ReceiptMetadataPanel(expense: expense)
+                      : const SizedBox.shrink(),
+                )
+                .value ??
+            const SizedBox.shrink(),
         SafeArea(
           top: false,
           child: Padding(

@@ -20,12 +20,11 @@ class _PieChartWidgetState extends State<PieChartWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget.categories.isEmpty) {
-      return _EmptyPie(message: 'Nenhum gasto neste mês');
+      return const _EmptyPie(message: 'Nenhum gasto neste mês');
     }
 
-    final total =
-        widget.categories.fold<int>(0, (s, c) => s + c.totalInCents);
-    if (total == 0) return _EmptyPie(message: 'Nenhum gasto neste mês');
+    final total = widget.categories.fold<int>(0, (s, c) => s + c.totalInCents);
+    if (total == 0) return const _EmptyPie(message: 'Nenhum gasto neste mês');
 
     final segments = widget.categories.map((c) {
       return _PieSegment(
@@ -126,10 +125,12 @@ class _PiePainter extends CustomPainter {
       var drawCenter = center;
       if (i == tappedIndex) {
         final midAngle = startAngle + sweep / 2;
-        drawCenter = center + Offset(
-          math.cos(midAngle) * 8,
-          math.sin(midAngle) * 8,
-        );
+        drawCenter =
+            center +
+            Offset(
+              math.cos(midAngle) * 8,
+              math.sin(midAngle) * 8,
+            );
       }
 
       final path = Path()
@@ -185,9 +186,8 @@ class _LegendItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                fontWeight:
-                    highlighted ? FontWeight.bold : FontWeight.normal,
-              ),
+            fontWeight: highlighted ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ],
     );
@@ -202,8 +202,7 @@ class _TooltipCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final currency =
-        NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
+    final currency = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
     final color = colorForCategory(summary.category);
 
     return Container(
@@ -217,9 +216,13 @@ class _TooltipCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(summary.category.label,
-              style: theme.textTheme.labelMedium
-                  ?.copyWith(color: color, fontWeight: FontWeight.bold)),
+          Text(
+            summary.category.label,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           Text(
             currency.format(summary.totalInCents / 100),
             style: theme.textTheme.labelMedium?.copyWith(color: color),
@@ -244,8 +247,11 @@ class _EmptyPie extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.pie_chart_outline,
-                size: 64, color: theme.colorScheme.outlineVariant),
+            Icon(
+              Icons.pie_chart_outline,
+              size: 64,
+              color: theme.colorScheme.outlineVariant,
+            ),
             const SizedBox(height: 8),
             Text(message, style: theme.textTheme.bodyMedium),
           ],
@@ -254,4 +260,3 @@ class _EmptyPie extends StatelessWidget {
     );
   }
 }
-

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -33,8 +32,9 @@ class NotificationService {
 
     final plugin = NotificationService.instance._plugin;
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -59,12 +59,14 @@ class NotificationService {
     if (Platform.isAndroid) {
       final android = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       return (await android?.areNotificationsEnabled()) ?? false;
     } else if (Platform.isIOS) {
       final ios = _plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>();
+            IOSFlutterLocalNotificationsPlugin
+          >();
       final settings = await ios?.checkPermissions();
       return settings?.isEnabled ?? false;
     }
@@ -75,12 +77,14 @@ class NotificationService {
     if (Platform.isAndroid) {
       final android = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       return (await android?.requestNotificationsPermission()) ?? false;
     } else if (Platform.isIOS) {
       final ios = _plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>();
+            IOSFlutterLocalNotificationsPlugin
+          >();
       return (await ios?.requestPermissions(alert: true, sound: true)) ?? false;
     }
     return false;
@@ -92,7 +96,8 @@ class NotificationService {
     await _plugin.zonedSchedule(
       id: _monthlyReminderId,
       title: 'DeduzAí',
-      body: 'Você registrou gastos dedutíveis este mês? '
+      body:
+          'Você registrou gastos dedutíveis este mês? '
           'Não esqueça remédios, consultas e terapia.',
       scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
       notificationDetails: _defaultDetails,
@@ -148,7 +153,8 @@ class NotificationService {
     await _plugin.zonedSchedule(
       id: _irSeasonReminderId,
       title: 'DeduzAí',
-      body: 'A época do IR chegou. Seus gastos de $year estão '
+      body:
+          'A época do IR chegou. Seus gastos de $year estão '
           'organizados. Veja o resumo.',
       scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
       notificationDetails: _defaultDetails,

@@ -3,7 +3,6 @@ import 'package:deduzai/core/domain/models/annual_summary.dart';
 import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/core/domain/models/deduction_caps.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'annual_summary_service.g.dart';
@@ -16,8 +15,11 @@ AnnualSummaryService annualSummaryService(Ref ref) =>
 /// background isolate so the UI thread stays responsive with large datasets.
 AnnualSummary _computeInIsolate((List<Expense>, int, int) args) {
   final (expenses, fiscalYear, dependentCount) = args;
-  return const AnnualSummaryService()
-      .computeSync(expenses, fiscalYear, dependentCount: dependentCount);
+  return const AnnualSummaryService().computeSync(
+    expenses,
+    fiscalYear,
+    dependentCount: dependentCount,
+  );
 }
 
 /// Aggregates a list of [Expense] rows into an [AnnualSummary], applying
@@ -30,8 +32,7 @@ class AnnualSummaryService {
     List<Expense> expenses,
     int fiscalYear, {
     int dependentCount = 0,
-  }) =>
-      compute(_computeInIsolate, (expenses, fiscalYear, dependentCount));
+  }) => compute(_computeInIsolate, (expenses, fiscalYear, dependentCount));
 
   /// Synchronous computation — fine for small datasets (e.g. single month).
   AnnualSummary computeSync(
@@ -39,7 +40,9 @@ class AnnualSummaryService {
     int fiscalYear, {
     int dependentCount = 0,
   }) {
-    final caps = Map<DeductionCategory, int?>.of(DeductionCaps.forYear(fiscalYear));
+    final caps = Map<DeductionCategory, int?>.of(
+      DeductionCaps.forYear(fiscalYear),
+    );
 
     // Multiply education cap by (1 + dependentCount) — each person gets their own cap.
     if (dependentCount > 0) {

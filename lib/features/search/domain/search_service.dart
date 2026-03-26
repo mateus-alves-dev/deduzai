@@ -20,9 +20,9 @@ final _accentPatterns = [
 
 @riverpod
 SearchService searchService(Ref ref) => SearchService(
-      ref.watch(expenseDaoProvider),
-      ref.watch(receiptDaoProvider),
-    );
+  ref.watch(expenseDaoProvider),
+  ref.watch(receiptDaoProvider),
+);
 
 class SearchService {
   const SearchService(this._expenseDao, this._receiptDao);
@@ -42,13 +42,13 @@ class SearchService {
       sort: filter.sortOrder,
     );
 
-    List<Expense> filtered = results;
+    var filtered = results;
 
     if (filter.query.isNotEmpty) {
       final q = normalizeText(filter.query);
       filtered = filtered
           .where(
-            (Expense e) =>
+            (e) =>
                 normalizeText(e.description).contains(q) ||
                 normalizeText(e.beneficiario ?? '').contains(q),
           )
@@ -57,9 +57,9 @@ class SearchService {
 
     if (filter.receiptFilter != SearchReceiptFilter.all) {
       final idsWithReceipt = await _receiptDao.getExpenseIdsWithReceipts(
-        filtered.map((Expense e) => e.id).toList(),
+        filtered.map((e) => e.id).toList(),
       );
-      filtered = filtered.where((Expense e) {
+      filtered = filtered.where((e) {
         final has = idsWithReceipt.contains(e.id);
         return filter.receiptFilter == SearchReceiptFilter.withReceipt
             ? has

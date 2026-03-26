@@ -119,10 +119,10 @@ class RecurringExpenseService {
     required DeductionCategory category,
     required RecurrenceFrequency frequency,
     required DateTime referenceDate,
+    required bool isActive,
     int? dayOfMonth,
     String? beneficiario,
     String? cnpj,
-    required bool isActive,
   }) async {
     await _dao.updateRecurringExpense(
       db.RecurringExpensesCompanion(
@@ -172,7 +172,7 @@ class RecurringExpenseService {
   /// Returns the number of expenses created.
   Future<int> registerAllPending(db.RecurringExpense template) async {
     final today = _today();
-    int count = 0;
+    var count = 0;
     var current = template;
 
     while (!current.nextDueDate.isAfter(today)) {

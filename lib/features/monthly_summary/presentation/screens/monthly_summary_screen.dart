@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/features/monthly_summary/domain/monthly_summary_service.dart';
 import 'package:deduzai/features/monthly_summary/presentation/providers/monthly_summary_providers.dart';
-import 'package:deduzai/features/monthly_summary/presentation/widgets/monthly_breakdown_card.dart';
 import 'package:deduzai/features/monthly_summary/presentation/widgets/month_navigator.dart';
+import 'package:deduzai/features/monthly_summary/presentation/widgets/monthly_breakdown_card.dart';
 import 'package:deduzai/features/monthly_summary/presentation/widgets/pie_chart_widget.dart';
 import 'package:deduzai/features/search/presentation/providers/search_providers.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +15,10 @@ import 'package:intl/intl.dart';
 class MonthlySummaryScreen extends ConsumerWidget {
   const MonthlySummaryScreen({super.key});
 
-  static final _currency =
-      NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
+  static final _currency = NumberFormat.currency(
+    locale: 'pt_BR',
+    symbol: r'R$',
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,8 +89,9 @@ class _SummaryContent extends ConsumerWidget {
                     Text(
                       'Sem dados no mês anterior',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer
-                            .withValues(alpha: 0.7),
+                        color: theme.colorScheme.onPrimaryContainer.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                     ),
                   ],
@@ -129,7 +132,9 @@ class _SummaryContent extends ConsumerWidget {
           for (final cat in summary.categories)
             MonthlyBreakdownCard(
               monthly: cat,
-              ytd: summary.ytdCategories.where((c) => c.category == cat.category).firstOrNull,
+              ytd: summary.ytdCategories
+                  .where((c) => c.category == cat.category)
+                  .firstOrNull,
               onTap: () => _openSearch(context, ref, cat.category),
             ),
       ],
@@ -145,8 +150,9 @@ class _SummaryContent extends ConsumerWidget {
     notifier.clearAll();
     notifier.setCategories([category]);
     notifier.setDateFrom(DateTime(period.year, period.month));
-    notifier.setDateTo(DateTime(period.year, period.month + 1)
-        .subtract(const Duration(days: 1)));
+    notifier.setDateTo(
+      DateTime(period.year, period.month + 1).subtract(const Duration(days: 1)),
+    );
     unawaited(context.push('/search'));
   }
 

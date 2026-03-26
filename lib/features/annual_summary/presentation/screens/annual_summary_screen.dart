@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:deduzai/core/database/providers/database_providers.dart';
 import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/core/domain/models/annual_summary.dart';
+import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:deduzai/features/annual_summary/data/export_service.dart';
 import 'package:deduzai/features/annual_summary/presentation/providers/annual_summary_provider.dart';
 import 'package:deduzai/features/annual_summary/presentation/widgets/category_breakdown_bar.dart';
@@ -12,7 +13,6 @@ import 'package:deduzai/features/annual_summary/presentation/widgets/refund_simu
 import 'package:deduzai/features/annual_summary/presentation/widgets/year_selector.dart';
 import 'package:deduzai/features/dependents/presentation/widgets/dependents_section.dart';
 import 'package:deduzai/features/monthly_summary/presentation/screens/monthly_summary_screen.dart';
-import 'package:deduzai/core/widgets/deduzai_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +49,9 @@ class _AnnualSummaryScreenState extends ConsumerState<AnnualSummaryScreen>
   }
 
   void _recordSummaryAccess(int year) {
-    ref.read(appSettingsDaoProvider).setValue(
+    ref
+        .read(appSettingsDaoProvider)
+        .setValue(
           AppSettingsKeys.summaryLastAccessedYear,
           year.toString(),
         );
@@ -188,8 +190,9 @@ class _SummaryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cappedCategories =
-        summary.categories.where((c) => c.surplusInCents != null).toList();
+    final cappedCategories = summary.categories
+        .where((c) => c.surplusInCents != null)
+        .toList();
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
@@ -237,8 +240,7 @@ class _CapWarningBanner extends StatelessWidget {
       0,
       (sum, s) => sum + (s.surplusInCents ?? 0),
     );
-    final categoryLabels =
-        summaries.map((s) => s.category.label).join(', ');
+    final categoryLabels = summaries.map((s) => s.category.label).join(', ');
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),

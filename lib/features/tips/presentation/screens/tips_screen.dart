@@ -51,11 +51,11 @@ const _sections = <_TipSection>[
         'de cada ano. Quem entrega antes entra nos primeiros lotes de restituição '
         '(pagos de maio a setembro).\n\n'
         'Você é obrigado a declarar se em 2024 teve rendimentos tributáveis '
-        'acima de R\$ 30.639,90, ou bens acima de R\$ 800.000,00, ou receita '
+        r'acima de R$ 30.639,90, ou bens acima de R$ 800.000,00, ou receita '
         'de atividade rural acima de R\$ 153.199,50.\n\n'
         'Prefira o Modelo Completo se tiver muitas despesas dedutíveis — ele '
         'costuma gerar restituição maior. O Modelo Simplificado aplica um '
-        'desconto fixo de 20% (limite R\$ 16.754,34) sem precisar de comprovantes.',
+        r'desconto fixo de 20% (limite R$ 16.754,34) sem precisar de comprovantes.',
   ),
   _TipSection(
     title: 'Saúde',
@@ -89,9 +89,9 @@ const _sections = <_TipSection>[
     title: 'Educação',
     icon: Icons.school_outlined,
     color: AppColors.categoryEducacao,
-    chips: ['Teto: R\$ 3.561,50/ano', 'Por pessoa'],
+    chips: [r'Teto: R$ 3.561,50/ano', 'Por pessoa'],
     body:
-        'O limite de dedução com educação é de R\$ 3.561,50 por pessoa ao ano — '
+        r'O limite de dedução com educação é de R$ 3.561,50 por pessoa ao ano — '
         'tanto para o declarante quanto para dependentes. '
         'O valor não aproveitado não passa para o ano seguinte.\n\n'
         'Para deduzir, guarde o comprovante anual emitido pela instituição de '
@@ -161,9 +161,9 @@ const _sections = <_TipSection>[
     title: 'Dependentes',
     icon: Icons.people_outline,
     color: AppColors.categoryDependentes,
-    chips: ['R\$ 2.275,08 por dependente', 'Gastos também deduzem'],
+    chips: [r'R$ 2.275,08 por dependente', 'Gastos também deduzem'],
     body:
-        'Cada dependente reduz a base de cálculo em R\$ 2.275,08 por ano. '
+        r'Cada dependente reduz a base de cálculo em R$ 2.275,08 por ano. '
         'Além disso, os gastos com saúde e educação do dependente somam às suas '
         'deduções normais.\n\n'
         'Um dependente não pode estar na sua declaração e fazer a própria '
@@ -173,7 +173,7 @@ const _sections = <_TipSection>[
       'Filhos e enteados até 25 anos (universitários ou escola técnica)',
       'Filhos de qualquer idade com deficiência',
       'Cônjuge ou companheiro(a) com união estável',
-      'Pais, avós e bisavós com renda anual ≤ R\$ 24.511,92',
+      r'Pais, avós e bisavós com renda anual ≤ R$ 24.511,92',
       'Menor de 21 anos sob guarda judicial',
       'Irmãos, netos ou bisnetos sob guarda + sem renda própria',
     ],

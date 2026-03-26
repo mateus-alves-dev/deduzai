@@ -4,7 +4,6 @@ import 'package:deduzai/core/domain/models/category.dart';
 import 'package:deduzai/features/expense_entry/data/cnpj_api_service.dart';
 import 'package:deduzai/features/expense_entry/domain/cnae_category_mapper.dart';
 import 'package:deduzai/features/expense_entry/domain/cnpj_lookup_result.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cnpj_categorization_service.g.dart';

@@ -55,8 +55,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           IconButton(
             icon: const Icon(Icons.bookmark_add_outlined),
             tooltip: 'Salvar favorito',
-            onPressed:
-                filter.hasActiveFilters ? () => _saveFavorite(context) : null,
+            onPressed: filter.hasActiveFilters
+                ? () => _saveFavorite(context)
+                : null,
           ),
         ],
       ),
@@ -102,20 +103,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
           // ── Filter panel ──────────────────────────────────────────────────
           if (_showFilters)
-            Expanded(
+            const Expanded(
               flex: 0,
               child: SingleChildScrollView(
-                child: const FilterPanel(),
+                child: FilterPanel(),
               ),
             ),
 
           // ── Results ───────────────────────────────────────────────────────
           Expanded(
             child: resultsAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) =>
-                  Center(child: Text('Erro ao buscar: $e')),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Erro ao buscar: $e')),
               data: (expenses) {
                 if (expenses.isEmpty) {
                   return _EmptyResults(
@@ -169,12 +168,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   String _sortLabel(SearchSortOrder order) => switch (order) {
-        SearchSortOrder.dateDesc => 'Data (mais recente)',
-        SearchSortOrder.dateAsc => 'Data (mais antigo)',
-        SearchSortOrder.amountDesc => 'Valor (maior)',
-        SearchSortOrder.amountAsc => 'Valor (menor)',
-        SearchSortOrder.categoryAz => 'Categoria (A–Z)',
-      };
+    SearchSortOrder.dateDesc => 'Data (mais recente)',
+    SearchSortOrder.dateAsc => 'Data (mais antigo)',
+    SearchSortOrder.amountDesc => 'Valor (maior)',
+    SearchSortOrder.amountAsc => 'Valor (menor)',
+    SearchSortOrder.categoryAz => 'Categoria (A–Z)',
+  };
 
   Future<void> _saveFavorite(BuildContext context) async {
     final filter = ref.read(searchNotifierProvider);
@@ -183,7 +182,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Limite de 10 favoritos atingido. Remova um para continuar.'),
+            content: Text(
+              'Limite de 10 favoritos atingido. Remova um para continuar.',
+            ),
           ),
         );
       }
@@ -226,7 +227,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ? null
         : jsonEncode(filter.categories.map((c) => c.name).toList());
 
-    await ref.read(filterFavoriteDaoProvider).insert(
+    await ref
+        .read(filterFavoriteDaoProvider)
+        .insert(
           FilterFavoritesCompanion.insert(
             id: const Uuid().v4(),
             nome: name,
@@ -286,8 +289,8 @@ class _ResultsList extends StatelessWidget {
           child: Text(
             'Encontrados: ${expenses.length}  •  ${currency.format(total / 100)}',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
         ),
         Expanded(

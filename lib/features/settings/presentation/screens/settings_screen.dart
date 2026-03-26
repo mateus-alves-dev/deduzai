@@ -22,10 +22,8 @@ class SettingsScreen extends ConsumerWidget {
     final timeOfDayAsync = ref.watch(reminderTimeOfDayProvider);
     final themeModeAsync = ref.watch(themeModeProvider);
 
-    final frequency =
-        frequencyAsync.value ?? ReminderFrequency.monthly;
-    final timeOfDay =
-        timeOfDayAsync.value ?? ReminderTimeOfDay.morning;
+    final frequency = frequencyAsync.value ?? ReminderFrequency.monthly;
+    final timeOfDay = timeOfDayAsync.value ?? ReminderTimeOfDay.morning;
     final currentThemeMode = themeModeAsync.value ?? ThemeMode.system;
 
     return Scaffold(
@@ -33,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          _SectionHeader('Notificações'),
+          const _SectionHeader('Notificações'),
           Card(
             margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,
@@ -111,13 +109,10 @@ class SettingsScreen extends ConsumerWidget {
                         icon: const Icon(Icons.bug_report, size: 18),
                         label: const Text('Testar notificação (10s)'),
                         onPressed: () async {
-                          final service =
-                              ref.read(notificationServiceProvider);
-                          final hasPermission =
-                              await service.checkPermission();
+                          final service = ref.read(notificationServiceProvider);
+                          final hasPermission = await service.checkPermission();
                           if (!hasPermission) {
-                            final granted =
-                                await service.requestPermission();
+                            final granted = await service.requestPermission();
                             if (!granted && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -130,8 +125,7 @@ class SettingsScreen extends ConsumerWidget {
                             }
                           }
                           await service.scheduleMonthlyReminder(
-                            DateTime.now()
-                                .add(const Duration(seconds: 10)),
+                            DateTime.now().add(const Duration(seconds: 10)),
                           );
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -153,8 +147,7 @@ class SettingsScreen extends ConsumerWidget {
                     Text(
                       'Horário',
                       style: AppTextStyles.labelMedium.copyWith(
-                        color:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
@@ -196,7 +189,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          _SectionHeader('Aparência'),
+          const _SectionHeader('Aparência'),
           Card(
             margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,
@@ -265,7 +258,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          _SectionHeader('Automação'),
+          const _SectionHeader('Automação'),
           Card(
             margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,
@@ -282,7 +275,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          _SectionHeader('Dados'),
+          const _SectionHeader('Dados'),
           Card(
             margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,

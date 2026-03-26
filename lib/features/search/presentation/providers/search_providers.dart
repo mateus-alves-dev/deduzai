@@ -15,8 +15,9 @@ final filterFavoritesProvider = StreamProvider<List<FilterFavorite>>(
 
 // ── Active filter state ───────────────────────────────────────────────────────
 
-final searchNotifierProvider =
-    NotifierProvider<SearchNotifier, SearchFilter>(SearchNotifier.new);
+final searchNotifierProvider = NotifierProvider<SearchNotifier, SearchFilter>(
+  SearchNotifier.new,
+);
 
 class SearchNotifier extends Notifier<SearchFilter> {
   Timer? _debounce;
@@ -62,13 +63,13 @@ class SearchNotifier extends Notifier<SearchFilter> {
       receiptFilter: fav.comComprovante == null
           ? SearchReceiptFilter.all
           : fav.comComprovante!
-              ? SearchReceiptFilter.withReceipt
-              : SearchReceiptFilter.withoutReceipt,
+          ? SearchReceiptFilter.withReceipt
+          : SearchReceiptFilter.withoutReceipt,
     );
   }
 
   static List<DeductionCategory> _parseCats(String json) {
-    final cleaned = json.replaceAll(RegExp('[\\[\\]"]'), '').trim();
+    final cleaned = json.replaceAll(RegExp(r'[\[\]"]'), '').trim();
     if (cleaned.isEmpty) return [];
     return cleaned
         .split(',')
@@ -86,7 +87,8 @@ class SearchNotifier extends Notifier<SearchFilter> {
 
 // ── Search results (recomputes on filter change) ─────────────────────────────
 
-final searchResultsProvider = FutureProvider.autoDispose<List<Expense>>((ref) {
-  final filter = ref.watch(searchNotifierProvider);
-  return ref.read(searchServiceProvider).searchExpenses(filter);
-});
+final FutureProvider<List<Expense>> searchResultsProvider =
+    FutureProvider.autoDispose<List<Expense>>((ref) {
+      final filter = ref.watch(searchNotifierProvider);
+      return ref.read(searchServiceProvider).searchExpenses(filter);
+    });

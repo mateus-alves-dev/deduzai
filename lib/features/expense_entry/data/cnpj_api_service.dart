@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:deduzai/core/domain/models/cnpj_info.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cnpj_api_service.g.dart';
 

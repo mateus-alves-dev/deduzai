@@ -4,17 +4,16 @@ import 'package:deduzai/core/database/providers/database_providers.dart';
 import 'package:deduzai/core/database/tables/app_settings_table.dart';
 import 'package:deduzai/features/notifications/data/notification_service.dart';
 import 'package:deduzai/features/notifications/domain/business_day_helper.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notification_scheduler.g.dart';
 
 @riverpod
 NotificationScheduler notificationScheduler(Ref ref) => NotificationScheduler(
-      ref.watch(notificationServiceProvider),
-      ref.watch(appSettingsDaoProvider),
-      ref.watch(expenseDaoProvider),
-    );
+  ref.watch(notificationServiceProvider),
+  ref.watch(appSettingsDaoProvider),
+  ref.watch(expenseDaoProvider),
+);
 
 class NotificationScheduler {
   NotificationScheduler(this._service, this._settings, this._expenseDao);
@@ -48,10 +47,16 @@ class NotificationScheduler {
         // Pre-schedule next month if current trigger has passed
         final nextMonth = now.month == 12 ? 1 : now.month + 1;
         final nextYear = now.month == 12 ? now.year + 1 : now.year;
-        final currentTrigger =
-            BusinessDayHelper.monthlyReminderTrigger(now.year, now.month, hour);
-        final nextTrigger =
-            BusinessDayHelper.monthlyReminderTrigger(nextYear, nextMonth, hour);
+        final currentTrigger = BusinessDayHelper.monthlyReminderTrigger(
+          now.year,
+          now.month,
+          hour,
+        );
+        final nextTrigger = BusinessDayHelper.monthlyReminderTrigger(
+          nextYear,
+          nextMonth,
+          hour,
+        );
         if (now.isAfter(currentTrigger) && nextTrigger.isAfter(now)) {
           await _service.scheduleMonthlyReminder(nextTrigger);
         }
@@ -64,8 +69,7 @@ class NotificationScheduler {
     int month,
     int hour,
   ) async {
-    final trigger =
-        BusinessDayHelper.monthlyReminderTrigger(year, month, hour);
+    final trigger = BusinessDayHelper.monthlyReminderTrigger(year, month, hour);
 
     if (trigger.isAfter(now)) {
       await _service.scheduleMonthlyReminder(trigger);
@@ -100,9 +104,12 @@ class NotificationScheduler {
       );
     }
     // Backwards compat: migrate from old monthlyReminderEnabled key.
-    final legacy =
-        await _settings.getValue(AppSettingsKeys.monthlyReminderEnabled);
-    return legacy == 'false' ? ReminderFrequency.none : ReminderFrequency.monthly;
+    final legacy = await _settings.getValue(
+      AppSettingsKeys.monthlyReminderEnabled,
+    );
+    return legacy == 'false'
+        ? ReminderFrequency.none
+        : ReminderFrequency.monthly;
   }
 
   Future<ReminderTimeOfDay> _readTimeOfDay() async {
@@ -119,8 +126,9 @@ class NotificationScheduler {
     if (now.month != 3) return; // Only relevant in March.
 
     final lastYear = now.year - 1;
-    final accessedYearRaw =
-        await _settings.getValue(AppSettingsKeys.summaryLastAccessedYear);
+    final accessedYearRaw = await _settings.getValue(
+      AppSettingsKeys.summaryLastAccessedYear,
+    );
 
     if (accessedYearRaw == lastYear.toString()) {
       await _service.cancelIrSeasonReminder();

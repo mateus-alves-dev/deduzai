@@ -6,7 +6,6 @@ import 'package:deduzai/core/database/daos/expense_dao.dart';
 import 'package:deduzai/core/database/daos/filter_favorite_dao.dart';
 import 'package:deduzai/core/database/daos/receipt_dao.dart';
 import 'package:deduzai/core/database/daos/recurring_expense_dao.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'database_providers.g.dart';

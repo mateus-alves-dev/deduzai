@@ -7,7 +7,7 @@ void main() {
   const service = AnnualSummaryService();
   const year = 2025;
 
-  Expense _makeExpense({
+  Expense makeExpense({
     required String category,
     required int amountInCents,
     DateTime? date,
@@ -21,21 +21,16 @@ void main() {
       description: 'Test expense',
       origem: 'MANUAL',
       createdAt: now,
-      updatedAt: null,
-      deletedAt: null,
-      receiptPath: null,
-      beneficiario: null,
-      cnpj: null,
     );
   }
 
   group('AnnualSummaryService with dependents', () {
     test('zero dependents — no dependent deduction', () {
       final expenses = [
-        _makeExpense(category: 'saude', amountInCents: 100000),
+        makeExpense(category: 'saude', amountInCents: 100000),
       ];
 
-      final result = service.computeSync(expenses, year, dependentCount: 0);
+      final result = service.computeSync(expenses, year);
 
       expect(result.dependentCount, 0);
       expect(result.dependentDeductionInCents, 0);
@@ -44,7 +39,7 @@ void main() {
 
     test('one dependent — adds fixed deduction', () {
       final expenses = [
-        _makeExpense(category: 'saude', amountInCents: 100000),
+        makeExpense(category: 'saude', amountInCents: 100000),
       ];
 
       final result = service.computeSync(expenses, year, dependentCount: 1);
@@ -57,7 +52,7 @@ void main() {
 
     test('three dependents — multiplied deduction', () {
       final expenses = [
-        _makeExpense(category: 'saude', amountInCents: 50000),
+        makeExpense(category: 'saude', amountInCents: 50000),
       ];
 
       final result = service.computeSync(expenses, year, dependentCount: 3);
@@ -88,26 +83,26 @@ void main() {
       // Education cap for 2025 is R$ 3.561,50 = 356150 centavos.
       // With 2 dependents, cap should be 356150 * 3 = 1068450.
       final expenses = [
-        _makeExpense(
+        makeExpense(
           category: 'educacao',
           amountInCents: 900000, // R$ 9.000
         ),
       ];
 
-      final withoutDeps =
-          service.computeSync(expenses, year, dependentCount: 0);
-      final withDeps =
-          service.computeSync(expenses, year, dependentCount: 2);
+      final withoutDeps = service.computeSync(expenses, year);
+      final withDeps = service.computeSync(expenses, year, dependentCount: 2);
 
       // Without dependents: capped at 356150
-      final educWithout = withoutDeps.categories
-          .firstWhere((c) => c.category.name == 'educacao');
+      final educWithout = withoutDeps.categories.firstWhere(
+        (c) => c.category.name == 'educacao',
+      );
       expect(educWithout.deductibleInCents, 356150);
       expect(educWithout.surplusInCents, 900000 - 356150);
 
       // With 2 dependents: cap is 356150 * 3 = 1068450
-      final educWith = withDeps.categories
-          .firstWhere((c) => c.category.name == 'educacao');
+      final educWith = withDeps.categories.firstWhere(
+        (c) => c.category.name == 'educacao',
+      );
       expect(educWith.capInCents, 356150 * 3);
       expect(educWith.deductibleInCents, 900000); // under new cap
       expect(educWith.surplusInCents, null); // no surplus
@@ -116,18 +111,18 @@ void main() {
     test('education cap exceeded even with dependents', () {
       // R$ 15.000 should exceed cap even with 2 deps (cap = 356150 * 3)
       final expenses = [
-        _makeExpense(
+        makeExpense(
           category: 'educacao',
           amountInCents: 1500000,
         ),
       ];
 
-      final result =
-          service.computeSync(expenses, year, dependentCount: 2);
+      final result = service.computeSync(expenses, year, dependentCount: 2);
 
-      final educ = result.categories
-          .firstWhere((c) => c.category.name == 'educacao');
-      final expectedCap = 356150 * 3;
+      final educ = result.categories.firstWhere(
+        (c) => c.category.name == 'educacao',
+      );
+      const expectedCap = 356150 * 3;
       expect(educ.capInCents, expectedCap);
       expect(educ.deductibleInCents, expectedCap);
       expect(educ.surplusInCents, 1500000 - expectedCap);
